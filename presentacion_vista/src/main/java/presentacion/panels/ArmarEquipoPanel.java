@@ -6,6 +6,6 @@ import java.awt.*;
 public class ArmarEquipoPanel extends JPanel{
 
     public ArmarEquipoPanel(){
-        setBackground(Color.BLACK);
+
     }
 }
