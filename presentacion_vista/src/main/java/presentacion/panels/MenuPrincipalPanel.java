@@ -2,13 +2,12 @@ package presentacion.panels;
 
 import javax.swing.*;
 
-public class MenuPrincipalPanel extends JPanel {
-    private JButton boton1;
+public class MenuPrincipalPanel extends PanelBase {
+    private BarraNavegacion barraNavegacion;
 
     public MenuPrincipalPanel(){
-        boton1 = new JButton("Boton");
+        super();
 
-        add(boton1);
     }
 
 
