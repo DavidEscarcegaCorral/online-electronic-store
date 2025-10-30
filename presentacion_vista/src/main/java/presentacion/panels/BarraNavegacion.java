@@ -1,13 +1,17 @@
 package presentacion.panels;
 
+import controlPresentacionVista.ControlDeNavegacion;
 import estilos.Estilos;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class BarraNavegacion extends JPanel {
     private JPanel panelSup;
     private JPanel panelInf;
+
     private JLabel armarPcLbl;
     private JLabel pedidosLbl;
     private JLabel carritoLbl;
@@ -83,6 +87,12 @@ public class BarraNavegacion extends JPanel {
         accesoriosLbl.setFont(font);
         accesoriosLbl.setForeground(Color.white);
 
+        Cursor cursorMano = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        armarPcLbl.setCursor(cursorMano);
+        pedidosLbl.setCursor(cursorMano);
+        carritoLbl.setCursor(cursorMano);
+        cuentaLbl.setCursor(cursorMano);
+
         //Menu superior
         panelSup.add(armarPcLbl);
         panelSup.add(pedidosLbl);
@@ -99,7 +109,41 @@ public class BarraNavegacion extends JPanel {
         add(panelSup);
         add(panelInf);
 
-
     }
 
+    public JLabel getArmarPcLbl() {
+        return armarPcLbl;
+    }
+
+    public JLabel getPedidosLbl() {
+        return pedidosLbl;
+    }
+
+    public JLabel getCarritoLbl() {
+        return carritoLbl;
+    }
+
+    public JLabel getCuentaLbl() {
+        return cuentaLbl;
+    }
+
+    public JLabel getEquiposLbl() {
+        return equiposLbl;
+    }
+
+    public JLabel getComponentesLbl() {
+        return componentesLbl;
+    }
+
+    public JLabel getAlmacenamientoLbl() {
+        return almacenamientoLbl;
+    }
+
+    public JLabel getRedesLbl() {
+        return redesLbl;
+    }
+
+    public JLabel getAccesoriosLbl() {
+        return accesoriosLbl;
+    }
 }

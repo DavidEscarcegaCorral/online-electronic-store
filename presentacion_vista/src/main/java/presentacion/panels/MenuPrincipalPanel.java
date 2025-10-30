@@ -7,6 +7,7 @@ public class MenuPrincipalPanel extends PanelBase {
 
     public MenuPrincipalPanel(){
         super();
+        add(new JLabel("PANELLLLLLL"));
 
     }
 
