@@ -3,7 +3,6 @@ package presentacion.frames;
 import estilos.Estilos;
 import presentacion.panels.BarraNavegacion;
 
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -18,11 +17,10 @@ public class FramePrincipal extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         barraNavegacion = new BarraNavegacion();
+        panelContenido = new JPanel();
 
-
-        //Añadir componentes
+        // Añadir componentes
         add(barraNavegacion,  BorderLayout.NORTH);
-
     }
 
     public BarraNavegacion getBarraNavegacion() {
@@ -31,6 +29,7 @@ public class FramePrincipal extends JFrame {
 
     public void setPanelContenido(JPanel panelContenido){
         this.panelContenido = panelContenido;
+        add(panelContenido, BorderLayout.CENTER);
     }
 
     public JPanel getPanelContenido(){

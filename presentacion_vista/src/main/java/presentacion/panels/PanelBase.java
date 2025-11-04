@@ -2,6 +2,7 @@ package presentacion.panels;
 
 import estilos.Boton;
 import estilos.Estilos;
+import estilos.TituloLabel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,8 @@ public class PanelBase extends JPanel {
     protected JPanel panelSur;
     protected JPanel panelEste;
     protected JPanel panelOeste;
+    protected JButton atrasBtn;
+    protected TituloLabel tituloLabel;
 
     protected Boton boton;
 
@@ -27,4 +30,5 @@ public class PanelBase extends JPanel {
         add(panelCentro);
 
     }
+
 }

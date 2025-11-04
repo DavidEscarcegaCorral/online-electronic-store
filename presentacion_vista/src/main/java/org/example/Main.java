@@ -7,7 +7,6 @@ public class Main {
     public static void main(String[] args) {
         FramePrincipal framePrincipal = new  FramePrincipal();
         ControlDeNavegacion controlDeNavegacion  = new ControlDeNavegacion(framePrincipal);
-
         framePrincipal.setVisible(true);
     }
 }
