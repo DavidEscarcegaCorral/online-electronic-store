@@ -17,7 +17,6 @@ public class FramePrincipal extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         barraNavegacion = new BarraNavegacion();
-        panelContenido = new JPanel();
 
         // Añadir componentes
         add(barraNavegacion,  BorderLayout.NORTH);
@@ -27,9 +26,17 @@ public class FramePrincipal extends JFrame {
         return barraNavegacion;
     }
 
-    public void setPanelContenido(JPanel panelContenido){
+    public void setPanelContenido(JPanel panelContenido) {
+        if (this.panelContenido != null) {
+            getContentPane().remove(this.panelContenido);
+        }
+
         this.panelContenido = panelContenido;
-        add(panelContenido, BorderLayout.CENTER);
+
+        getContentPane().add(this.panelContenido, BorderLayout.CENTER);
+
+        getContentPane().revalidate();
+        getContentPane().repaint();
     }
 
     public JPanel getPanelContenido(){
