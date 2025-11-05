@@ -1,12 +1,22 @@
 package presentacion.panels;
 
+import estilos.Boton;
+import estilos.Estilos;
+import estilos.TituloLabel;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class PanelBase extends JPanel {
     protected JPanel panelNorte;
     protected JPanel panelCentro;
-    protected BarraNavegacion barraNavegacion;
+    protected JPanel panelSur;
+    protected JPanel panelEste;
+    protected JPanel panelOeste;
+    protected JButton atrasBtn;
+    protected TituloLabel tituloLabel;
+
+    protected Boton boton;
 
     public PanelBase() {
         setOpaque(false);
@@ -15,12 +25,10 @@ public class PanelBase extends JPanel {
         panelNorte.setOpaque(false);
         panelCentro = new JPanel();
         panelCentro.setOpaque(false);
-        barraNavegacion = new BarraNavegacion();
 
-        //Panel norte
-        panelNorte.setPreferredSize(new Dimension(950, 200));
-        panelNorte.add(barraNavegacion);
         add(panelNorte);
+        add(panelCentro);
 
     }
+
 }
