@@ -44,10 +44,6 @@ public class ControlDeNavegacion {
     }
 
     public void mostrarNuevoPanel(JPanel nuevoPanel){
-        framePrincipal.getPanelContenido().removeAll();
         framePrincipal.setPanelContenido(nuevoPanel);
-        framePrincipal.revalidate();
-        framePrincipal.repaint();
-
     }
 }
