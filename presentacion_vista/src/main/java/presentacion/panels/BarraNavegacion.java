@@ -1,6 +1,8 @@
 package presentacion.panels;
 
 import controlPresentacionVista.ControlDeNavegacion;
+import estilos.Boton;
+import estilos.BotonHighSpecs;
 import estilos.Estilos;
 
 import javax.swing.*;
@@ -12,6 +14,7 @@ public class BarraNavegacion extends JPanel {
     private JPanel panelSup;
     private JPanel panelInf;
 
+    private BotonHighSpecs boton;
     private JLabel armarPcLbl;
     private JLabel pedidosLbl;
     private JLabel carritoLbl;
@@ -58,6 +61,7 @@ public class BarraNavegacion extends JPanel {
         panelInf.setLayout(new FlowLayout(FlowLayout.CENTER, 60, 8));
         panelInf.setOpaque(false);
 
+        boton = new BotonHighSpecs();
         armarPcLbl = new JLabel("Armar Pc");
         armarPcLbl.setFont(font);
         armarPcLbl.setForeground(Color.white);
@@ -92,6 +96,8 @@ public class BarraNavegacion extends JPanel {
         pedidosLbl.setCursor(cursorMano);
         carritoLbl.setCursor(cursorMano);
         cuentaLbl.setCursor(cursorMano);
+
+        add(boton);
 
         //Menu superior
         panelSup.add(armarPcLbl);

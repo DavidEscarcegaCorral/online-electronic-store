@@ -7,7 +7,7 @@ public class MenuPrincipalPanel extends PanelBase {
     private JPanel masVendidosPanel;
     private JPanel ofertasPanel;
 
-    public MenuPrincipalPanel(){
+    public MenuPrincipalPanel() {
         super();
 
 

@@ -1,23 +1,23 @@
 package controlPresentacionVista;
 
 import presentacion.frames.FramePrincipal;
-import presentacion.panels.ArmarEquipoPanel;
-import presentacion.panels.BarraNavegacion;
-import presentacion.panels.CarritoPanel;
-import presentacion.panels.MenuPrincipalPanel;
+import presentacion.panels.*;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ControlDeNavegacion {
-    public FramePrincipal framePrincipal;
-    public MenuPrincipalPanel  menuPrincipalPanel;
-    public ArmarEquipoPanel armarEquipoPantalla;
-    public CarritoPanel carritoPantalla;
+    private FramePrincipal framePrincipal;
+    private MenuPrincipalPanel  menuPrincipalPanel;
+    private ArmarEquipoPanel armarEquipoPantalla;
+    private CarritoPanel carritoPantalla;
+    private PanelBase panelBase;
+    private JPanel panelAnterior;
 
     public ControlDeNavegacion(FramePrincipal framePrincipal){
        this.framePrincipal = framePrincipal;
+       panelBase = new PanelBase();
        menuPrincipalPanel = new MenuPrincipalPanel();
        armarEquipoPantalla = new ArmarEquipoPanel();
        carritoPantalla =  new CarritoPanel();
@@ -32,6 +32,7 @@ public class ControlDeNavegacion {
             @Override
             public void mouseClicked(MouseEvent e) {
                 mostrarNuevoPanel(armarEquipoPantalla);
+                panelBase = armarEquipoPantalla;
             }
         });
 
@@ -41,6 +42,7 @@ public class ControlDeNavegacion {
                 mostrarNuevoPanel(carritoPantalla);
             }
         });
+
     }
 
     public void mostrarNuevoPanel(JPanel nuevoPanel){

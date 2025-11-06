@@ -19,7 +19,7 @@ public class FramePrincipal extends JFrame {
         barraNavegacion = new BarraNavegacion();
 
         // Añadir componentes
-        add(barraNavegacion,  BorderLayout.NORTH);
+        add(barraNavegacion, BorderLayout.NORTH);
     }
 
     public BarraNavegacion getBarraNavegacion() {
@@ -32,15 +32,13 @@ public class FramePrincipal extends JFrame {
         }
 
         this.panelContenido = panelContenido;
-
         getContentPane().add(this.panelContenido, BorderLayout.CENTER);
-
         getContentPane().revalidate();
         getContentPane().repaint();
     }
 
-    public JPanel getPanelContenido(){
-        return  panelContenido;
+    public JPanel getPanelContenido() {
+        return panelContenido;
     }
 
 

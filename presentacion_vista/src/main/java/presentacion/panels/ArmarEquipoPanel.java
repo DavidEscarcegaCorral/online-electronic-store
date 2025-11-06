@@ -1,23 +1,25 @@
 package presentacion.panels;
 
+import estilos.Boton;
 import estilos.Estilos;
 import estilos.TituloLabel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ArmarEquipoPanel extends PanelBase{
+public class ArmarEquipoPanel extends PanelBase {
     private static String titulo = "Aramr Equipo";
     private JLabel subTItuloLabel;
     private JPanel categoriaPanel;
+    private Boton continuarBtn;
 
-    public ArmarEquipoPanel(){
+    public ArmarEquipoPanel() {
         super();
         tituloLabel = new TituloLabel(titulo);
         subTItuloLabel = new JLabel("Categoria");
         subTItuloLabel.setForeground(Color.white);
         subTItuloLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        categoriaPanel = new JPanel(){
+        categoriaPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -29,14 +31,20 @@ public class ArmarEquipoPanel extends PanelBase{
                 g2d.dispose();
             }
         };
-        // Panel NORTE
+        continuarBtn = new Boton("Continuar", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
+
+        // Panel Norte
         panelNorte.add(tituloLabel);
 
         // panel Categoria
         categoriaPanel.setOpaque(false);
         categoriaPanel.add(subTItuloLabel);
 
-        // Añadir las componentes
-        add(categoriaPanel);
+        // Panel Centro
+        panelCentro.add(categoriaPanel);
+
+        // Panel Sur
+        panelSur.add(continuarBtn);
+
     }
 }
