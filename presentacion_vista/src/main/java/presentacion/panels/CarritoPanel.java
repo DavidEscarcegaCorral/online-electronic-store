@@ -7,9 +7,11 @@ import javax.swing.*;
 public class CarritoPanel extends PanelBase {
     private static String titulo = "Carrito";
 
-    public CarritoPanel(){
+    public CarritoPanel() {
         super();
         tituloLabel = new TituloLabel(titulo);
+
+        // Panel Norte
         panelNorte.add(tituloLabel);
     }
 
