@@ -1,15 +1,23 @@
 package presentacion.panels;
 
+import estilos.FontUtil;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MenuPrincipalPanel extends PanelBase {
+    private static String titulo = "Menu Principal";
+    private JLabel tituloLbl;
     private JPanel masVendidosPanel;
     private JPanel ofertasPanel;
 
-    public MenuPrincipalPanel(){
+    public MenuPrincipalPanel() {
         super();
+        tituloLbl = new JLabel(titulo);
+        tituloLbl.setFont(FontUtil.loadFont(28, "Inter_SemiBold"));
+        tituloLbl.setForeground(Color.white);
 
+        panelNorte.add(tituloLbl);
 
     }
 

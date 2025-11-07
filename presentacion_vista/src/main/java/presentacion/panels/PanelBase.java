@@ -13,22 +13,77 @@ public class PanelBase extends JPanel {
     protected JPanel panelSur;
     protected JPanel panelEste;
     protected JPanel panelOeste;
-    protected JButton atrasBtn;
+    protected Boton atrasBtn;
     protected TituloLabel tituloLabel;
 
     protected Boton boton;
 
     public PanelBase() {
         setOpaque(false);
+        setLayout(new BorderLayout());
+//        atrasBtn = new Boton("←", 50, 50, 15, 25, Color.white, Estilos.COLOR_ATRAS_BOTON, Estilos.COLOR_ATRAS_BOTON_HOOVER);
 
         panelNorte = new JPanel();
         panelNorte.setOpaque(false);
         panelCentro = new JPanel();
         panelCentro.setOpaque(false);
+        panelSur = new JPanel();
+        panelSur.setOpaque(false);
+        panelEste = new JPanel();
+        panelEste.setOpaque(false);
+        panelOeste = new JPanel();
+        panelOeste.setOpaque(false);
 
-        add(panelNorte);
-        add(panelCentro);
+        add(panelNorte,  BorderLayout.NORTH);
+        add(panelCentro,   BorderLayout.CENTER);
+        add(panelSur,    BorderLayout.SOUTH);
+        add(panelEste,    BorderLayout.EAST);
+        add(panelOeste,    BorderLayout.WEST);
 
+    }
+
+    public JPanel getPanelNorte() {
+        return panelNorte;
+    }
+
+    public void setPanelNorte(JPanel panelNorte) {
+        this.panelNorte = panelNorte;
+    }
+
+    public JPanel getPanelCentro() {
+        return panelCentro;
+    }
+
+    public void setPanelCentro(JPanel panelCentro) {
+        this.panelCentro = panelCentro;
+    }
+
+    public JPanel getPanelSur() {
+        return panelSur;
+    }
+
+    public void setPanelSur(JPanel panelSur) {
+        this.panelSur = panelSur;
+    }
+
+    public JPanel getPanelEste() {
+        return panelEste;
+    }
+
+    public void setPanelEste(JPanel panelEste) {
+        this.panelEste = panelEste;
+    }
+
+    public JPanel getPanelOeste() {
+        return panelOeste;
+    }
+
+    public void setPanelOeste(JPanel panelOeste) {
+        this.panelOeste = panelOeste;
+    }
+
+    public Boton getAtrasBtn() {
+        return atrasBtn;
     }
 
 }
