@@ -1,14 +1,15 @@
-package presentacion.panels;
+package presentacion.panels.armarpc;
 
 import estilos.Boton;
 import estilos.Estilos;
 import estilos.FontUtil;
 import estilos.TituloLabel;
+import presentacion.panels.PanelBase;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ArmarEquipoPanel extends PanelBase {
+public class ArmarPcPanel extends PanelBase {
     private static String titulo = "Armar PC";
     private JLabel tituloLbl;
     private TituloLabel subTItuloLabel;
@@ -19,7 +20,7 @@ public class ArmarEquipoPanel extends PanelBase {
     private CategoriaPanel categoriaPanelCustom;
     private Boton continuarBtn;
 
-    public ArmarEquipoPanel() {
+    public ArmarPcPanel() {
         super();
         tituloLbl = new JLabel(titulo);
         tituloLbl.setFont(FontUtil.loadFont(28, "Inter_SemiBold"));
@@ -43,12 +44,14 @@ public class ArmarEquipoPanel extends PanelBase {
                 g2d.dispose();
             }
         };
+        categoriasPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
 
         // Boton
         continuarBtn = new Boton("Continuar", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
 
         // Panel Norte
         panelNorte.add(tituloLbl);
+        panelNorte.add(subTItuloLabel);
 
         // panel Categoria
         categoriasPanel.add(categoriaPanelGamer);
@@ -58,11 +61,14 @@ public class ArmarEquipoPanel extends PanelBase {
         categoriasPanel.setOpaque(false);
 
         // Panel Centro
-        panelCentro.add(subTItuloLabel);
         panelCentro.add(categoriasPanel);
 
         // Panel Sur
         panelSur.add(continuarBtn);
 
+    }
+
+    public Boton getContinuarBtn() {
+        return continuarBtn;
     }
 }

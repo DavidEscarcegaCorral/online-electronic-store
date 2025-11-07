@@ -118,6 +118,10 @@ public class BarraNavegacion extends JPanel {
 
     }
 
+    public BotonHighSpecs getBoton() {
+        return boton;
+    }
+
     public JLabel getArmarPcLbl() {
         return armarPcLbl;
     }

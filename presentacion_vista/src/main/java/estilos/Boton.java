@@ -23,7 +23,7 @@ public class Boton extends JButton {
         this.colorBtn = colorBtn;
         this.colorHover = colorHover;
 
-        setFont(FontUtil.loadFont(fontSize, "Inter_Medium"));
+        setFont(FontUtil.loadFont(fontSize, "Inter_SemiBold"));
         setForeground(this.colorText);
         setFocusPainted(false);
         setContentAreaFilled(false);

@@ -1,4 +1,4 @@
-package presentacion.panels;
+package presentacion.panels.armarpc;
 
 import javax.swing.*;
 import java.awt.*;

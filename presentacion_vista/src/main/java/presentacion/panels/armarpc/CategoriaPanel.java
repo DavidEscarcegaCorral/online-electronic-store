@@ -1,4 +1,4 @@
-package presentacion.panels;
+package presentacion.panels.armarpc;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +22,7 @@ public class CategoriaPanel extends JPanel {
 
     }
 
-    private void initComponents(){
+    private void initComponents() {
         setOpaque(false);
         setPreferredSize(new Dimension(120, 170));
         setMaximumSize(new Dimension(120, 170));
@@ -50,13 +50,13 @@ public class CategoriaPanel extends JPanel {
 
     }
 
-    private void cargarImagen(String path){
+    private void cargarImagen(String path) {
         try {
             ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
             Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(200, -1, Image.SCALE_SMOOTH);
+            Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
             imagenCategoriaLbl.setIcon(new ImageIcon(scaledImage));
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Error al cargar la imagen para " + nombreCategoria + ": " + path);
             imagenCategoriaLbl.setText("No Image");
             imagenCategoriaLbl.setIcon(null);
