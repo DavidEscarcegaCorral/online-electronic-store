@@ -4,6 +4,7 @@ import controlPresentacionVista.ControlDeNavegacion;
 import estilos.Boton;
 import estilos.BotonHighSpecs;
 import estilos.Estilos;
+import estilos.FontUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,9 +27,9 @@ public class BarraNavegacion extends JPanel {
     private JLabel accesoriosLbl;
 
     public BarraNavegacion() {
-        setPreferredSize(new Dimension(950, 200));
+        setPreferredSize(new Dimension(900, 130));
         setOpaque(false);
-        Font font = new Font("Arial", Font.PLAIN, 16);
+        Font font = FontUtil.loadFont(18, "IBMPlexSans-Regular");
 
         panelSup = new JPanel() {
             @Override
@@ -37,13 +38,12 @@ public class BarraNavegacion extends JPanel {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setColor(Estilos.COLOR_NAV_SUP);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
                 g2d.dispose();
             }
         };
         panelSup.setLayout(new FlowLayout(FlowLayout.CENTER, 70, 8));
-        panelSup.setMaximumSize(new Dimension(200, 40));
         panelSup.setOpaque(false);
 
         panelInf = new JPanel() {
@@ -53,12 +53,13 @@ public class BarraNavegacion extends JPanel {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setColor(Estilos.COLOR_NAV_INF);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
                 g2d.dispose();
             }
         };
         panelInf.setLayout(new FlowLayout(FlowLayout.CENTER, 60, 8));
+        panelInf.setPreferredSize(new Dimension(900, 40));
         panelInf.setOpaque(false);
 
         boton = new BotonHighSpecs();
@@ -115,6 +116,10 @@ public class BarraNavegacion extends JPanel {
         add(panelSup);
         add(panelInf);
 
+    }
+
+    public BotonHighSpecs getBoton() {
+        return boton;
     }
 
     public JLabel getArmarPcLbl() {

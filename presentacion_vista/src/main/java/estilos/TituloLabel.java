@@ -8,11 +8,15 @@ public class TituloLabel extends JLabel {
 
     public TituloLabel(String titulo){
         setText(titulo);
-        setFont(FontUtil.loadFont( 18, "Inter_SemiBold"));
+        setFont(FontUtil.loadFont( 24, "IBMPlexMono-Regular"));
         setForeground(Color.white);
         setHorizontalAlignment(JLabel.CENTER);
         setOpaque(false);
         setPreferredSize(new Dimension(230, 40));
+    }
+
+    public void setTitulo(String titulo){
+        setText(titulo);
     }
 
     @Override
