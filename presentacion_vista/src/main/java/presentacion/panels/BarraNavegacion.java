@@ -38,7 +38,7 @@ public class BarraNavegacion extends JPanel {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setColor(Estilos.COLOR_NAV_SUP);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
                 g2d.dispose();
             }
@@ -53,7 +53,7 @@ public class BarraNavegacion extends JPanel {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setColor(Estilos.COLOR_NAV_INF);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
                 g2d.dispose();
             }

@@ -11,13 +11,12 @@ import java.awt.*;
 
 public class ArmarPcPanel extends PanelBase {
     private static String titulo = "Armar PC";
+    private CategoriasPanel categoriasPanel;
+    private MarcaProcesadorPanel marcasPanel;
+
     private JLabel tituloLbl;
     private TituloLabel subTItuloLabel;
-    private JPanel categoriasPanel;
-    private CategoriaPanel categoriaPanelGamer;
-    private CategoriaPanel categoriaPanelOffice;
-    private CategoriaPanel categoriaPanelDesing;
-    private CategoriaPanel categoriaPanelCustom;
+
     private Boton continuarBtn;
 
     public ArmarPcPanel() {
@@ -27,24 +26,9 @@ public class ArmarPcPanel extends PanelBase {
         tituloLbl.setForeground(Color.white);
         subTItuloLabel = new TituloLabel("CATEGORIAS");
         subTItuloLabel.setForeground(Color.white);
-        categoriaPanelGamer = new CategoriaPanel("GAMER", "/img/categorias/gamer.png");
-        categoriaPanelOffice = new CategoriaPanel("OFFICE", "/img/categorias/oficina.png");
-        categoriaPanelDesing = new CategoriaPanel("DESING", "/img/categorias/desing.png");
-        categoriaPanelCustom  = new CategoriaPanel("CUSTOM", "/img/categorias/custom.png");
 
-        categoriasPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Estilos.COLOR_NAV_INF);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-
-                g2d.dispose();
-            }
-        };
-        categoriasPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        categoriasPanel = new CategoriasPanel();
+        marcasPanel = new MarcaProcesadorPanel();
 
         // Boton
         continuarBtn = new Boton("Continuar", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
@@ -52,13 +36,6 @@ public class ArmarPcPanel extends PanelBase {
         // Panel Norte
         panelNorte.add(tituloLbl);
         panelNorte.add(subTItuloLabel);
-
-        // panel Categoria
-        categoriasPanel.add(categoriaPanelGamer);
-        categoriasPanel.add(categoriaPanelOffice);
-        categoriasPanel.add(categoriaPanelDesing);
-        categoriasPanel.add(categoriaPanelCustom);
-        categoriasPanel.setOpaque(false);
 
         // Panel Centro
         panelCentro.add(categoriasPanel);
@@ -71,4 +48,15 @@ public class ArmarPcPanel extends PanelBase {
     public Boton getContinuarBtn() {
         return continuarBtn;
     }
+
+//    public void setContenido(){
+//        if (this.panelContenido != null) {
+//            panelContenedor.remove(this.panelContenido);
+//        }
+//
+//        this.panelContenido = panelContenido;
+//        panelContenedor.add(this.panelContenido, BorderLayout.CENTER);
+//        panelContenedor.revalidate();
+//        panelContenedor.repaint();
+//    }
 }

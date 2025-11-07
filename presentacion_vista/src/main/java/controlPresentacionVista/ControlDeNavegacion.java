@@ -13,12 +13,10 @@ public class ControlDeNavegacion {
     private MenuPrincipalPanel menuPrincipalPanel;
     private ArmarPcPanel armarEquipoPantalla;
     private CarritoPanel carritoPantalla;
-    private PanelBase panelBase;
     private JPanel panelAnterior;
 
     public ControlDeNavegacion(FramePrincipal framePrincipal) {
         this.framePrincipal = framePrincipal;
-        panelBase = new PanelBase();
         menuPrincipalPanel = new MenuPrincipalPanel();
         armarEquipoPantalla = new ArmarPcPanel();
         carritoPantalla = new CarritoPanel();
@@ -32,12 +30,10 @@ public class ControlDeNavegacion {
             mostrarNuevoPanel(menuPrincipalPanel);
         });
 
-
         barra.getArmarPcLbl().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 mostrarNuevoPanel(armarEquipoPantalla);
-                panelBase = armarEquipoPantalla;
             }
         });
 
@@ -52,5 +48,10 @@ public class ControlDeNavegacion {
 
     public void mostrarNuevoPanel(JPanel nuevoPanel) {
         framePrincipal.setPanelContenido(nuevoPanel);
+    }
+
+    public void armarPcNavegacion(JPanel nuevoPanel) {
+        armarEquipoPantalla.setPanelCentro(nuevoPanel);
+
     }
 }

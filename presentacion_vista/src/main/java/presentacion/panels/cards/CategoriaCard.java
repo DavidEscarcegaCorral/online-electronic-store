@@ -1,18 +1,18 @@
-package presentacion.panels.armarpc;
+package presentacion.panels.cards;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class CategoriaPanel extends JPanel {
+public class CategoriaCard extends JPanel {
     private JLabel imagenCategoriaLbl;
     private JLabel nombreCategoriaLbl;
 
     private String nombreCategoria;
     private String imagenUrl;
 
-    public CategoriaPanel(String nombreCategoria, String imagenUrl) {
+    public CategoriaCard(String nombreCategoria, String imagenUrl) {
         this.nombreCategoria = nombreCategoria;
         this.imagenUrl = imagenUrl;
 

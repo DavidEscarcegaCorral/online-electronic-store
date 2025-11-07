@@ -1,11 +1,11 @@
-package presentacion.panels.armarpc;
+package presentacion.panels.cards;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ProductoPanel extends JPanel {
+public class ProductoCard extends JPanel {
     private JLabel imagenProductoLbl;
     private JLabel nombreProductoLbl;
     private JLabel precioProductoLbl;
@@ -16,7 +16,7 @@ public class ProductoPanel extends JPanel {
     private double precioProducto;
     private String imagenUrl;
 
-    public ProductoPanel(String id, String nombreProducto, double productoPrecio, String imagenUrl){
+    public ProductoCard(String id, String nombreProducto, double productoPrecio, String imagenUrl){
         this.id = id;
         this.nombreProducto = nombreProducto;
         this.precioProducto = productoPrecio;
