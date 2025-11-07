@@ -19,6 +19,7 @@ public class ArmarEquipoPanel extends PanelBase {
         subTItuloLabel = new JLabel("Categoria");
         subTItuloLabel.setForeground(Color.white);
         subTItuloLabel.setFont(new Font("Arial", Font.BOLD, 20));
+
         categoriaPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {

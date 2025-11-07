@@ -8,7 +8,7 @@ public class BotonHighSpecs extends JButton {
     private final String TEXT_SPECS = "SPECS";
 
     private final Font FONT_HIGH = FontUtil.loadFont(54, "Iceland-Regular");
-    private final Font FONT_SPECS = FontUtil.loadFont(42, "IBMPlexSans-MediumItalic");
+    private final Font FONT_SPECS = FontUtil.loadFont(38, "IBMPlexSans-MediumItalic");
 
     private final Color COLOR_HIGH = Estilos.COLOR_ENFASIS;
     private final Color COLOR_SPECS = Color.WHITE;

@@ -4,6 +4,7 @@ import controlPresentacionVista.ControlDeNavegacion;
 import estilos.Boton;
 import estilos.BotonHighSpecs;
 import estilos.Estilos;
+import estilos.FontUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,9 +27,9 @@ public class BarraNavegacion extends JPanel {
     private JLabel accesoriosLbl;
 
     public BarraNavegacion() {
-        setPreferredSize(new Dimension(950, 200));
+        setPreferredSize(new Dimension(900, 130));
         setOpaque(false);
-        Font font = new Font("Arial", Font.PLAIN, 16);
+        Font font = FontUtil.loadFont(18, "IBMPlexSans-Regular");
 
         panelSup = new JPanel() {
             @Override
@@ -43,7 +44,6 @@ public class BarraNavegacion extends JPanel {
             }
         };
         panelSup.setLayout(new FlowLayout(FlowLayout.CENTER, 70, 8));
-        panelSup.setMaximumSize(new Dimension(200, 40));
         panelSup.setOpaque(false);
 
         panelInf = new JPanel() {
@@ -59,6 +59,7 @@ public class BarraNavegacion extends JPanel {
             }
         };
         panelInf.setLayout(new FlowLayout(FlowLayout.CENTER, 60, 8));
+        panelInf.setPreferredSize(new Dimension(900, 40));
         panelInf.setOpaque(false);
 
         boton = new BotonHighSpecs();
