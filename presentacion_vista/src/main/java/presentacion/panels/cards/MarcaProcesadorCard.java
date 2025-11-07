@@ -23,8 +23,8 @@ public class MarcaProcesadorCard extends JPanel {
 
     private void initComponents() {
         setOpaque(false);
-        setPreferredSize(new Dimension(120, 170));
-        setMaximumSize(new Dimension(120, 170));
+        setPreferredSize(new Dimension(260, 220));
+        setMaximumSize(new Dimension(260, 220));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -46,7 +46,7 @@ public class MarcaProcesadorCard extends JPanel {
         try {
             ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
             Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
+            Image scaledImage = originalImage.getScaledInstance(220, -1, Image.SCALE_SMOOTH);
             imagenMarcaLbl.setIcon(new ImageIcon(scaledImage));
         } catch (Exception e) {
             System.err.println("Error al cargar la imagen para " + nombreMarca + ": " + path);
@@ -63,6 +63,16 @@ public class MarcaProcesadorCard extends JPanel {
                 System.out.println("Tarjeta de producto clickeada: " + nombreMarca);
             }
         });
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.WHITE);
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+        g2d.dispose();
     }
 
 

@@ -13,7 +13,6 @@ public class ControlDeNavegacion {
     private MenuPrincipalPanel menuPrincipalPanel;
     private ArmarPcPanel armarEquipoPantalla;
     private CarritoPanel carritoPantalla;
-    private JPanel panelAnterior;
 
     public ControlDeNavegacion(FramePrincipal framePrincipal) {
         this.framePrincipal = framePrincipal;
@@ -44,14 +43,28 @@ public class ControlDeNavegacion {
             }
         });
 
+        armarEquipoPantalla.getContinuarBtn().addActionListener(e -> avanzar());
+        armarEquipoPantalla.getRetrocederBtn().addActionListener(e -> volver());
+
     }
 
     public void mostrarNuevoPanel(JPanel nuevoPanel) {
         framePrincipal.setPanelContenido(nuevoPanel);
     }
 
-    public void armarPcNavegacion(JPanel nuevoPanel) {
-        armarEquipoPantalla.setPanelCentro(nuevoPanel);
+    public void avanzar() {
+        //
+        // Validaciones
+        //
+        armarEquipoPantalla.getCardLayout().next(armarEquipoPantalla.getPanelCardsPanel());
+
+    }
+
+    public void volver() {
+        //
+        // Validaciones
+        //
+        armarEquipoPantalla.getCardLayout().previous(armarEquipoPantalla.getPanelCardsPanel());
 
     }
 }

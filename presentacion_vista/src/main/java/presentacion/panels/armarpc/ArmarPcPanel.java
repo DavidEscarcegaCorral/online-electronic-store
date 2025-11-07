@@ -13,11 +13,16 @@ public class ArmarPcPanel extends PanelBase {
     private static String titulo = "Armar PC";
     private CategoriasPanel categoriasPanel;
     private MarcaProcesadorPanel marcasPanel;
+    private CatalagoPanel catalagoPanel;
+    private JPanel cardsPanel;
+
+    private CardLayout cardLayout;
 
     private JLabel tituloLbl;
     private TituloLabel subTItuloLabel;
 
     private Boton continuarBtn;
+    private Boton retrocederBtn;
 
     public ArmarPcPanel() {
         super();
@@ -29,18 +34,29 @@ public class ArmarPcPanel extends PanelBase {
 
         categoriasPanel = new CategoriasPanel();
         marcasPanel = new MarcaProcesadorPanel();
+        catalagoPanel = new CatalagoPanel("Procesador");
+        cardLayout = new CardLayout();
+
+        // Cards Panel
+        cardsPanel = new JPanel(cardLayout);
+        cardsPanel.setOpaque(false);
+        cardsPanel.add(categoriasPanel);
+        cardsPanel.add(marcasPanel);
+        cardsPanel.add(catalagoPanel, "Procesador");
 
         // Boton
         continuarBtn = new Boton("Continuar", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
+        retrocederBtn = new Boton("Volver", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
 
         // Panel Norte
         panelNorte.add(tituloLbl);
         panelNorte.add(subTItuloLabel);
 
         // Panel Centro
-        panelCentro.add(categoriasPanel);
+        panelCentro.add(cardsPanel);
 
         // Panel Sur
+        panelSur.add(retrocederBtn);
         panelSur.add(continuarBtn);
 
     }
@@ -49,14 +65,25 @@ public class ArmarPcPanel extends PanelBase {
         return continuarBtn;
     }
 
-//    public void setContenido(){
-//        if (this.panelContenido != null) {
-//            panelContenedor.remove(this.panelContenido);
-//        }
-//
-//        this.panelContenido = panelContenido;
-//        panelContenedor.add(this.panelContenido, BorderLayout.CENTER);
-//        panelContenedor.revalidate();
-//        panelContenedor.repaint();
-//    }
+    public Boton getRetrocederBtn() {
+        return retrocederBtn;
+    }
+
+    public CardLayout getCardLayout() {
+        return cardLayout;
+    }
+
+    public JPanel getPanelCardsPanel() {
+        return cardsPanel;
+    }
+
+    public void setContenido(JPanel nuevoContenido) {
+        if (this.panelCentro!= null) {
+            panelCentro.removeAll();
+        }
+
+        panelCentro.add(nuevoContenido, BorderLayout.CENTER);
+        panelCentro.revalidate();
+        panelCentro.repaint();
+    }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 public class CatalagoPanel extends JPanel {
     public List<ProductoCard> productoCardList;
 
-    public CatalagoPanel() {
+    public CatalagoPanel(String Producto) {
         setOpaque(false);
         productoCardList = new ArrayList<>();
         cargarLista();
@@ -23,7 +23,7 @@ public class CatalagoPanel extends JPanel {
                 "P001",
                 "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
                 1419.00,
-                "/img/Ryzen5.png"
+                "/img/productos/procesadores/Ryzen5.jpg"
         );
         add(card1);
     }

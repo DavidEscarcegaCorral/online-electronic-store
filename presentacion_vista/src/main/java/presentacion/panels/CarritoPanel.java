@@ -20,5 +20,4 @@ public class CarritoPanel extends PanelBase {
         panelNorte.add(tituloLbl);
     }
 
-
 }

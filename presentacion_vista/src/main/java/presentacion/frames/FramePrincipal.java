@@ -14,7 +14,8 @@ public class FramePrincipal extends JFrame {
 
     public FramePrincipal() {
         setTitle("Electronic store");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(1200, 780);
+//        setExtendedState(JFrame.MAXIMIZED_BOTH);
         getContentPane().setBackground(Estilos.COLOR_BACKGROUND);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
