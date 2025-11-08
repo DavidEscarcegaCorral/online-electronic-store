@@ -14,7 +14,7 @@ public class CategoriasPanel extends JPanel {
 
     public CategoriasPanel() {
         setOpaque(false);
-        setLayout(new FlowLayout(FlowLayout.CENTER, 40, 20));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 25, 25));
         add(categoriaCardGamer);
         add(categoriaCardOffice);
         add(categoriaCardDesing);

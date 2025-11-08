@@ -12,7 +12,7 @@ public class MarcaProcesadorPanel extends JPanel {
 
     public MarcaProcesadorPanel() {
         setOpaque(false);
-        setLayout(new FlowLayout(FlowLayout.CENTER, 40, 20));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 25, 25));
         add(intel);
         add(amd);
     }

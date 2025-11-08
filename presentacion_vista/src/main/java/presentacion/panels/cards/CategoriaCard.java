@@ -1,5 +1,7 @@
 package presentacion.panels.cards;
 
+import estilos.FontUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -24,18 +26,30 @@ public class CategoriaCard extends JPanel {
 
     private void initComponents() {
         setOpaque(false);
-        setPreferredSize(new Dimension(120, 170));
-        setMaximumSize(new Dimension(120, 170));
+        setPreferredSize(new Dimension(180, 250));
+        setMaximumSize(new Dimension(180, 250));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         imagenCategoriaLbl = new JLabel();
         imagenCategoriaLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cargarImagen(this.imagenUrl);
+
+        int maxImgAncho = 150;
+        int maxImgAlto = 150;
+
+        Dimension imgSize = new Dimension(maxImgAncho, maxImgAlto);
+        imagenCategoriaLbl.setPreferredSize(imgSize);
+        imagenCategoriaLbl.setMinimumSize(imgSize);
+        imagenCategoriaLbl.setMaximumSize(imgSize);
+
+        imagenCategoriaLbl.setHorizontalAlignment(SwingConstants.CENTER);
+        imagenCategoriaLbl.setVerticalAlignment(SwingConstants.CENTER);
+
+        cargarImagen(this.imagenUrl, maxImgAncho, maxImgAlto);
 
         // Label del nombre
-        nombreCategoriaLbl = new JLabel("<html><div style='text-align: center;'>" + nombreCategoria + "</div></html>");
-        nombreCategoriaLbl.setFont(new Font("Arial", Font.PLAIN, 18));
+        nombreCategoriaLbl = new JLabel(nombreCategoria);
+        nombreCategoriaLbl.setFont(FontUtil.loadFont(25, "IBMPlexSans-Bold"));
         nombreCategoriaLbl.setForeground(Color.BLACK);
         nombreCategoriaLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         nombreCategoriaLbl.setHorizontalAlignment(SwingConstants.CENTER);
@@ -50,18 +64,42 @@ public class CategoriaCard extends JPanel {
 
     }
 
-    private void cargarImagen(String path) {
+    private void cargarImagen(String path, int targetWidth, int targetHeight) {
         try {
             ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
-            Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
-            imagenCategoriaLbl.setIcon(new ImageIcon(scaledImage));
+            ImageIcon scaledIcon = getScaledIcon(originalIcon, targetWidth, targetHeight);
+            imagenCategoriaLbl.setIcon(scaledIcon);
         } catch (Exception e) {
             System.err.println("Error al cargar la imagen para " + nombreCategoria + ": " + path);
             imagenCategoriaLbl.setText("No Image");
             imagenCategoriaLbl.setIcon(null);
             e.printStackTrace();
         }
+    }
+
+    private ImageIcon getScaledIcon(ImageIcon srcIcon, int targetWidth, int targetHeight) {
+
+        int originalWidth = srcIcon.getIconWidth();
+        int originalHeight = srcIcon.getIconHeight();
+
+        if (originalWidth == 0 || originalHeight == 0) {
+            return srcIcon;
+        }
+        if (originalWidth <= targetWidth && originalHeight <= targetHeight) {
+            return srcIcon;
+        }
+
+        double widthRatio = (double) targetWidth / (double) originalWidth;
+        double heightRatio = (double) targetHeight / (double) originalHeight;
+
+        double ratio = Math.min(widthRatio, heightRatio);
+
+        int newWidth = (int) (originalWidth * ratio);
+        int newHeight = (int) (originalHeight * ratio);
+
+        Image scaledImage = srcIcon.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+
+        return new ImageIcon(scaledImage);
     }
 
     private void setupListeners() {

@@ -1,5 +1,8 @@
 package presentacion.panels.cards;
 
+import estilos.Boton;
+import estilos.Estilos;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,6 +13,7 @@ public class ProductoCard extends JPanel {
     private JLabel nombreProductoLbl;
     private JLabel precioProductoLbl;
     private JLabel productoLinkLbl;
+    private Boton productoLinkBtn;
 
     private String id;
     private String nombreProducto;
@@ -30,8 +34,8 @@ public class ProductoCard extends JPanel {
 
     private void initComponents(){
         setOpaque(false);
-        setPreferredSize(new Dimension(280, 420));
-        setMaximumSize(new Dimension(280, 420));
+        setPreferredSize(new Dimension(200, 310));
+        setMaximumSize(new Dimension(200, 310));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -41,23 +45,26 @@ public class ProductoCard extends JPanel {
 
         // Label del nombre
         nombreProductoLbl = new JLabel("<html><div style='text-align: center;'>" + nombreProducto + "</div></html>");
-        nombreProductoLbl.setFont(new Font("Arial", Font.PLAIN, 18));
+        nombreProductoLbl.setFont(new Font("Arial", Font.PLAIN, 14));
         nombreProductoLbl.setForeground(Color.BLACK);
         nombreProductoLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         nombreProductoLbl.setHorizontalAlignment(SwingConstants.CENTER);
 
         // Label del precio
         precioProductoLbl = new JLabel(String.format("$%,.2f", precioProducto));
-        precioProductoLbl.setFont(new Font("Arial", Font.BOLD, 24));
+        precioProductoLbl.setFont(new Font("Arial", Font.BOLD, 18));
         precioProductoLbl.setForeground(Color.BLACK);
         precioProductoLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         //  Label del enlace al producto
         productoLinkLbl = new JLabel("<html><u>ir al producto</u></html>");
-        productoLinkLbl.setFont(new Font("Arial", Font.PLAIN, 16));
+        productoLinkLbl.setFont(new Font("Arial", Font.PLAIN, 12));
         productoLinkLbl.setForeground(new Color(138, 43, 226));
         productoLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         productoLinkLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        productoLinkBtn = new Boton("Ir al producto", 85, 30, 14, 10, Color.white, Estilos.COLOR_ENFASIS,  Estilos.COLOR_ENFASIS_HOOVER);
+        productoLinkBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
     private void añadirComponentes() {
@@ -68,7 +75,7 @@ public class ProductoCard extends JPanel {
         add(Box.createVerticalStrut(15));
         add(precioProductoLbl);
         add(Box.createVerticalStrut(15));
-        add(productoLinkLbl);
+        add(productoLinkBtn);
         add(Box.createVerticalGlue());
     }
 
@@ -86,7 +93,7 @@ public class ProductoCard extends JPanel {
         try {
             ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
             Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(200, -1, Image.SCALE_SMOOTH);
+            Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
             imagenProductoLbl.setIcon(new ImageIcon(scaledImage));
         }catch (Exception e) {
             System.err.println("Error al cargar la imagen para " + nombreProducto + ": " + path);
