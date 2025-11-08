@@ -27,7 +27,7 @@ public class BarraNavegacion extends JPanel {
     private JLabel accesoriosLbl;
 
     public BarraNavegacion() {
-        setPreferredSize(new Dimension(900, 180));
+        setPreferredSize(new Dimension(900, 160));
         setLayout(new FlowLayout(FlowLayout.CENTER, 50, 20));
         setOpaque(false);
         Font font = FontUtil.loadFont(28, "Iceland-Regular");

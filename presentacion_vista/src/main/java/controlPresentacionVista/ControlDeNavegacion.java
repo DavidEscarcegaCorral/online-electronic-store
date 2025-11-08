@@ -55,6 +55,19 @@ public class ControlDeNavegacion {
     private void navegarComponentes(int direction) {
         int currentIndex = armarEquipoPantalla.getCurrentIndex();
         int newIndex = currentIndex + direction;
+        if (newIndex >=2){
+            armarEquipoPantalla.añadirMenusNavegacion();
+        }
+        if  (newIndex <2){
+            armarEquipoPantalla.getPanelEste().removeAll();
+            armarEquipoPantalla.getPanelEste().revalidate();
+            armarEquipoPantalla.getPanelEste().repaint();
+
+
+            armarEquipoPantalla.getPanelOeste().removeAll();
+            armarEquipoPantalla.getPanelOeste().revalidate();
+            armarEquipoPantalla.getPanelOeste().repaint();
+        }
 
         if (newIndex >= 0 && newIndex < armarEquipoPantalla.getCardNames().size()) {
             currentIndex = newIndex;

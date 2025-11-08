@@ -8,29 +8,66 @@ import java.awt.*;
 
 public class MenuComponentesPanel extends JPanel {
     private JLabel titulo;
-    private JLabel procesador;
-    private JLabel tarjetaMadre;
-    private JLabel memoriaRAM;
-    private JLabel almacenamiento;
-    private JLabel unidadSSD;
-    private JLabel tarjetaDeVideo;
-    private JLabel fuenteDePoder;
-    private JLabel disipador;
-    private JLabel Ventilador;
-    private JLabel Monitor;
-    private JLabel kitTecladoRaton;
-    private JLabel red;
+    private JLabel procesadorLbl;
+    private JLabel tarjetaMadreLbl;
+    private JLabel memoriaRAMLbl;
+    private JLabel almacenamientoLbl;
+    private JLabel unidadSSDLbl;
+    private JLabel tarjetaDeVideoLbl;
+    private JLabel fuenteDePoderLbl;
+    private JLabel disipadorLbl;
+    private JLabel VentiladorLbl;
+    private JLabel MonitorLbl;
+    private JLabel kitTecladoRatonLbl;
+    private JLabel redLbl;
 
     public MenuComponentesPanel() {
         setOpaque(false);
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setPreferredSize(new Dimension(250, 700));
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 60));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        iniciarLabels();
+
+        add(Box.createVerticalStrut(10));
+        add(titulo);
+        add(Box.createVerticalStrut(20));
+        add(procesadorLbl);
+        add(Box.createVerticalStrut(15));
+        add(tarjetaMadreLbl);
+        add(Box.createVerticalStrut(15));
+        add(memoriaRAMLbl);
+        add(Box.createVerticalStrut(15));
+        add(almacenamientoLbl);
+        add(Box.createVerticalStrut(15));
+        add(unidadSSDLbl);
+    }
+
+    public void iniciarLabels(){
         titulo = new JLabel("Menú");
-        titulo.setFont(FontUtil.loadFont(15, "Inter_Regular"));
+        titulo.setFont(FontUtil.loadFont(32, "Iceland-Regular"));
         titulo.setForeground(Color.white);
 
-        add(titulo);
+        procesadorLbl = new JLabel("Processador");
+        procesadorLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
+        procesadorLbl.setForeground(Color.white);
+
+        tarjetaMadreLbl = new JLabel("Tarjeta Madre");
+        tarjetaMadreLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
+        tarjetaMadreLbl.setForeground(Color.white);
+
+        memoriaRAMLbl  = new JLabel("Memoria RAM");
+        memoriaRAMLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
+        memoriaRAMLbl.setForeground(Color.white);
+
+        almacenamientoLbl  = new JLabel("Almacenamiento");
+        almacenamientoLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
+        almacenamientoLbl.setForeground(Color.white);
+
+        unidadSSDLbl  = new JLabel("Unidad SSD");
+        unidadSSDLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
+        unidadSSDLbl.setForeground(Color.white);
+
     }
 
     @Override

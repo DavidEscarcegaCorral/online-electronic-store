@@ -13,7 +13,8 @@ public class CatalagoPanel extends JPanel {
 
     public CatalagoPanel(String Producto) {
         setOpaque(false);
-        setLayout(new FlowLayout(FlowLayout.CENTER, 40, 20));
+        setPreferredSize(new Dimension(780, 700));
+        setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
         productoCardList = new ArrayList<>();
         cargarLista();
 
@@ -38,10 +39,24 @@ public class CatalagoPanel extends JPanel {
                 1419.00,
                 "/img/productos/procesadores/Ryzen5.jpg"
         );
+        ProductoCard card4 = new ProductoCard(
+                "P001",
+                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                1419.00,
+                "/img/productos/procesadores/Ryzen5.jpg"
+        );
+        ProductoCard card5 = new ProductoCard(
+                "P001",
+                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                1419.00,
+                "/img/productos/procesadores/Ryzen5.jpg"
+        );
 
         add(card1);
         add(card2);
         add(card3);
+        add(card4);
+        add(card5);
     }
 
     @Override

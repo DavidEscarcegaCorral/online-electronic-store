@@ -15,6 +15,8 @@ public class ArmarPcPanel extends PanelBase {
     private CategoriasPanel categoriasPanel;
     private MarcaProcesadorPanel marcasPanel;
     private CatalagoPanel catalagoPanel;
+    private MenuComponentesPanel menuComponentesPanel;
+    private ResumenPanel resumenPanel;
     private JPanel cardsPanel;
 
     private CardLayout cardLayout;
@@ -39,6 +41,8 @@ public class ArmarPcPanel extends PanelBase {
         categoriasPanel = new CategoriasPanel();
         marcasPanel = new MarcaProcesadorPanel();
         catalagoPanel = new CatalagoPanel("Procesador");
+        menuComponentesPanel = new MenuComponentesPanel();
+        resumenPanel = new ResumenPanel();
         cardLayout = new CardLayout();
 
         // Cards Panel
@@ -52,25 +56,40 @@ public class ArmarPcPanel extends PanelBase {
         cardNames.add("Procesadores");
 
         // Boton
-        continuarBtn = new Boton("Continuar", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
-        retrocederBtn = new Boton("Volver", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
+        continuarBtn = new Boton("→", 55, 35, 18, 20, Color.white, Estilos.COLOR_BACKGROUND, Estilos.COLOR_ATRAS_BOTON_HOOVER);
+        retrocederBtn = new Boton("←", 55, 35, 18, 20, Color.white, Estilos.COLOR_BACKGROUND, Estilos.COLOR_ATRAS_BOTON_HOOVER);
 
         // Panel Norte
-        panelNorte.add(tituloLbl);
+        panelNorte.add(retrocederBtn);
         panelNorte.add(subTItuloLabel);
+        panelNorte.add(continuarBtn);
 
         // Panel Centro
         panelCentro.add(cardsPanel);
-
-        // Panel Sur
-        panelSur.add(retrocederBtn);
-        panelSur.add(continuarBtn);
 
     }
 
     public void updateButtonState() {
         retrocederBtn.setEnabled(currentIndex > 0);
         continuarBtn.setEnabled(currentIndex < cardNames.size() - 1);
+    }
+
+    public void añadirMenusNavegacion(){
+        panelOeste.add(menuComponentesPanel);
+        panelEste.add(resumenPanel);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(Color.white);
+        Font tittleFont = FontUtil.loadFont(30, "Inter_SemiBold");
+        g2d.setFont(tittleFont);
+        g2d.drawString("Armar PC", 500, 45);
+
+        g2d.dispose();
     }
 
     public Boton getContinuarBtn() {
@@ -96,6 +115,7 @@ public class ArmarPcPanel extends PanelBase {
     public int getCurrentIndex() {
         return currentIndex;
     }
+
     public void setCurrentIndex(int currentIndex) {
         this.currentIndex = currentIndex;
     }
