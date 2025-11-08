@@ -8,6 +8,7 @@ import presentacion.panels.PanelBase;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class ArmarPcPanel extends PanelBase {
     private static String titulo = "Armar PC";
@@ -23,6 +24,9 @@ public class ArmarPcPanel extends PanelBase {
 
     private Boton continuarBtn;
     private Boton retrocederBtn;
+
+    private ArrayList<String> cardNames = new ArrayList<>();
+    private int currentIndex = 0;
 
     public ArmarPcPanel() {
         super();
@@ -40,9 +44,12 @@ public class ArmarPcPanel extends PanelBase {
         // Cards Panel
         cardsPanel = new JPanel(cardLayout);
         cardsPanel.setOpaque(false);
-        cardsPanel.add(categoriasPanel);
-        cardsPanel.add(marcasPanel);
-        cardsPanel.add(catalagoPanel, "Procesador");
+        cardsPanel.add(categoriasPanel, "Categorias");
+        cardNames.add("Categorias");
+        cardsPanel.add(marcasPanel, "Marcas");
+        cardNames.add("Marcas");
+        cardsPanel.add(catalagoPanel, "Procesadores");
+        cardNames.add("Procesadores");
 
         // Boton
         continuarBtn = new Boton("Continuar", 130, 30, 16, 25, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
@@ -61,6 +68,11 @@ public class ArmarPcPanel extends PanelBase {
 
     }
 
+    public void updateButtonState() {
+        retrocederBtn.setEnabled(currentIndex > 0);
+        continuarBtn.setEnabled(currentIndex < cardNames.size() - 1);
+    }
+
     public Boton getContinuarBtn() {
         return continuarBtn;
     }
@@ -73,17 +85,18 @@ public class ArmarPcPanel extends PanelBase {
         return cardLayout;
     }
 
-    public JPanel getPanelCardsPanel() {
+    public JPanel getCardsPanel() {
         return cardsPanel;
     }
 
-    public void setContenido(JPanel nuevoContenido) {
-        if (this.panelCentro!= null) {
-            panelCentro.removeAll();
-        }
+    public ArrayList<String> getCardNames() {
+        return cardNames;
+    }
 
-        panelCentro.add(nuevoContenido, BorderLayout.CENTER);
-        panelCentro.revalidate();
-        panelCentro.repaint();
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
     }
 }

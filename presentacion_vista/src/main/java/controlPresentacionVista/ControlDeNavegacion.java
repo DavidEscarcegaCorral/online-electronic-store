@@ -26,45 +26,42 @@ public class ControlDeNavegacion {
         framePrincipal.setVisible(true);
 
         barra.getBoton().addActionListener(e -> {
-            mostrarNuevoPanel(menuPrincipalPanel);
+            mostrarNuevaPantalla(menuPrincipalPanel);
         });
 
         barra.getArmarPcLbl().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                mostrarNuevoPanel(armarEquipoPantalla);
+                mostrarNuevaPantalla(armarEquipoPantalla);
             }
         });
 
         barra.getCarritoLbl().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                mostrarNuevoPanel(carritoPantalla);
+                mostrarNuevaPantalla(carritoPantalla);
             }
         });
 
-        armarEquipoPantalla.getContinuarBtn().addActionListener(e -> avanzar());
-        armarEquipoPantalla.getRetrocederBtn().addActionListener(e -> volver());
+        armarEquipoPantalla.getContinuarBtn().addActionListener(e -> navegarComponentes(1));
+        armarEquipoPantalla.getRetrocederBtn().addActionListener(e -> navegarComponentes(-1));
 
     }
 
-    public void mostrarNuevoPanel(JPanel nuevoPanel) {
+    public void mostrarNuevaPantalla(JPanel nuevoPanel) {
         framePrincipal.setPanelContenido(nuevoPanel);
     }
 
-    public void avanzar() {
-        //
-        // Validaciones
-        //
-        armarEquipoPantalla.getCardLayout().next(armarEquipoPantalla.getPanelCardsPanel());
+    private void navegarComponentes(int direction) {
+        int currentIndex = armarEquipoPantalla.getCurrentIndex();
+        int newIndex = currentIndex + direction;
 
-    }
+        if (newIndex >= 0 && newIndex < armarEquipoPantalla.getCardNames().size()) {
+            currentIndex = newIndex;
+            armarEquipoPantalla.getCardLayout().show(armarEquipoPantalla.getCardsPanel(), armarEquipoPantalla.getCardNames().get(currentIndex));
+            armarEquipoPantalla.setCurrentIndex(newIndex);
 
-    public void volver() {
-        //
-        // Validaciones
-        //
-        armarEquipoPantalla.getCardLayout().previous(armarEquipoPantalla.getPanelCardsPanel());
-
+            armarEquipoPantalla.updateButtonState();
+        }
     }
 }
