@@ -10,6 +10,7 @@ public class Boton extends JButton {
     private int cornerRadius;
     private int width;
     private int height;
+    private int fontSize;
     private Color colorText;
     private Color colorBtn;
     private Color colorHover;
@@ -22,6 +23,7 @@ public class Boton extends JButton {
         this.colorText = colorText;
         this.colorBtn = colorBtn;
         this.colorHover = colorHover;
+        this.fontSize = fontSize;
 
         setFont(FontUtil.loadFont(fontSize, "Inter_SemiBold"));
         setForeground(this.colorText);
@@ -51,6 +53,11 @@ public class Boton extends JButton {
                 repaint();
             }
         });
+    }
+
+    public void setNewFont(){
+        setFont(FontUtil.loadFont(fontSize, "Inter_Light"));
+        setHorizontalAlignment(SwingConstants.LEFT);
     }
 
     @Override
