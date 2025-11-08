@@ -8,7 +8,7 @@ public class TituloLabel extends JLabel {
 
     public TituloLabel(String titulo){
         setText(titulo);
-        setFont(FontUtil.loadFont( 24, "IBMPlexMono-Regular"));
+        setFont(FontUtil.loadFont( 24, "Inter_Light"));
         setForeground(Color.white);
         setHorizontalAlignment(JLabel.CENTER);
         setOpaque(false);
@@ -25,7 +25,7 @@ public class TituloLabel extends JLabel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2d.setColor(Estilos.COLOR_TITULO_LABEL);
-        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
         super.paintComponent(g2d);
         g2d.dispose();

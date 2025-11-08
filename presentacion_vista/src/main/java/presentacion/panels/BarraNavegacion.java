@@ -27,9 +27,11 @@ public class BarraNavegacion extends JPanel {
     private JLabel accesoriosLbl;
 
     public BarraNavegacion() {
-        setPreferredSize(new Dimension(900, 130));
+        setPreferredSize(new Dimension(900, 160));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 50, 20));
         setOpaque(false);
-        Font font = FontUtil.loadFont(18, "IBMPlexSans-Regular");
+        Font font = FontUtil.loadFont(28, "Iceland-Regular");
+        Font font2 = FontUtil.loadFont(18, "IBMPlexSans-Regular");
 
         panelSup = new JPanel() {
             @Override
@@ -43,7 +45,7 @@ public class BarraNavegacion extends JPanel {
                 g2d.dispose();
             }
         };
-        panelSup.setLayout(new FlowLayout(FlowLayout.CENTER, 70, 8));
+        panelSup.setLayout(new FlowLayout(FlowLayout.CENTER, 70, 0));
         panelSup.setOpaque(false);
 
         panelInf = new JPanel() {
@@ -77,19 +79,19 @@ public class BarraNavegacion extends JPanel {
         cuentaLbl.setForeground(Color.white);
 
         equiposLbl = new JLabel("Equipos");
-        equiposLbl.setFont(font);
+        equiposLbl.setFont(font2);
         equiposLbl.setForeground(Color.white);
         componentesLbl = new JLabel("Componentes");
-        componentesLbl.setFont(font);
+        componentesLbl.setFont(font2);
         componentesLbl.setForeground(Color.white);
         almacenamientoLbl = new JLabel("Almacenamiento");
-        almacenamientoLbl.setFont(font);
+        almacenamientoLbl.setFont(font2);
         almacenamientoLbl.setForeground(Color.white);
         redesLbl = new JLabel("Redes");
-        redesLbl.setFont(font);
+        redesLbl.setFont(font2);
         redesLbl.setForeground(Color.white);
         accesoriosLbl = new JLabel("Accesorios");
-        accesoriosLbl.setFont(font);
+        accesoriosLbl.setFont(font2);
         accesoriosLbl.setForeground(Color.white);
 
         Cursor cursorMano = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
@@ -98,9 +100,8 @@ public class BarraNavegacion extends JPanel {
         carritoLbl.setCursor(cursorMano);
         cuentaLbl.setCursor(cursorMano);
 
-        add(boton);
-
         //Menu superior
+        panelSup.add(boton);
         panelSup.add(armarPcLbl);
         panelSup.add(pedidosLbl);
         panelSup.add(carritoLbl);

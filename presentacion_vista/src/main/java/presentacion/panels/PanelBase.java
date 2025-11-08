@@ -21,18 +21,25 @@ public class PanelBase extends JPanel {
     public PanelBase() {
         setOpaque(false);
         setLayout(new BorderLayout());
-//        atrasBtn = new Boton("←", 50, 50, 15, 25, Color.white, Estilos.COLOR_ATRAS_BOTON, Estilos.COLOR_ATRAS_BOTON_HOOVER);
 
         panelNorte = new JPanel();
         panelNorte.setOpaque(false);
+        panelNorte.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        panelNorte.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
+
         panelCentro = new JPanel();
         panelCentro.setOpaque(false);
+
         panelSur = new JPanel();
         panelSur.setOpaque(false);
+
         panelEste = new JPanel();
         panelEste.setOpaque(false);
+        panelEste.setLayout(new FlowLayout(FlowLayout.LEFT));
+
         panelOeste = new JPanel();
         panelOeste.setOpaque(false);
+        panelOeste.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         add(panelNorte,  BorderLayout.NORTH);
         add(panelCentro,   BorderLayout.CENTER);
@@ -80,10 +87,6 @@ public class PanelBase extends JPanel {
 
     public void setPanelOeste(JPanel panelOeste) {
         this.panelOeste = panelOeste;
-    }
-
-    public Boton getAtrasBtn() {
-        return atrasBtn;
     }
 
 }
