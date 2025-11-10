@@ -25,6 +25,8 @@ public class ControlDeNavegacion {
         BarraNavegacion barra = this.framePrincipal.getBarraNavegacion();
         framePrincipal.setVisible(true);
 
+
+        // Botones de "Barra de navegacion"
         barra.getBoton().addActionListener(e -> {
             mostrarNuevaPantalla(menuPrincipalPanel);
         });
@@ -43,38 +45,85 @@ public class ControlDeNavegacion {
             }
         });
 
-        armarEquipoPantalla.getContinuarBtn().addActionListener(e -> navegarComponentes(1));
-        armarEquipoPantalla.getRetrocederBtn().addActionListener(e -> navegarComponentes(-1));
 
+        // Botones de navegacion de "Armar PC"
+        armarEquipoPantalla.getContinuarBtn().addActionListener(e -> navegarDireccion(1));
+        armarEquipoPantalla.getRetrocederBtn().addActionListener(e -> navegarDireccion(-1));
+        armarEquipoPantalla.getMenuComponentesPanel().getProcesadorBtn().addActionListener(e -> {
+            navegarComponente(2);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getTarjetaMadreBtn().addActionListener(e -> {
+            navegarComponente(3);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getMemoriaRAMBtn().addActionListener(e -> {
+            navegarComponente(4);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getAlmacenamientoBtn().addActionListener(e -> {
+            navegarComponente(5);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getUnidadSSDBtn().addActionListener(e -> {
+            navegarComponente(6);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getTarjetaDeVideoBtn().addActionListener(e -> {
+            navegarComponente(7);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getFuenteDePoderBtn().addActionListener(e -> {
+            navegarComponente(8);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getDisipadorBtn().addActionListener(e -> {
+            navegarComponente(9);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getVentiladorBtn().addActionListener(e -> {
+            navegarComponente(10);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getMonitorBtn().addActionListener(e -> {
+            navegarComponente(11);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getKitTecladoRatonBtn().addActionListener(e -> {
+            navegarComponente(12);
+        });
+        armarEquipoPantalla.getMenuComponentesPanel().getRedBtn().addActionListener(e -> {
+            navegarComponente(13);
+        });
     }
 
     public void mostrarNuevaPantalla(JPanel nuevoPanel) {
         framePrincipal.setPanelContenido(nuevoPanel);
     }
 
-    private void navegarComponentes(int direction) {
-        int currentIndex = armarEquipoPantalla.getCurrentIndex();
-        int newIndex = currentIndex + direction;
-        if (newIndex >=2){
+    private void navegarDireccion(int direction) {
+        int currentIndex = armarEquipoPantalla.getIndiceActual();
+        int nuevoIndice = currentIndex + direction;
+
+        if (nuevoIndice >= 2) {
             armarEquipoPantalla.añadirMenusNavegacion();
         }
-        if  (newIndex <2){
-            armarEquipoPantalla.getPanelEste().removeAll();
-            armarEquipoPantalla.getPanelEste().revalidate();
-            armarEquipoPantalla.getPanelEste().repaint();
 
-
-            armarEquipoPantalla.getPanelOeste().removeAll();
-            armarEquipoPantalla.getPanelOeste().revalidate();
-            armarEquipoPantalla.getPanelOeste().repaint();
+        if (nuevoIndice < 2) {
+            armarEquipoPantalla.eliminarMenusNavegacion();
         }
 
-        if (newIndex >= 0 && newIndex < armarEquipoPantalla.getCardNames().size()) {
-            currentIndex = newIndex;
-            armarEquipoPantalla.getCardLayout().show(armarEquipoPantalla.getCardsPanel(), armarEquipoPantalla.getCardNames().get(currentIndex));
-            armarEquipoPantalla.setCurrentIndex(newIndex);
-
+        if (nuevoIndice >= 0 && nuevoIndice < armarEquipoPantalla.getListaPasosArmado().length) {
+            currentIndex = nuevoIndice;
+            armarEquipoPantalla.getCardLayout().show(armarEquipoPantalla.getCardsPanel(), armarEquipoPantalla.getListaPasosArmado()[currentIndex]);
+            armarEquipoPantalla.setIndiceActual(nuevoIndice);
+            armarEquipoPantalla.getSubTItuloLabel().setTitulo(armarEquipoPantalla.getListaPasosArmado()[currentIndex]);
             armarEquipoPantalla.updateButtonState();
         }
+    }
+
+    public void navegarComponente(int componente) {
+        if (componente >= 2) {
+            armarEquipoPantalla.añadirMenusNavegacion();
+        }
+
+        if (componente < 2) {
+            armarEquipoPantalla.eliminarMenusNavegacion();
+        }
+
+        armarEquipoPantalla.getCardLayout().show(armarEquipoPantalla.getCardsPanel(), armarEquipoPantalla.getListaPasosArmado()[componente]);
+        armarEquipoPantalla.setIndiceActual(componente);
+        armarEquipoPantalla.getSubTItuloLabel().setTitulo(armarEquipoPantalla.getListaPasosArmado()[componente]);
+        armarEquipoPantalla.updateButtonState();
     }
 }

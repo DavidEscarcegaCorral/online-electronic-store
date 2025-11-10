@@ -1,6 +1,7 @@
 package presentacion.frames;
 
 import estilos.Estilos;
+import estilos.ScrollPaneCustom;
 import presentacion.panels.BarraNavegacion;
 
 import javax.swing.*;
@@ -10,30 +11,28 @@ public class FramePrincipal extends JFrame {
     private JPanel panelContenedor;
     private BarraNavegacion barraNavegacion;
     private JPanel panelContenido;
-    private JScrollPane scroll;
+    private ScrollPaneCustom scrollCustom;
 
     public FramePrincipal() {
         setTitle("Electronic store");
         getContentPane().setBackground(Estilos.COLOR_BACKGROUND);
-        setSize(1360, 780);
+        setSize(1380, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Panel contenedor
         panelContenedor = new JPanel();
         panelContenedor.setLayout(new BorderLayout());
         panelContenedor.setOpaque(false);
         barraNavegacion = new BarraNavegacion();
 
+        // ScrollPane
+        scrollCustom = new ScrollPaneCustom(panelContenedor);
+
         // Añadir componentes
         panelContenedor.add(barraNavegacion, BorderLayout.NORTH);
-        scroll = new JScrollPane(panelContenedor);
-        scroll.setOpaque(false);
-        scroll.getViewport().setOpaque(false);
-        scroll.getVerticalScrollBar().setUnitIncrement(20);
-        scroll.getHorizontalScrollBar().setUnitIncrement(20);
-        scroll.setBorder(null);
 
-        add(scroll);
+        add(scrollCustom, BorderLayout.CENTER);
     }
 
     public BarraNavegacion getBarraNavegacion() {

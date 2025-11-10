@@ -13,50 +13,81 @@ public class CatalagoPanel extends JPanel {
 
     public CatalagoPanel(String Producto) {
         setOpaque(false);
-        setPreferredSize(new Dimension(780, 700));
+        setPreferredSize(new Dimension(740, 650));
         setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
         productoCardList = new ArrayList<>();
-        cargarLista();
+        cargarLista(Producto);
 
     }
 
-    public void cargarLista(){
-        ProductoCard card1 = new ProductoCard(
-                "P001",
-                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
-                1419.00,
-                "/img/productos/procesadores/Ryzen5.jpg"
-        );
-        ProductoCard card2 = new ProductoCard(
-                "P001",
-                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
-                1419.00,
-                "/img/productos/procesadores/Ryzen5.jpg"
-        );
-        ProductoCard card3 = new ProductoCard(
-                "P001",
-                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
-                1419.00,
-                "/img/productos/procesadores/Ryzen5.jpg"
-        );
-        ProductoCard card4 = new ProductoCard(
-                "P001",
-                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
-                1419.00,
-                "/img/productos/procesadores/Ryzen5.jpg"
-        );
-        ProductoCard card5 = new ProductoCard(
-                "P001",
-                "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
-                1419.00,
-                "/img/productos/procesadores/Ryzen5.jpg"
-        );
+    // Debe recibir que tipo de producto va a cargar. Esto se debe cambiar al momento
+    // de implementar la base de datos
+    public void cargarLista(String nombreProcuto) {
+        switch (nombreProcuto) {
+            case "Procesador":
+                ProductoCard card1 = new ProductoCard(
+                        "P001",
+                        "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                        1419.00,
+                        "/img/productos/procesadores/Ryzen5.jpg"
+                );
+                ProductoCard card2 = new ProductoCard(
+                        "P001",
+                        "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                        1419.00,
+                        "/img/productos/procesadores/Ryzen5.jpg"
+                );
+                ProductoCard card3 = new ProductoCard(
+                        "P001",
+                        "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                        1419.00,
+                        "/img/productos/procesadores/Ryzen5.jpg"
+                );
+                ProductoCard card4 = new ProductoCard(
+                        "P001",
+                        "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                        1419.00,
+                        "/img/productos/procesadores/Ryzen5.jpg"
+                );
+                ProductoCard card5 = new ProductoCard(
+                        "P001",
+                        "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
+                        1419.00,
+                        "/img/productos/procesadores/Ryzen5.jpg"
+                );
 
-        add(card1);
-        add(card2);
-        add(card3);
-        add(card4);
-        add(card5);
+                add(card1);
+                add(card2);
+                add(card3);
+                add(card4);
+                add(card5);
+                break;
+            case "Tarjeta madre":
+                break;
+            case "Memoria RAM":
+                break;
+            case "Almacenamiento":
+                break;
+            case "Unidad SSD":
+                break;
+            case "Tarjeta de video":
+                break;
+            case "Fuente de poder":
+                break;
+            case "Disipador":
+                break;
+            case "Ventilador":
+                break;
+            case "Monitor":
+                break;
+            case "Teclado/Ratón":
+                break;
+            case "Red":
+                break;
+
+        }
+
+
     }
 
     @Override

@@ -16,7 +16,7 @@ public class ResumenPanel extends JPanel {
 
     public ResumenPanel() {
         setOpaque(false);
-        setPreferredSize(new Dimension(250, 700));
+        setPreferredSize(new Dimension(240, 610));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
