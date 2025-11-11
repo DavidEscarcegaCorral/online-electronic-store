@@ -3,6 +3,7 @@ package controlPresentacionVista;
 import presentacion.frames.FramePrincipal;
 import presentacion.panels.*;
 import presentacion.panels.armarpc.ArmarPcPanel;
+import presentacion.panels.carrito.CarritoPanel;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
