@@ -20,6 +20,7 @@
         <module>presentacion_vista</module>
         <module>dto_negocio</module>
         <module>objetos_negocio</module>
+        <module>negocio_iniciarSesion</module>
     </modules>
 
 </project>
