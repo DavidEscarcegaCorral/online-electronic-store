@@ -12,7 +12,7 @@ public class TituloLabel extends JLabel {
         setForeground(Color.white);
         setHorizontalAlignment(JLabel.CENTER);
         setOpaque(false);
-        setPreferredSize(new Dimension(230, 40));
+        setPreferredSize(new Dimension(260,50));
     }
 
     public void setTitulo(String titulo){

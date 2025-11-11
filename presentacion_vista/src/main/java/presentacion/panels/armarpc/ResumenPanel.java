@@ -16,16 +16,9 @@ public class ResumenPanel extends JPanel {
 
     public ResumenPanel() {
         setOpaque(false);
-        setPreferredSize(new Dimension(250, 700));
+        setPreferredSize(new Dimension(240, 610));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        panelNorte = new JPanel();
-        panelNorte.setOpaque(false);
-        panelCentro = new JPanel();
-        panelCentro.setPreferredSize(new Dimension(250, 560));
-        panelCentro.setOpaque(false);
-        panelSur = new JPanel();
-        panelSur.setOpaque(false);
 
         tituloLbl = new JLabel("Resumen");
         tituloLbl.setForeground(Color.white);
@@ -34,9 +27,18 @@ public class ResumenPanel extends JPanel {
         totalCard = new TotalCard();
 
         // Panel Norte
+        panelNorte = new JPanel();
+        panelNorte.setOpaque(false);
         panelNorte.add(tituloLbl);
 
+        // Panel Centro
+        panelCentro = new JPanel();
+        panelCentro.setPreferredSize(new Dimension(250, 560));
+        panelCentro.setOpaque(false);
+
         // Panel Sur
+        panelSur = new JPanel();
+        panelSur.setOpaque(false);
         panelSur.add(totalCard);
 
         add(panelNorte);

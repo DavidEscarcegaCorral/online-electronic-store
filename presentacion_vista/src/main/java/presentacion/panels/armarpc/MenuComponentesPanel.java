@@ -1,5 +1,6 @@
 package presentacion.panels.armarpc;
 
+import estilos.Boton;
 import estilos.Estilos;
 import estilos.FontUtil;
 
@@ -7,66 +8,108 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MenuComponentesPanel extends JPanel {
+    private JPanel panelMenu;
+    private JPanel panelCentro;
     private JLabel titulo;
-    private JLabel procesadorLbl;
-    private JLabel tarjetaMadreLbl;
-    private JLabel memoriaRAMLbl;
-    private JLabel almacenamientoLbl;
-    private JLabel unidadSSDLbl;
-    private JLabel tarjetaDeVideoLbl;
-    private JLabel fuenteDePoderLbl;
-    private JLabel disipadorLbl;
-    private JLabel VentiladorLbl;
-    private JLabel MonitorLbl;
-    private JLabel kitTecladoRatonLbl;
-    private JLabel redLbl;
+    private Boton procesadorBtn;
+    private Boton tarjetaMadreBtn;
+    private Boton memoriaRAMBtn;
+    private Boton almacenamientoBtn;
+    private Boton unidadSSDBtn;
+    private Boton tarjetaDeVideoBtn;
+    private Boton fuenteDePoderBtn;
+    private Boton disipadorBtn;
+    private Boton VentiladorBtn;
+    private Boton MonitorBtn;
+    private Boton kitTecladoRatonBtn;
+    private Boton redBtn;
 
     public MenuComponentesPanel() {
         setOpaque(false);
-        setPreferredSize(new Dimension(250, 700));
-        setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 60));
+        setPreferredSize(new Dimension(240, 610));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        iniciarLabels();
+        iniciarBotones();
 
-        add(Box.createVerticalStrut(10));
-        add(titulo);
-        add(Box.createVerticalStrut(20));
-        add(procesadorLbl);
-        add(Box.createVerticalStrut(15));
-        add(tarjetaMadreLbl);
-        add(Box.createVerticalStrut(15));
-        add(memoriaRAMLbl);
-        add(Box.createVerticalStrut(15));
-        add(almacenamientoLbl);
-        add(Box.createVerticalStrut(15));
-        add(unidadSSDLbl);
+        // Panel Menu
+        panelMenu = new JPanel();
+        panelMenu.setOpaque(false);
+        panelMenu.add(titulo);
+
+        // Panel Centro
+        panelCentro = new JPanel();
+        panelCentro.setOpaque(false);
+        panelCentro.setPreferredSize(new Dimension(230, 700));
+        panelCentro.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 15));
+        panelCentro.add(procesadorBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(tarjetaMadreBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(memoriaRAMBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(almacenamientoBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(unidadSSDBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(tarjetaDeVideoBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(fuenteDePoderBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(disipadorBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(VentiladorBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(MonitorBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(kitTecladoRatonBtn);
+        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(redBtn);
+
+        add(panelMenu);
+        add(panelCentro);
     }
 
-    public void iniciarLabels(){
+    public void iniciarBotones(){
         titulo = new JLabel("Menú");
         titulo.setFont(FontUtil.loadFont(32, "Iceland-Regular"));
         titulo.setForeground(Color.white);
 
-        procesadorLbl = new JLabel("Processador");
-        procesadorLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
-        procesadorLbl.setForeground(Color.white);
+        procesadorBtn = new Boton("Procesador", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        procesadorBtn.setNewFont();
 
-        tarjetaMadreLbl = new JLabel("Tarjeta Madre");
-        tarjetaMadreLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
-        tarjetaMadreLbl.setForeground(Color.white);
+        tarjetaMadreBtn = new Boton("Tarjeta Madre", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        tarjetaMadreBtn.setNewFont();
 
-        memoriaRAMLbl  = new JLabel("Memoria RAM");
-        memoriaRAMLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
-        memoriaRAMLbl.setForeground(Color.white);
+        memoriaRAMBtn = new Boton("Memoria RAM", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        memoriaRAMBtn.setNewFont();
 
-        almacenamientoLbl  = new JLabel("Almacenamiento");
-        almacenamientoLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
-        almacenamientoLbl.setForeground(Color.white);
+        almacenamientoBtn = new Boton("Almacenamiento", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        almacenamientoBtn.setNewFont();
 
-        unidadSSDLbl  = new JLabel("Unidad SSD");
-        unidadSSDLbl.setFont(FontUtil.loadFont(14, "Inter_Regular"));
-        unidadSSDLbl.setForeground(Color.white);
+        unidadSSDBtn = new Boton("Unidad SSD", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        unidadSSDBtn.setNewFont();
+
+        tarjetaDeVideoBtn = new Boton("Tarjeta de video", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        tarjetaDeVideoBtn.setNewFont();
+
+        fuenteDePoderBtn = new Boton("Fuente de poder", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        fuenteDePoderBtn.setNewFont();
+
+        disipadorBtn = new Boton("Disipador", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        disipadorBtn.setNewFont();
+
+        VentiladorBtn = new Boton("Ventiladores", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        VentiladorBtn.setNewFont();
+
+        MonitorBtn = new Boton("Monitor", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        MonitorBtn.setNewFont();
+
+        kitTecladoRatonBtn = new Boton("Kit de teclado y mouse", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        kitTecladoRatonBtn.setNewFont();
+
+        redBtn = new Boton("Redes e internet", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        redBtn.setNewFont();
 
     }
 
@@ -79,5 +122,53 @@ public class MenuComponentesPanel extends JPanel {
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
 
         g2d.dispose();
+    }
+
+    public Boton getProcesadorBtn() {
+        return procesadorBtn;
+    }
+
+    public Boton getTarjetaMadreBtn() {
+        return tarjetaMadreBtn;
+    }
+
+    public Boton getMemoriaRAMBtn() {
+        return memoriaRAMBtn;
+    }
+
+    public Boton getAlmacenamientoBtn() {
+        return almacenamientoBtn;
+    }
+
+    public Boton getUnidadSSDBtn() {
+        return unidadSSDBtn;
+    }
+
+    public Boton getTarjetaDeVideoBtn() {
+        return tarjetaDeVideoBtn;
+    }
+
+    public Boton getFuenteDePoderBtn() {
+        return fuenteDePoderBtn;
+    }
+
+    public Boton getDisipadorBtn() {
+        return disipadorBtn;
+    }
+
+    public Boton getVentiladorBtn() {
+        return VentiladorBtn;
+    }
+
+    public Boton getMonitorBtn() {
+        return MonitorBtn;
+    }
+
+    public Boton getKitTecladoRatonBtn() {
+        return kitTecladoRatonBtn;
+    }
+
+    public Boton getRedBtn() {
+        return redBtn;
     }
 }
