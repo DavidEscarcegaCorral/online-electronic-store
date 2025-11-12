@@ -16,11 +16,15 @@
     </properties>
 
     <modules>
-        <module>presentacion_control</module>
-        <module>presentacion_vista</module>
-        <module>dto_negocio</module>
+        <module>dto_negocios</module>
         <module>objetos_negocio</module>
-        <module>negocio_iniciarSesion</module>
+        <module>negocios_ControlSesion</module>
+        <module>negocios_armarPC</module>
+        <module>presentacion_comun</module>
+
+        <module>presentacion_armadoPC</module>
+        <module>presentacion_carrito</module>
+        <module>presentacion_controlNavegacion</module>
     </modules>
 
 </project>
