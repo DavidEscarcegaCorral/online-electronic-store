@@ -1,6 +1,7 @@
-package objetosNegocio;
+package objetosnegocio;
 
 import dto.ComponenteDTO;
+import objetosnegocio.interfaces.IComponenteON;
 
 import java.util.ArrayList;
 import java.util.List;

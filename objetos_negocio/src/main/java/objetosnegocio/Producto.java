@@ -1,4 +1,4 @@
-package objetosNegocio;
+package objetosnegocio;
 
 public abstract class Producto {
     protected Long id;
