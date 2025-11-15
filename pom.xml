@@ -16,9 +16,12 @@
     </properties>
 
     <modules>
-        <module>presentacion_control</module>
-        <module>presentacion_vista</module>
-        <module>dto_negocio</module>
+        <module>dto_negocios</module>
+        <module>objetos_negocio</module>
+
+        <module>presentacion</module>
+        <module>negocios_ControlSesion</module>
+        <module>negocio_armarPC</module>
     </modules>
 
 </project>
