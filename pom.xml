@@ -22,6 +22,8 @@
         <module>presentacion</module>
         <module>negocios_ControlSesion</module>
         <module>negocio_armarPC</module>
+        <module>Config</module>
+        <module>Model</module>
     </modules>
 
 </project>
