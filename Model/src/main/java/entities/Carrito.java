@@ -4,6 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Carrito {
@@ -20,23 +21,62 @@ public class Carrito {
     @BsonProperty("updated_In")
     private Instant updated_In;
 
-    public Carrito() {}
+    public Carrito() {
+        this.products = new ArrayList<>();
+        this.pcS = new ArrayList<>();
+        this.totalCost = 0;
+        this.created_In = Instant.now();
+        this.updated_In = Instant.now();
+    }
 
     public Carrito(ObjectId _id, List<Producto> products, List<ArmadoPC> pcS, Cliente client) {
         this._id = _id;
-        this.products = products;
-        this.pcS = pcS;
+        this.products = (products!=null)?products: new ArrayList<>();
+        this.pcS = (pcS != null)?pcS: new ArrayList<>();
         this.client = client;
 
-        for(Producto p :  products) {
-            this.totalCost += p.getPrice();
-        }
+        this.created_In = Instant.now();
+        this.updated_In = Instant.now();
 
-        for(ArmadoPC a :  pcS) {
-            this.totalCost += a.getTotalPrice();
+        this.totalCost = 0;
+
+    }
+
+    private void recalcularTotal(){
+        this.totalCost = 0;
+        for(Producto p : products){
+            this.totalCost+=p.getPrice();
+        }
+        for(ArmadoPC a : pcS){
+            this.totalCost+=a.getTotalPrice();
         }
     }
 
+    public void agregarProducto(Producto p) {
+        this.products.add(p);
+        this.totalCost += p.getPrice();
+        this.updated_In = Instant.now();
+    }
+
+    public void agregarPC(ArmadoPC pc) {
+        this.pcS.add(pc);
+        this.totalCost += pc.getTotalPrice();
+        this.updated_In = Instant.now();
+    }
+
+    public void removerProducto(Producto p) {
+        if (this.products.remove(p)) {
+            this.totalCost -= p.getPrice();
+            this.updated_In = Instant.now();
+        }
+    }
+
+    public void removerPC(ArmadoPC pc) {
+        if (this.pcS.remove(pc)) {
+            this.totalCost -= pc.getTotalPrice();
+            this.updated_In = Instant.now();
+        }
+    }
     public ObjectId get_id() {
         return _id;
     }
