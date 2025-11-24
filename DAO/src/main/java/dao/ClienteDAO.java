@@ -81,7 +81,7 @@ public class ClienteDAO implements IClienteDAO {
         try{
             var result=collection.deleteOne(Filters.eq("_id",id));
             if(result.getDeletedCount()==0)
-                throw new DAOException("Client not found: "+ id);
+                throw new EntityNotFoundException("Client not found: "+ id);
             return true;
         }catch (MongoException e) {
             throw new DAOException("Client delete error: ",e);

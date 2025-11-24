@@ -42,7 +42,8 @@ public class CarritoDAO implements ICarritoDAO {
             return Optional.ofNullable(collection.find(Filters.eq("_id",id)).first());
         } catch (MongoException e) {
             throw new DAOException("Client find error: ",e);
-        }    }
+        }
+    }
 
     @Override
     public List<Carrito> findAll() throws DAOException {
@@ -80,11 +81,12 @@ public class CarritoDAO implements ICarritoDAO {
         try{
             var result=collection.deleteOne(Filters.eq("_id",id));
             if(result.getDeletedCount()==0)
-                throw new DAOException("Client not found: "+ id);
+                throw new EntityNotFoundException("Client not found: "+ id);
             return true;
         }catch (MongoException e) {
             throw new DAOException("Client delete error: ",e);
-        }    }
+        }
+    }
 
     @Override
     public long deleteAll() throws DAOException {
