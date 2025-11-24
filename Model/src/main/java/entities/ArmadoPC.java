@@ -13,9 +13,9 @@ public class ArmadoPC {
     private Integer totalPrice;
 
     @BsonProperty("created_In")
-    private Instant created_In;
+    private Instant createdIn;
     @BsonProperty("updated_In")
-    private Instant updated_In;
+    private Instant updatedIn;
 
     public ArmadoPC() {
     }
@@ -53,19 +53,19 @@ public class ArmadoPC {
         this.totalPrice = totalPrice;
     }
 
-    public Instant getCreated_In() {
-        return created_In;
+    public Instant getCreatedIn() {
+        return createdIn;
     }
 
-    public void setCreated_In(Instant created_In) {
-        this.created_In = created_In;
+    public void setCreatedIn(Instant created_In) {
+        this.createdIn = created_In;
     }
 
-    public Instant getUpdated_In() {
-        return updated_In;
+    public Instant getUpdatedIn() {
+        return updatedIn;
     }
 
-    public void setUpdated_In(Instant updated_In) {
-        this.updated_In = updated_In;
+    public void setUpdatedIn(Instant updatedIn) {
+        this.updatedIn = updatedIn;
     }
 }
