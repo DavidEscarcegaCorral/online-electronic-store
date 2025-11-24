@@ -16,17 +16,17 @@ public class Carrito {
     private Cliente client;
 
     @BsonProperty("created_In")
-    private Instant created_In;
+    private Instant createdIn;
 
     @BsonProperty("updated_In")
-    private Instant updated_In;
+    private Instant updatedIn;
 
     public Carrito() {
         this.products = new ArrayList<>();
         this.pcS = new ArrayList<>();
         this.totalCost = 0;
-        this.created_In = Instant.now();
-        this.updated_In = Instant.now();
+        this.createdIn = Instant.now();
+        this.updatedIn = Instant.now();
     }
 
     public Carrito(ObjectId _id, List<Producto> products, List<ArmadoPC> pcS, Cliente client) {
@@ -35,8 +35,8 @@ public class Carrito {
         this.pcS = (pcS != null)?pcS: new ArrayList<>();
         this.client = client;
 
-        this.created_In = Instant.now();
-        this.updated_In = Instant.now();
+        this.createdIn = Instant.now();
+        this.updatedIn = Instant.now();
 
         this.totalCost = 0;
 
@@ -55,26 +55,26 @@ public class Carrito {
     public void agregarProducto(Producto p) {
         this.products.add(p);
         this.totalCost += p.getPrice();
-        this.updated_In = Instant.now();
+        this.updatedIn = Instant.now();
     }
 
     public void agregarPC(ArmadoPC pc) {
         this.pcS.add(pc);
         this.totalCost += pc.getTotalPrice();
-        this.updated_In = Instant.now();
+        this.updatedIn = Instant.now();
     }
 
     public void removerProducto(Producto p) {
         if (this.products.remove(p)) {
             this.totalCost -= p.getPrice();
-            this.updated_In = Instant.now();
+            this.updatedIn = Instant.now();
         }
     }
 
     public void removerPC(ArmadoPC pc) {
         if (this.pcS.remove(pc)) {
             this.totalCost -= pc.getTotalPrice();
-            this.updated_In = Instant.now();
+            this.updatedIn = Instant.now();
         }
     }
     public ObjectId get_id() {
@@ -117,19 +117,19 @@ public class Carrito {
         this.client = client;
     }
 
-    public Instant getCreated_In() {
-        return created_In;
+    public Instant getCreatedIn() {
+        return createdIn;
     }
 
-    public void setCreated_In(Instant created_In) {
-        this.created_In = created_In;
+    public void setCreatedIn(Instant createdIn) {
+        this.createdIn = createdIn;
     }
 
-    public Instant getUpdated_In() {
-        return updated_In;
+    public Instant getUpdatedIn() {
+        return updatedIn;
     }
 
-    public void setUpdated_In(Instant updated_In) {
-        this.updated_In = updated_In;
+    public void setUpdatedIn(Instant updatedIn) {
+        this.updatedIn = updatedIn;
     }
 }
