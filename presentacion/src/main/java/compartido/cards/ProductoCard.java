@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.function.Consumer;
 
 public class ProductoCard extends JPanel {
     private JLabel imagenProductoLbl;
@@ -20,6 +21,9 @@ public class ProductoCard extends JPanel {
     private double precioProducto;
     private String imagenUrl;
 
+    // callback para notificar selección
+    private Consumer<String> onSelect;
+
     public ProductoCard(String id, String nombreProducto, double productoPrecio, String imagenUrl){
         this.id = id;
         this.nombreProducto = nombreProducto;
@@ -30,6 +34,14 @@ public class ProductoCard extends JPanel {
         añadirComponentes();
         setupListeners();
 
+    }
+
+    public void setOnSelect(Consumer<String> onSelect) {
+        this.onSelect = onSelect;
+    }
+
+    public String getId() {
+        return id;
     }
 
     private void initComponents(){
@@ -84,14 +96,28 @@ public class ProductoCard extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 System.out.println("Tarjeta de producto clickeada: " + nombreProducto);
+                if (onSelect != null) {
+                    onSelect.accept(id);
+                }
 
             }
+        });
+
+        // también permitir seleccionar con el botón "Ir al producto"
+        productoLinkBtn.addActionListener(e -> {
+            if (onSelect != null) onSelect.accept(id);
         });
     }
 
     private void cargarImagen(String path){
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
+            java.net.URL location = getClass().getResource(path);
+            if (location == null) {
+                imagenProductoLbl.setText("No Image");
+                imagenProductoLbl.setIcon(null);
+                return;
+            }
+            ImageIcon originalIcon = new ImageIcon(location);
             Image originalImage = originalIcon.getImage();
             Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
             imagenProductoLbl.setIcon(new ImageIcon(scaledImage));

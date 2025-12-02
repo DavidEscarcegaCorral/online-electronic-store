@@ -9,6 +9,7 @@ public class MarcaProcesadorCard extends JPanel {
     private JLabel imagenMarcaLbl;
     private String nombreMarca;
     private String imagenUrl;
+    private java.util.function.Consumer<String> onMarcaSelected;
 
     public MarcaProcesadorCard(String nombreMarca, String imagenUrl) {
         this.nombreMarca = nombreMarca;
@@ -17,6 +18,10 @@ public class MarcaProcesadorCard extends JPanel {
         initComponentes();
         añadirComponentes();
         setupListeners();
+    }
+
+    public void setOnMarcaSelected(java.util.function.Consumer<String> callback) {
+        this.onMarcaSelected = callback;
     }
 
     private void initComponentes() {
@@ -56,7 +61,10 @@ public class MarcaProcesadorCard extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Tarjeta de producto clickeada: " + nombreMarca);
+                System.out.println("Marca seleccionada: " + nombreMarca);
+                if (onMarcaSelected != null) {
+                    onMarcaSelected.accept(nombreMarca);
+                }
             }
         });
     }

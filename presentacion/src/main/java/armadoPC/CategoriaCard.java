@@ -13,6 +13,8 @@ public class CategoriaCard extends JPanel {
 
     private String nombreCategoria;
     private String imagenUrl;
+    // callback que notifica la seleccion de categoria
+    private java.util.function.Consumer<String> onCategoriaSelected;
 
     public CategoriaCard(String nombreCategoria, String imagenUrl) {
         this.nombreCategoria = nombreCategoria;
@@ -22,6 +24,10 @@ public class CategoriaCard extends JPanel {
         añadirComponentes();
         setupListeners();
 
+    }
+
+    public void setOnCategoriaSelected(java.util.function.Consumer<String> callback) {
+        this.onCategoriaSelected = callback;
     }
 
     private void initComponents() {
@@ -106,7 +112,10 @@ public class CategoriaCard extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Tarjeta de producto clickeada: " + nombreCategoria);
+                System.out.println("Categoria clickeada: " + nombreCategoria);
+                if (onCategoriaSelected != null) {
+                    onCategoriaSelected.accept(nombreCategoria);
+                }
 
             }
         });
