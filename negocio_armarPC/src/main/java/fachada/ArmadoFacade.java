@@ -65,12 +65,16 @@ public class ArmadoFacade implements IArmadoFacade {
     // Logica de negocio
     /**
      * Valida si un componente nuevo es compatible con el ensamblaje actual.
+     * 
      * @param componenteNuevo El componente a probar.
-     * @param ensamblaje El ensamblaje actual.
+     * @param ensamblaje      El ensamblaje actual.
      * @return Lista de errores. Vacía si es compatible.
      */
     private List<String> validarCompatibilidad(ComponenteDTO componenteNuevo, EnsamblajeDTO ensamblaje) {
         List<String> errores = new ArrayList<>();
+
+        if (ensamblaje == null)
+            return errores; // Si no hay ensamblaje, todo es compatible (primer componente o check de stock)
 
         // Obtenemos los componentes clave ya seleccionados
         ComponenteDTO placaMadre = ensamblaje.getComponente("Tarjeta Madre");
@@ -95,7 +99,8 @@ public class ArmadoFacade implements IArmadoFacade {
                 if (ram != null && !ram.getTipoRam().equals(componenteNuevo.getTipoRam())) {
                     errores.add("Tipo de RAM incompatible con RAM (" + ram.getTipoRam() + ")");
                 }
-                if (gabinete != null && gabinete.getFormFactor().equals("Micro-ATX") && componenteNuevo.getFormFactor().equals("ATX")) {
+                if (gabinete != null && gabinete.getFormFactor().equals("Micro-ATX")
+                        && componenteNuevo.getFormFactor().equals("ATX")) {
                     errores.add("Placa ATX no cabe en gabinete Micro-ATX");
                 }
                 break;
@@ -107,7 +112,8 @@ public class ArmadoFacade implements IArmadoFacade {
                 break;
 
             case "Gabinete":
-                if (placaMadre != null && componenteNuevo.getFormFactor().equals("Micro-ATX") && placaMadre.getFormFactor().equals("ATX")) {
+                if (placaMadre != null && componenteNuevo.getFormFactor().equals("Micro-ATX")
+                        && placaMadre.getFormFactor().equals("ATX")) {
                     errores.add("Gabinete Micro-ATX es muy pequeño para la Placa Madre (ATX)");
                 }
                 break;
@@ -117,4 +123,75 @@ public class ArmadoFacade implements IArmadoFacade {
 
         return errores;
     }
+
+    @Override
+    public boolean verificarStockSuficiente(String tipoUso) {
+        // Lógica simplificada: verificar si hay al menos un componente de cada
+        // categoría crítica
+        String[] categoriasCriticas = { "Procesador", "Tarjeta Madre", "Memoria RAM", "Tarjeta de video",
+                "Fuente de poder", "Gabinete" };
+        for (String cat : categoriasCriticas) {
+            List<ComponenteDTO> disponibles = obtenerComponentesCompatibles(cat, tipoUso);
+            if (disponibles.isEmpty()) {
+                // Si es oficina, tal vez no necesite GPU dedicada si el procesador tiene
+                // gráficos integrados
+                // Pero por simplicidad, asumiremos que todos necesitan todo por ahora, o
+                // ajustamos:
+                if (tipoUso.equalsIgnoreCase("OFFICE") && cat.equals("Tarjeta de video")) {
+                    continue; // Oficina puede no requerir GPU dedicada (asumiendo iGPU)
+                }
+                System.out.println("Falta stock para: " + cat);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<ComponenteDTO> obtenerComponentesCompatibles(String categoria, String tipoUso) {
+        // 1. Obtener todos los de la categoría
+        List<ComponenteDTO> todos = this.componenteON.obtenerPorCategoria(categoria);
+        List<ComponenteDTO> compatibles = new ArrayList<>();
+
+        // 2. Filtrar por compatibilidad con ensamblaje actual
+        for (ComponenteDTO c : todos) {
+            if (validarCompatibilidad(c, this.ensamblajeActual).isEmpty()) {
+                compatibles.add(c);
+            }
+        }
+
+        // 3. Filtrar por Tipo de Uso (Lógica de negocio simulada)
+        // Por ejemplo, si es GAMER, solo mostrar componentes de gama media/alta o
+        // ciertas series
+        if (tipoUso != null) {
+            compatibles = filtrarPorUso(compatibles, tipoUso);
+        }
+
+        return compatibles;
+    }
+
+    private List<ComponenteDTO> filtrarPorUso(List<ComponenteDTO> componentes, String tipoUso) {
+        // Implementación simple de filtrado por uso
+        // En un sistema real, esto podría basarse en tags o propiedades del componente
+        List<ComponenteDTO> filtrados = new ArrayList<>();
+        for (ComponenteDTO c : componentes) {
+            boolean apto = true;
+            if (tipoUso.equalsIgnoreCase("OFFICE")) {
+                // Para oficina, evitar componentes muy caros o "Gamer" excesivos
+                if (c.getNombre().toUpperCase().contains("RTX 3090") || c.getNombre().toUpperCase().contains("I9")) {
+                    apto = false;
+                }
+            } else if (tipoUso.equalsIgnoreCase("GAMER")) {
+                // Para gamer, evitar componentes muy básicos
+                if (c.getNombre().toUpperCase().contains("CELERON") || c.getNombre().toUpperCase().contains("GT 710")) {
+                    apto = false;
+                }
+            }
+            if (apto) {
+                filtrados.add(c);
+            }
+        }
+        return filtrados;
+    }
+
 }

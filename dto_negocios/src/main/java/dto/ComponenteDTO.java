@@ -1,37 +1,31 @@
 package dto;
 
+/**
+ * DTO que representa un componente de hardware.
+ */
 public class ComponenteDTO {
     private String id;
     private String nombre;
-    private double precioCompra;
-    private double costoCompra;
+    private double precio;
     private String categoria;
-    private String imagenUrl;
-
-    // Atributos para validar compatibilidad
     private String socket;
     private String tipoRam;
     private String formFactor;
     private int watts;
 
-    public ComponenteDTO() {
-
-    }
-
-    public ComponenteDTO(String id, String nombre, double precioCompra, double costoCompra, String categoria, String imagenUrl) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precioCompra = precioCompra;
-        this.costoCompra = costoCompra;
-        this.categoria = categoria;
-        this.imagenUrl = imagenUrl;
-    }
+    public ComponenteDTO() {}
 
     public String getId() { return id; }
-    public String getNombre() { return nombre; }
-    public double getPrecioCompra() { return precioCompra; }
-    public String getCategoria() { return categoria; }
+    public void setId(String id) { this.id = id; }
 
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public double getPrecio() { return precio; }
+    public void setPrecio(double precio) { this.precio = precio; }
+
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 
     public String getSocket() { return socket; }
     public void setSocket(String socket) { this.socket = socket; }

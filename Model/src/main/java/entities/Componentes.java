@@ -10,8 +10,9 @@ public class Componentes {
     private String name;
     private String description;
     private Integer price;
-    private Integer Stock;
+    private Integer stock;
     private TipoComponente componentType;
+
     @BsonProperty("created_In")
     private Instant created_In;
 
@@ -21,13 +22,15 @@ public class Componentes {
     public Componentes() {
     }
 
-    public Componentes(ObjectId _id, String name, String description, Integer price, Integer stock, TipoComponente componentType) {
+    public Componentes(ObjectId _id, String name, String description, Integer price, Integer stock, TipoComponente componentType, Instant created_In, Instant updated_In) {
         this._id = _id;
         this.name = name;
         this.description = description;
         this.price = price;
-        Stock = stock;
+        stock = stock;
         this.componentType = componentType;
+        this.created_In = created_In;
+        this.updated_In = updated_In;
     }
 
     public ObjectId get_id() {
@@ -63,11 +66,11 @@ public class Componentes {
     }
 
     public Integer getStock() {
-        return Stock;
+        return stock;
     }
 
     public void setStock(Integer stock) {
-        Stock = stock;
+        stock = stock;
     }
 
     public TipoComponente getComponentType() {
@@ -76,5 +79,21 @@ public class Componentes {
 
     public void setComponentType(TipoComponente componentType) {
         this.componentType = componentType;
+    }
+
+    public Instant getCreated_In() {
+        return created_In;
+    }
+
+    public void setCreated_In(Instant created_In) {
+        this.created_In = created_In;
+    }
+
+    public Instant getUpdated_In() {
+        return updated_In;
+    }
+
+    public void setUpdated_In(Instant updated_In) {
+        this.updated_In = updated_In;
     }
 }

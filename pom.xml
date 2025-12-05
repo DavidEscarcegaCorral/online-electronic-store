@@ -18,13 +18,15 @@
     <modules>
         <module>dto_negocios</module>
         <module>objetos_negocio</module>
+
+        <module>bo_negocio</module>
+        <module>dao_datos</module>
+        <module>negocio_configuracion</module>
+        <module>negocio_venta</module>
         <module>presentacion</module>
         <module>negocios_ControlSesion</module>
         <module>negocio_armarPC</module>
-        <module>Config</module>
-        <module>Model</module>
-        <module>DAO</module>
-        <module>Exceptions</module>
+
     </modules>
 
 </project>
