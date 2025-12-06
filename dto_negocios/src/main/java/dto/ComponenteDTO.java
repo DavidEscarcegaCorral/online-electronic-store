@@ -8,34 +8,111 @@ public class ComponenteDTO {
     private String nombre;
     private double precio;
     private String categoria;
+    private String marca;
     private String socket;
     private String tipoRam;
     private String formFactor;
     private int watts;
+    private int stock;
+    private String descripcion;
+    private String imagenUrl;
 
-    public ComponenteDTO() {}
+    public ComponenteDTO() {
+    }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getSocket() { return socket; }
-    public void setSocket(String socket) { this.socket = socket; }
+    public double getPrecio() {
+        return precio;
+    }
 
-    public String getTipoRam() { return tipoRam; }
-    public void setTipoRam(String tipoRam) { this.tipoRam = tipoRam; }
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
 
-    public String getFormFactor() { return formFactor; }
-    public void setFormFactor(String formFactor) { this.formFactor = formFactor; }
+    public String getCategoria() {
+        return categoria;
+    }
 
-    public int getWatts() { return watts; }
-    public void setWatts(int watts) { this.watts = watts; }
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    public String getSocket() {
+        return socket;
+    }
+
+    public void setSocket(String socket) {
+        this.socket = socket;
+    }
+
+    public String getTipoRam() {
+        return tipoRam;
+    }
+
+    public void setTipoRam(String tipoRam) {
+        this.tipoRam = tipoRam;
+    }
+
+    public String getFormFactor() {
+        return formFactor;
+    }
+
+    public void setFormFactor(String formFactor) {
+        this.formFactor = formFactor;
+    }
+
+    public int getWatts() {
+        return watts;
+    }
+
+    public void setWatts(int watts) {
+        this.watts = watts;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
 }

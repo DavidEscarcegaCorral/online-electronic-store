@@ -11,6 +11,8 @@ public class MenuComponentesPanel extends JPanel {
     private JPanel panelMenu;
     private JPanel panelCentro;
     private JLabel titulo;
+    private Boton categoriasBtn;
+    private Boton marcaProcesadorBtn;
     private Boton procesadorBtn;
     private Boton tarjetaMadreBtn;
     private Boton memoriaRAMBtn;
@@ -23,7 +25,7 @@ public class MenuComponentesPanel extends JPanel {
     private Boton MonitorBtn;
     private Boton kitTecladoRatonBtn;
     private Boton redBtn;
-    private Boton resumenBtn;
+    private Boton resumenConfiguracionBtn;
 
     public MenuComponentesPanel() {
         setOpaque(false);
@@ -42,32 +44,36 @@ public class MenuComponentesPanel extends JPanel {
         panelCentro = new JPanel();
         panelCentro.setOpaque(false);
         panelCentro.setPreferredSize(new Dimension(230, 745));
-        panelCentro.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 15));
+        panelCentro.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 10));
+        panelCentro.add(categoriasBtn);
+        panelCentro.add(Box.createVerticalStrut(10));
+        panelCentro.add(marcaProcesadorBtn);
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(procesadorBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(tarjetaMadreBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(memoriaRAMBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(almacenamientoBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(unidadSSDBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(tarjetaDeVideoBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(fuenteDePoderBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(disipadorBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(VentiladorBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(MonitorBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(kitTecladoRatonBtn);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(redBtn);
-        panelCentro.add(Box.createVerticalStrut(1));
-        panelCentro.add(resumenBtn);
+        panelCentro.add(Box.createVerticalStrut(10));
+        panelCentro.add(resumenConfiguracionBtn);
 
         add(panelMenu);
         add(panelCentro);
@@ -77,6 +83,12 @@ public class MenuComponentesPanel extends JPanel {
         titulo = new JLabel("Menú");
         titulo.setFont(FontUtil.loadFont(32, "Iceland-Regular"));
         titulo.setForeground(Color.white);
+
+        categoriasBtn = new Boton("Categorías", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        categoriasBtn.setNewFont();
+
+        marcaProcesadorBtn = new Boton("Marca Procesador", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        marcaProcesadorBtn.setNewFont();
 
         procesadorBtn = new Boton("Procesador", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
         procesadorBtn.setNewFont();
@@ -114,8 +126,8 @@ public class MenuComponentesPanel extends JPanel {
         redBtn = new Boton("Redes e internet", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
         redBtn.setNewFont();
 
-        resumenBtn = new Boton("Resumen", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
-        resumenBtn.setNewFont();
+        resumenConfiguracionBtn = new Boton("Resumen Configuración", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        resumenConfiguracionBtn.setNewFont();
 
     }
 
@@ -178,7 +190,4 @@ public class MenuComponentesPanel extends JPanel {
         return redBtn;
     }
 
-    public Boton getResumenBtn() {
-        return resumenBtn;
-    }
 }

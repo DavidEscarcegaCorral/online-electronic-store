@@ -23,6 +23,7 @@ public class ProductoCard extends JPanel {
 
     // callback para notificar selección
     private Consumer<String> onSelect;
+    private boolean seleccionado = false;
 
     public ProductoCard(String id, String nombreProducto, double productoPrecio, String imagenUrl){
         this.id = id;
@@ -42,6 +43,15 @@ public class ProductoCard extends JPanel {
 
     public String getId() {
         return id;
+    }
+
+    public void setSeleccionado(boolean seleccionado) {
+        this.seleccionado = seleccionado;
+        repaint();
+    }
+
+    public boolean isSeleccionado() {
+        return seleccionado;
     }
 
     private void initComponents(){
@@ -137,6 +147,13 @@ public class ProductoCard extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.WHITE);
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+
+        if (seleccionado) {
+            g2d.setColor(Estilos.COLOR_ENFASIS);
+            g2d.setStroke(new BasicStroke(3));
+            g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 25, 25);
+        }
+
         g2d.dispose();
     }
 }
