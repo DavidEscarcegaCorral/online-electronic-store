@@ -31,22 +31,22 @@ La aplicación utiliza una arquitectura en capas modular con los siguientes subs
   - ComponenteON: Gestión del catálogo de componentes
   - Interfaces de negocio (IComponenteON)
 
-- **`negocio_configuracion`** — **[NUEVO]** Subsistema de configuración secuencial:
+- **`negocio_configuracion`** — Subsistema de configuración secuencial:
   - Flujo: Categoría → Marca → Productos
   - Validación de disponibilidad de productos
   - ConfiguracionFacade: Punto de entrada único
 
-- **`negocio_venta`** — **[NUEVO]** Subsistema de ventas y pago:
+- **`negocio_venta`** — Subsistema de ventas y pago:
   - Gestión de carrito de compras
   - Proceso de pago (mock - happy path)
   - Actualización de stock
   - VentaFacade: Punto de entrada único
 
-- **`negocio_armarPC`** — **[ACTUALIZADO]** Fachada de armado de PC:
+- **`negocio_armarPC`** — Fachada de armado de PC:
   - Validación de compatibilidad entre componentes
   - Filtrado por tipo de uso (GAMER, OFFICE)
-  - **Nuevo**: Soporte para cambiar componentes ya seleccionados
-  - **Nuevo**: Revalidación de ensamblaje completo
+  - Soporte para cambiar componentes ya seleccionados
+  - Revalidación de ensamblaje completo
   - ArmadoFacade: Punto de entrada único
 
 ### Módulo de Presentación
