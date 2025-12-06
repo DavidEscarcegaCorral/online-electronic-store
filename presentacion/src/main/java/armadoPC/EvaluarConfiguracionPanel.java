@@ -7,14 +7,11 @@ import java.awt.*;
 
 public class EvaluarConfiguracionPanel extends JPanel {
 
-
     public EvaluarConfiguracionPanel() {
         setOpaque(false);
         setPreferredSize(new Dimension(240, 700));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-
     }
 
     @Override

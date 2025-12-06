@@ -4,16 +4,44 @@ import compartido.estilos.Estilos;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 public class MarcaProcesadorPanel extends JPanel {
     private static MarcaProcesadorCard intel = new MarcaProcesadorCard("Intel", "/img/marcas/intelLogo.png");
     private static MarcaProcesadorCard amd = new MarcaProcesadorCard("AMD", "/img/marcas/AMDLogo.png");
+    private java.util.function.Consumer<String> onMarcaSelected;
 
     public MarcaProcesadorPanel() {
         setOpaque(false);
         setLayout(new FlowLayout(FlowLayout.CENTER, 25, 25));
         add(intel);
         add(amd);
+
+        configurarCallbacks();
+    }
+
+    private void configurarCallbacks() {
+        intel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (onMarcaSelected != null) {
+                    onMarcaSelected.accept("Intel");
+                }
+            }
+        });
+
+        amd.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (onMarcaSelected != null) {
+                    onMarcaSelected.accept("AMD");
+                }
+            }
+        });
+    }
+
+    public void setOnMarcaSelected(Consumer<String> callback) {
+        this.onMarcaSelected = callback;
     }
 
     @Override

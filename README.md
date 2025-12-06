@@ -1,47 +1,135 @@
-# online-electronic-store — instrucciones rápidas
+# online-electronic-store — Tienda Online de Componentes Electrónicos
 
-Este repositorio contiene una aplicación modular Java (Maven) mínima para un caso base de tienda online y armado de PCs. He añadido módulos mínimos para poder ejecutar un flujo de venta usando DAOs en memoria y un `Runner` de prueba.
+Este repositorio contiene una aplicación modular Java (Maven) para una tienda online especializada en armado de PCs con validación de compatibilidad de componentes y gestión de ventas.
 
-Requisitos locales
-- Java JDK (11+ recomendado, el POM usa compilación Java 23 pero puedes ajustar en tu entorno).
-- Maven instalado y disponible en PATH (`mvn -v`).
+## Requisitos
+- Java JDK 23+
+- Maven 3.6+
+- MongoDB 4.x+ (corriendo en localhost:27017)
 
-Resumen de módulos añadidos/actualizados
-- `dto_negocios` — DTOs en el paquete `dto.model` (ComponenteDTO, EnsamblajeDTO, CarritoDTO, ItemCarritoDTO, CompraDTO, MetodoPagoDTO, ClienteDTO).
-- `dao_datos` — DAOs in-memory (ICatalogoDAO, IPedidoDAO, InMemoryCatalogoDAO, InMemoryPedidoDAO).
-- `bo_negocio` — BOs (CarritoBO, PedidoBO, PagoBO).
-- `negocio_venta` — Fachada de venta (IVentaFacade, VentaFacade) y un `Runner` de prueba en `debug.Runner`.
-- `negocio_configuracion` — Fábrica simple (ConfiguracionFactory) para resolver fachadas (opcional).
-- `presentacion/pom.xml` actualizado para depender de `negocio_configuracion` y `dto_negocios`.
+## Arquitectura del Proyecto
 
-Comandos útiles (PowerShell)
-- Compilar todo:
-```powershell
-mvn -DskipTests clean install
+La aplicación utiliza una arquitectura en capas modular con los siguientes subsistemas:
+
+### Módulos de Datos
+
+- **`dominio_datos`** — Entidades de dominio mapeadas a MongoDB:
+  - ProductoEntidad: Productos del catálogo
+  - PedidoEntidad: Órdenes de compra
+
+- **`dao_datos`** — Capa de acceso a datos:
+  - ProductoDAO: CRUD de productos con filtros por categoría y marca
+  - PedidoDAO: Gestión de pedidos
+  - ConexionMongoDB: Singleton para conexión a base de datos
+
+### Módulos de Negocio
+
+- **`dto_negocios`** — Objetos de transferencia de datos (DTOs):
+  - ComponenteDTO, EnsamblajeDTO, CarritoDTO, ItemCarritoDTO, CompraDTO, MetodoPagoDTO, ClienteDTO
+
+- **`objetos_negocio`** — Capa de lógica de negocio:
+  - ComponenteON: Gestión del catálogo de componentes
+  - Interfaces de negocio (IComponenteON)
+
+- **`negocio_configuracion`** — Subsistema de configuración secuencial:
+  - Flujo: Categoría → Marca → Productos
+  - Validación de disponibilidad de productos
+  - ConfiguracionFacade: Punto de entrada único
+
+- **`negocio_venta`** — Subsistema de ventas y pago:
+  - Gestión de carrito de compras
+  - Proceso de pago (mock - happy path)
+  - Actualización de stock
+  - VentaFacade: Punto de entrada único
+
+- **`negocio_armarPC`** — Fachada de armado de PC:
+  - Validación de compatibilidad entre componentes
+  - Filtrado por tipo de uso (GAMER, OFFICE)
+  - Soporte para cambiar componentes ya seleccionados
+  - Revalidación de ensamblaje completo
+  - ArmadoFacade: Punto de entrada único
+
+### Módulo de Presentación
+
+- **`presentacion`** — Interfaz gráfica de usuario (Swing):
+  - Paneles de armado de PC paso a paso
+  - Catálogos de componentes con cards
+  - Sistema de navegación por tarjetas (CardLayout)
+  - Carrito de compras interactivo
+  - Estilos personalizados y componentes reutilizables
+
+## Características Principales
+
+### Flujo de Configuración Secuencial
+1. Usuario selecciona categoría de componente
+2. Sistema muestra marcas disponibles
+3. Usuario selecciona marca
+4. Sistema muestra productos disponibles
+5. Si no hay productos → Notificación y fin del flujo
+6. Usuario hace clic en ProductCard → Resaltado visual
+7. Flecha de avance habilitada solo con componente seleccionado
+8. Validación de compatibilidad al agregar componente
+
+### Sistema de Ventas
+- Carrito de compras con gestión de items
+- Verificación de stock en tiempo real
+- Proceso de pago mock (happy path)
+- Creación automática de pedidos
+- Actualización de inventario
+
+### Validaciones de Compatibilidad
+- Socket de procesador vs tarjeta madre
+- Tipo de RAM (DDR4/DDR5)
+- Form factor (ATX/Micro-ATX)
+- Consumo eléctrico vs fuente de poder
+
+## Tecnologías Utilizadas
+
+- **Java 23**
+- **Maven** — Gestión de dependencias y construcción
+- **MongoDB** — Base de datos NoSQL
+- **MongoDB Java Driver 4.11.1** — Conexión a base de datos
+- **Swing** — Interfaz gráfica de usuario
+- **Patrón Facade** — Aislamiento de subsistemas
+- **Patrón Singleton** — Gestión de instancias únicas
+- **Patrón DAO** — Acceso a datos
+
+## Estructura del Proyecto
+
 ```
-- Ejecutar el runner de prueba (desde la raíz):
-```powershell
-mvn -pl negocio_venta exec:java
+online-electronic-store/
+├── dominio_datos/          # Entidades MongoDB
+├── dao_datos/              # Acceso a datos
+├── dto_negocios/           # DTOs
+├── objetos_negocio/        # Lógica de negocio base
+├── negocio_configuracion/  # Flujo secuencial
+├── negocio_venta/          # Gestión de ventas
+├── negocio_armarPC/        # Validación de compatibilidad
+├── presentacion/           # UI (Swing)
+└── README.md               # Este archivo
 ```
-(El plugin `exec-maven-plugin` se añadió a `negocio_venta/pom.xml` con `debug.Runner` como `mainClass`.)
+## Notas Importantes
 
-Qué hace el Runner
-- Crea un carrito, agrega un item, crea un pedido (checkout), simula el pago con un mock y persiste el pedido en memoria. Imprime `Pago OK: true/false, pedidoId: <id>`.
+1. MongoDB debe estar corriendo antes de ejecutar la aplicación
+2. Ejecutar el script para tener datos de prueba
+3. Las imágenes deben estar en `presentacion/src/main/resources/img/`
+4. Conexión a MongoDB: `mongodb://localhost:27017/highspecs_db`
 
-Problemas comunes y solución rápida
-- Si ves errores de "Duplicate class" relacionados con clases generadas en `target/generated-sources`:
-  - Ejecuta `mvn clean` para eliminar `target` y recompila.
-  - Si el proceso de generación vuelve a crear clases con paquete `dto`, considera ajustar/identificar el plugin que genera ese código o renombrar paquetes generados.
+## Funcionalidades Principales
 
-Siguientes pasos recomendados
-- Añadir tests JUnit para los flujos "venta" y "armado".
-- Implementar persistencia real (MongoDB) si deseas producción; por ahora está el mock in-memory.
-- Revisar y ajustar la versión de Java en los POMs si tu JDK difiere (el `pom.xml` raíz usa `maven.compiler.source/target` = 23).
+1. **Armado de PC Guiado**:
+   - Selección de tipo de PC (Gamer, Office, etc.)
+   - Validación de stock suficiente
+   - Selección de componentes paso a paso
+   - Validación automática de compatibilidad
 
-Si quieres, puedo:
-- Añadir tests unitarios básicos.
-- Implementar la integración con MongoDB (añadir dependencias y un DAO concreto).
-- Crear un módulo `runner` separado si prefieres no poner `debug.Runner` dentro de `negocio_venta`.
+2. **Validaciones de Compatibilidad**:
+   - Socket del procesador con tarjeta madre
+   - Tipo de RAM (DDR4, DDR5)
+   - Form factor (ATX, Micro-ATX)
+   - Otros criterios específicos por categoría
 
-Si encuentras errores al ejecutar `mvn`, pega la salida aquí y lo depuro contigo.
+3. **Filtrado**:
+   - Solo se muestran componentes compatibles con la selección actual
+   - Prevención de selecciones incompatibles
 

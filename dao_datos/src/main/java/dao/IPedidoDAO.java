@@ -1,13 +1,19 @@
 package dao;
 
-import dto.CompraDTO;
+import entidades.PedidoEntidad;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
- * Interfaz DAO para persistir pedidos/compras.
+ * Interfaz para operaciones de acceso a datos de Pedidos.
  */
 public interface IPedidoDAO {
-    void save(CompraDTO compra);
-    Optional<CompraDTO> findById(String id);
+    String crearPedido(PedidoEntidad pedido);
+
+    PedidoEntidad obtenerPorId(String id);
+
+    List<PedidoEntidad> obtenerPorCliente(String clienteId);
+
+    boolean actualizarEstado(String id, String nuevoEstado);
 }
+
