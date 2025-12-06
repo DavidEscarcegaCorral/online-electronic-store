@@ -9,14 +9,11 @@ import menuprincipal.MenuPrincipalPanel;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import dao.ProductoDAO;
+import fachada.ArmadoFacade;
+import fachada.IArmadoFacade;
 
 public class ControlDeNavegacion {
-    // Constantes para índices de navegación
-    private static final int INDICE_INICIO_MENUS = 2;
-    private static final int DIRECCION_ADELANTE = 1;
-    private static final int DIRECCION_ATRAS = -1;
-
-    // Índices de componentes
     private static final int INDICE_PROCESADOR = 2;
     private static final int INDICE_TARJETA_MADRE = 3;
     private static final int INDICE_MEMORIA_RAM = 4;
@@ -35,6 +32,8 @@ public class ControlDeNavegacion {
     private final ArmarPcPanel armarEquipoPantalla;
     private final CarritoPanel carritoPantalla;
 
+    private int indiceActual = 0;
+
     public ControlDeNavegacion(FramePrincipal framePrincipal) {
         this.framePrincipal = framePrincipal;
         this.menuPrincipalPanel = new MenuPrincipalPanel();
@@ -43,36 +42,32 @@ public class ControlDeNavegacion {
 
         inicializarVista();
         configurarBarraNavegacion();
-        configurarNavegacionArmarPC();
         configurarBotonesComponentes();
+        configurarNavegacionInterna();
+        configurarCallbacksNegocio();
     }
 
-    /**
-     * Inicializa la vista mostrando el panel principal.
-     */
     private void inicializarVista() {
         framePrincipal.setPanelContenido(menuPrincipalPanel);
         framePrincipal.setVisible(true);
+
+        armarEquipoPantalla.mostrarMenusLaterales();
+        habilitarMenusLaterales(false);
     }
 
-    /**
-     * Configura los listeners de la barra de navegación principal.
-     */
     private void configurarBarraNavegacion() {
         BarraNavegacion barra = framePrincipal.getBarraNavegacion();
 
-        // Botón de inicio/home
         barra.getBoton().addActionListener(e -> mostrarNuevaPantalla(menuPrincipalPanel));
 
-        // Label de "Armar PC"
         barra.getArmarPcLbl().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 mostrarNuevaPantalla(armarEquipoPantalla);
+                mostrarPasoInicialArmar();
             }
         });
 
-        // Label de "Carrito"
         barra.getCarritoLbl().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -81,146 +76,180 @@ public class ControlDeNavegacion {
         });
     }
 
-    /**
-     * Configura los botones de navegación (continuar/retroceder) del panel de armado.
-     */
-    private void configurarNavegacionArmarPC() {
-        armarEquipoPantalla.getContinuarBtn()
-            .addActionListener(e -> navegarDireccion(DIRECCION_ADELANTE));
-
-        armarEquipoPantalla.getRetrocederBtn()
-            .addActionListener(e -> navegarDireccion(DIRECCION_ATRAS));
-    }
-
-    /**
-     * Configura los listeners para los botones de selección directa de componentes.
-     */
     private void configurarBotonesComponentes() {
         var menuComponentes = armarEquipoPantalla.getMenuComponentesPanel();
+        if (menuComponentes == null) return;
 
         menuComponentes.getProcesadorBtn()
-            .addActionListener(e -> navegarComponente(INDICE_PROCESADOR));
+            .addActionListener(e -> navegarAIndice(INDICE_PROCESADOR));
 
         menuComponentes.getTarjetaMadreBtn()
-            .addActionListener(e -> navegarComponente(INDICE_TARJETA_MADRE));
+            .addActionListener(e -> navegarAIndice(INDICE_TARJETA_MADRE));
 
         menuComponentes.getMemoriaRAMBtn()
-            .addActionListener(e -> navegarComponente(INDICE_MEMORIA_RAM));
+            .addActionListener(e -> navegarAIndice(INDICE_MEMORIA_RAM));
 
         menuComponentes.getAlmacenamientoBtn()
-            .addActionListener(e -> navegarComponente(INDICE_ALMACENAMIENTO));
+            .addActionListener(e -> navegarAIndice(INDICE_ALMACENAMIENTO));
 
         menuComponentes.getUnidadSSDBtn()
-            .addActionListener(e -> navegarComponente(INDICE_UNIDAD_SSD));
+            .addActionListener(e -> navegarAIndice(INDICE_UNIDAD_SSD));
 
         menuComponentes.getTarjetaDeVideoBtn()
-            .addActionListener(e -> navegarComponente(INDICE_TARJETA_VIDEO));
+            .addActionListener(e -> navegarAIndice(INDICE_TARJETA_VIDEO));
 
         menuComponentes.getFuenteDePoderBtn()
-            .addActionListener(e -> navegarComponente(INDICE_FUENTE_PODER));
+            .addActionListener(e -> navegarAIndice(INDICE_FUENTE_PODER));
 
         menuComponentes.getDisipadorBtn()
-            .addActionListener(e -> navegarComponente(INDICE_DISIPADOR));
+            .addActionListener(e -> navegarAIndice(INDICE_DISIPADOR));
 
         menuComponentes.getVentiladorBtn()
-            .addActionListener(e -> navegarComponente(INDICE_VENTILADOR));
+            .addActionListener(e -> navegarAIndice(INDICE_VENTILADOR));
 
         menuComponentes.getMonitorBtn()
-            .addActionListener(e -> navegarComponente(INDICE_MONITOR));
+            .addActionListener(e -> navegarAIndice(INDICE_MONITOR));
 
         menuComponentes.getKitTecladoRatonBtn()
-            .addActionListener(e -> navegarComponente(INDICE_KIT_TECLADO_RATON));
+            .addActionListener(e -> navegarAIndice(INDICE_KIT_TECLADO_RATON));
 
         menuComponentes.getRedBtn()
-            .addActionListener(e -> navegarComponente(INDICE_RED));
+            .addActionListener(e -> navegarAIndice(INDICE_RED));
     }
 
-    /**
-     * Muestra una nueva pantalla en el frame principal.
-     * @param nuevoPanel El panel a mostrar
-     */
+    private void configurarNavegacionInterna() {
+        var siguiente = armarEquipoPantalla.getContinuarBtn();
+        var retroceder = armarEquipoPantalla.getRetrocederBtn();
+        if (siguiente != null) {
+            siguiente.addActionListener(e -> avanzarPaso());
+        }
+        if (retroceder != null) {
+            retroceder.addActionListener(e -> retrocederPaso());
+        }
+    }
+
+    private void configurarCallbacksNegocio() {
+        armarEquipoPantalla.setOnProductoSelected(productoId -> {
+            try {
+                dto.ComponenteDTO componente = convertirAComponenteDTO(productoId);
+                if (componente == null) {
+                    JOptionPane.showMessageDialog(framePrincipal, "Producto no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
+                java.util.List<String> errores = armadoFacade.agregarComponente(componente);
+                if (!errores.isEmpty()) {
+                    JOptionPane.showMessageDialog(framePrincipal, String.join("\n", errores), "Error de compatibilidad", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
+                    var btn = armarEquipoPantalla.getContinuarBtn();
+                    if (btn != null) btn.setEnabled(true);
+                    habilitarMenusLaterales(true);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(framePrincipal, "Error procesando selección: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
     private void mostrarNuevaPantalla(JPanel nuevoPanel) {
         framePrincipal.setPanelContenido(nuevoPanel);
-    }
-
-    /**
-     * Navega hacia adelante o atrás en el flujo de armado de PC.
-     * @param direction 1 para adelante, -1 para atrás
-     */
-    private void navegarDireccion(int direction) {
-        int indiceActual = armarEquipoPantalla.getIndiceActual();
-        int nuevoIndice = indiceActual + direction;
-        navegarAIndice(nuevoIndice);
-    }
-
-    /**
-     * Navega directamente a un componente específico por su índice.
-     * @param indiceComponente El índice del componente al que navegar
-     */
-    private void navegarComponente(int indiceComponente) {
-        navegarAIndice(indiceComponente);
-    }
-
-    /**
-     * Método centralizado para navegar a cualquier índice del flujo de armado.
-     * Gestiona la validación, actualización de menús y cambio de pantalla.
-     * @param nuevoIndice El índice al que se quiere navegar
-     */
-    private void navegarAIndice(int nuevoIndice) {
-        // Validar que el índice esté dentro del rango válido
-        if (!esIndiceValido(nuevoIndice)) {
-            return;
-        }
-
-        // Gestionar visibilidad de menús de navegación
-        actualizarVisibilidadMenus(nuevoIndice);
-
-        // Actualizar la vista del panel de armado
-        actualizarVistaPanelArmado(nuevoIndice);
-    }
-
-    /**
-     * Valida si un índice está dentro del rango válido de pasos de armado.
-     * @param indice El índice a validar
-     * @return true si el índice es válido, false en caso contrario
-     */
-    private boolean esIndiceValido(int indice) {
-        return indice >= 0 && indice < armarEquipoPantalla.getListaPasosArmado().length;
-    }
-
-    /**
-     * Actualiza la visibilidad de los menús de navegación según el índice.
-     * Los menús se muestran a partir del índice 2 (después de las pantallas iniciales).
-     * @param indice El índice actual de navegación
-     */
-    private void actualizarVisibilidadMenus(int indice) {
-        if (indice >= INDICE_INICIO_MENUS) {
-            armarEquipoPantalla.añadirMenusNavegacion();
-        } else {
-            armarEquipoPantalla.eliminarMenusNavegacion();
+        if (nuevoPanel == armarEquipoPantalla) {
+            armarEquipoPantalla.mostrarMenusLaterales();
+            var contBtn = armarEquipoPantalla.getContinuarBtn();
+            if (contBtn != null) contBtn.setEnabled(true);
+            habilitarMenusLaterales(false);
         }
     }
 
-    /**
-     * Actualiza la vista del panel de armado mostrando el paso correspondiente.
-     * @param indice El índice del paso a mostrar
-     */
-    private void actualizarVistaPanelArmado(int indice) {
+    private void mostrarPasoInicialArmar() {
         String[] pasos = armarEquipoPantalla.getListaPasosArmado();
+        if (pasos != null && pasos.length > 0) {
+            indiceActual = 0;
+            armarEquipoPantalla.getCardLayout().show(armarEquipoPantalla.getCardsPanel(), pasos[0]);
+            var cont = armarEquipoPantalla.getContinuarBtn();
+            if (cont != null) cont.setEnabled(true);
+            habilitarMenusLaterales(false);
+        }
+    }
 
-        // Cambiar a la tarjeta correspondiente
-        armarEquipoPantalla.getCardLayout().show(
-            armarEquipoPantalla.getCardsPanel(),
-            pasos[indice]
-        );
+    private void navegarAIndice(int nuevoIndice) {
+        if (!esIndiceValido(nuevoIndice)) return;
 
-        // Actualizar el índice actual
-        armarEquipoPantalla.setIndiceActual(indice);
+        armarEquipoPantalla.mostrarMenusLaterales();
+        habilitarMenusLaterales(nuevoIndice >= 2);
 
-        // Actualizar el título del paso
-        armarEquipoPantalla.getSubTItuloLabel().setTitulo(pasos[indice]);
+        String[] pasos = armarEquipoPantalla.getListaPasosArmado();
+        indiceActual = nuevoIndice;
+        armarEquipoPantalla.getCardLayout().show(armarEquipoPantalla.getCardsPanel(), pasos[nuevoIndice]);
 
-        // Actualizar estado de botones (habilitar/deshabilitar)
-        armarEquipoPantalla.updateButtonState();
+        var contBtn = armarEquipoPantalla.getContinuarBtn();
+        if (contBtn != null) {
+            contBtn.setEnabled(nuevoIndice <= 1);
+        }
+
+        String paso = pasos[nuevoIndice];
+        int maxIndice = pasos.length - 1;
+        if (nuevoIndice >= 2 && nuevoIndice < maxIndice) {
+            armarEquipoPantalla.cargarCatalogo(paso);
+        }
+    }
+
+    private dto.ComponenteDTO convertirAComponenteDTO(String productoId) {
+        try {
+            ProductoDAO productoDAO = new ProductoDAO();
+            entidades.ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
+            if (producto == null) return null;
+            dto.ComponenteDTO dto = new dto.ComponenteDTO();
+            dto.setId(producto.getId().toString());
+            dto.setNombre(producto.getNombre());
+            dto.setPrecio(producto.getPrecio());
+            dto.setCategoria(producto.getCategoria());
+            dto.setMarca(producto.getMarca());
+            if (producto.getEspecificaciones() != null) {
+                dto.setSocket(producto.getEspecificaciones().get("socket"));
+                dto.setTipoRam(producto.getEspecificaciones().get("tipoRam"));
+                dto.setFormFactor(producto.getEspecificaciones().get("formFactor"));
+            }
+            return dto;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private boolean esIndiceValido(int indice) {
+        String[] pasos = armarEquipoPantalla.getListaPasosArmado();
+        return pasos != null && indice >= 0 && indice < pasos.length;
+    }
+
+    private void avanzarPaso() {
+        int siguiente = Math.min(indiceActual + 1, armarEquipoPantalla.getListaPasosArmado().length - 1);
+        navegarAIndice(siguiente);
+    }
+
+    private void retrocederPaso() {
+        int anterior = Math.max(indiceActual - 1, 0);
+        navegarAIndice(anterior);
+    }
+
+    private void habilitarMenusLaterales(boolean habilitar) {
+        var menu = armarEquipoPantalla.getMenuComponentesPanel();
+        if (menu == null) return;
+
+        menu.getProcesadorBtn().setEnabled(habilitar);
+        menu.getTarjetaMadreBtn().setEnabled(habilitar);
+        menu.getMemoriaRAMBtn().setEnabled(habilitar);
+        menu.getAlmacenamientoBtn().setEnabled(habilitar);
+        menu.getUnidadSSDBtn().setEnabled(habilitar);
+        menu.getTarjetaDeVideoBtn().setEnabled(habilitar);
+        menu.getFuenteDePoderBtn().setEnabled(habilitar);
+        menu.getDisipadorBtn().setEnabled(habilitar);
+        menu.getVentiladorBtn().setEnabled(habilitar);
+        menu.getMonitorBtn().setEnabled(habilitar);
+        menu.getKitTecladoRatonBtn().setEnabled(habilitar);
+        menu.getRedBtn().setEnabled(habilitar);
     }
 }

@@ -4,6 +4,7 @@ import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
 import dao.ProductoDAO;
 import entidades.ProductoEntidad;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,15 +12,17 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CatalagoPanel extends JPanel {
-    public List<ProductoCard> productoCardList;
+    private final ProductoDAO productoDAO;
     private Consumer<String> onProductoSelected;
-    private ProductoCard productoSeleccionado;
-    private ProductoDAO productoDAO;
 
-    public CatalagoPanel(String Producto) {
+    private ProductoCard productoSeleccionado;
+    public List<ProductoCard> productoCardList;
+
+    public CatalagoPanel() {
         setOpaque(false);
         setPreferredSize(new Dimension(740, 650));
         setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
+
         productoCardList = new ArrayList<>();
         productoDAO = new ProductoDAO();
     }
@@ -43,25 +46,7 @@ public class CatalagoPanel extends JPanel {
                 add(mensajeVacio);
             } else {
                 for (ProductoEntidad producto : productos) {
-                    ProductoCard card = new ProductoCard(
-                            producto.getId().toString(),
-                            producto.getNombre(),
-                            producto.getPrecio(),
-                            "/img/productos/default.png"
-                    );
-
-                    card.setOnSelect(id -> {
-                        if (productoSeleccionado != null) {
-                            productoSeleccionado.setSeleccionado(false);
-                        }
-                        card.setSeleccionado(true);
-                        productoSeleccionado = card;
-
-                        if (onProductoSelected != null) {
-                            onProductoSelected.accept(id);
-                        }
-                    });
-
+                    ProductoCard card = crearProductoCard(producto);
                     productoCardList.add(card);
                     add(card);
                 }
@@ -77,49 +62,29 @@ public class CatalagoPanel extends JPanel {
 
         revalidate();
         repaint();
-
     }
 
-    public void cargarLista(java.util.List<dto.ComponenteDTO> componentes) {
-        removeAll();
-        productoCardList.clear();
-        productoSeleccionado = null;
+    private ProductoCard crearProductoCard(ProductoEntidad producto) {
+        ProductoCard card = new ProductoCard(
+                producto.getId().toString(),
+                producto.getNombre(),
+                producto.getPrecio(),
+                "/img/productos/default.png"
+        );
 
-        if (componentes == null || componentes.isEmpty()) {
-            JLabel mensajeVacio = new JLabel("No hay productos disponibles");
-            mensajeVacio.setForeground(Color.WHITE);
-            mensajeVacio.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-            add(mensajeVacio);
-            revalidate();
-            repaint();
-            return;
-        }
+        card.setOnSelect(id -> {
+            if (productoSeleccionado != null) {
+                productoSeleccionado.setSeleccionado(false);
+            }
+            card.setSeleccionado(true);
+            productoSeleccionado = card;
 
-        for (dto.ComponenteDTO dto : componentes) {
-            ProductoCard card = new ProductoCard(
-                    dto.getId(),
-                    dto.getNombre(),
-                    dto.getPrecio(),
-                    "/img/productos/default.png");
+            if (onProductoSelected != null) {
+                onProductoSelected.accept(id);
+            }
+        });
 
-            card.setOnSelect(id -> {
-                if (productoSeleccionado != null) {
-                    productoSeleccionado.setSeleccionado(false);
-                }
-                card.setSeleccionado(true);
-                productoSeleccionado = card;
-
-                if (onProductoSelected != null) {
-                    onProductoSelected.accept(id);
-                }
-            });
-
-            productoCardList.add(card);
-            add(card);
-        }
-
-        revalidate();
-        repaint();
+        return card;
     }
 
     public ProductoCard getProductoSeleccionado() {
