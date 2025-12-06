@@ -138,27 +138,59 @@ public class ArmarPcPanel extends PanelBase {
                 return;
             }
 
-            if (controlConfiguracion.getComponenteSeleccionado() != null) {
-                java.util.List<String> errores = controlConfiguracion.avanzarConComponenteSeleccionado();
+            try {
+                dao.ProductoDAO productoDAO = new dao.ProductoDAO();
+                String productoId = controlConfiguracion.getComponenteSeleccionado().getId();
+                entidades.ProductoEntidad productoEntidad = productoDAO.obtenerPorId(productoId);
 
-                if (!errores.isEmpty()) {
-                    JOptionPane.showMessageDialog(this,
-                        String.join("\n", errores),
-                        "Error de compatibilidad",
-                        JOptionPane.ERROR_MESSAGE);
-                    return;
+                if (productoEntidad != null) {
+                    dto.ComponenteDTO componenteDTO = new dto.ComponenteDTO();
+                    componenteDTO.setId(productoEntidad.getId().toString());
+                    componenteDTO.setNombre(productoEntidad.getNombre());
+                    componenteDTO.setPrecio(productoEntidad.getPrecio());
+                    componenteDTO.setCategoria(productoEntidad.getCategoria());
+                    componenteDTO.setMarca(productoEntidad.getMarca());
+
+                    if (productoEntidad.getEspecificaciones() != null) {
+                        componenteDTO.setSocket(productoEntidad.getEspecificaciones().get("socket"));
+                        componenteDTO.setTipoRam(productoEntidad.getEspecificaciones().get("tipoRam"));
+                        componenteDTO.setFormFactor(productoEntidad.getEspecificaciones().get("formFactor"));
+                    }
+
+                    fachada.IArmadoFacade armadoFacade = fachada.ArmadoFacade.getInstance();
+                    java.util.List<String> errores = armadoFacade.agregarComponente(componenteDTO);
+
+                    if (!errores.isEmpty()) {
+                        JOptionPane.showMessageDialog(this,
+                            String.join("\n", errores),
+                            "Error de compatibilidad",
+                            JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    sideMenuResumenPanel.updateFrom(armadoFacade.getEnsamblajeActual());
+
+                    String siguienteCategoria = obtenerSiguienteCategoria(productoEntidad.getCategoria());
+                    if (siguienteCategoria != null) {
+                        int indiceCatalogo = obtenerIndiceCatalogo(siguienteCategoria);
+                        if (indiceCatalogo != -1) {
+                            CatalagoPanel catalogo = catalogos.get(listaPasosArmado[indiceCatalogo]);
+                            if (catalogo != null) {
+                                catalogo.setOnProductoSelected(id -> handleProductoSeleccionado(id));
+                                catalogo.cargarLista(siguienteCategoria);
+                                avanzarAPaso(indiceCatalogo);
+                            }
+                        }
+                    } else {
+                        avanzarAPaso(14);
+                    }
                 }
-
-                sideMenuResumenPanel.updateFrom(controlConfiguracion.getEnsamblajeActual());
-
-                String siguienteCategoria = obtenerSiguienteCategoria();
-                if (siguienteCategoria != null) {
-                    controlConfiguracion.seleccionarCategoria(siguienteCategoria);
-                    avanzarAPaso(1);
-                    cargarMarcasParaCategoriaActual();
-                } else {
-                    avanzarAPaso(14);
-                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,
+                    "Error al avanzar: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -200,20 +232,15 @@ public class ArmarPcPanel extends PanelBase {
                 componenteDTO.setCategoria(productoEntidad.getCategoria());
                 componenteDTO.setMarca(productoEntidad.getMarca());
 
-                IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-                java.util.List<String> errores = armadoFacade.agregarComponente(componenteDTO);
-
-                if (!errores.isEmpty()) {
-                    JOptionPane.showMessageDialog(this,
-                        String.join("\n", errores),
-                        "Error de compatibilidad",
-                        JOptionPane.ERROR_MESSAGE);
-                    pasoCompletado = false;
-                } else {
-                    sideMenuResumenPanel.updateFrom(armadoFacade.getEnsamblajeActual());
-                    pasoCompletado = true;
+                if (productoEntidad.getEspecificaciones() != null) {
+                    componenteDTO.setSocket(productoEntidad.getEspecificaciones().get("socket"));
+                    componenteDTO.setTipoRam(productoEntidad.getEspecificaciones().get("tipoRam"));
+                    componenteDTO.setFormFactor(productoEntidad.getEspecificaciones().get("formFactor"));
                 }
 
+                controlConfiguracion.seleccionarProducto(componenteDTO);
+
+                pasoCompletado = true;
                 updateButtonState();
             }
         } catch (Exception ex) {
@@ -268,13 +295,12 @@ public class ArmarPcPanel extends PanelBase {
         return -1;
     }
 
-    private String obtenerSiguienteCategoria() {
+    private String obtenerSiguienteCategoria(String categoriaActual) {
         String[] categorias = {"Procesador", "Tarjeta Madre", "RAM", "Tarjeta de video",
                               "Almacenamiento", "Fuente de poder", "Gabinete"};
-        String actual = controlConfiguracion.getCategoriaActual();
 
         for (int i = 0; i < categorias.length - 1; i++) {
-            if (categorias[i].equals(actual)) {
+            if (categorias[i].equals(categoriaActual)) {
                 return categorias[i + 1];
             }
         }
