@@ -2,7 +2,8 @@ package armadoPC;
 
 import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
-
+import dao.ProductoDAO;
+import entidades.ProductoEntidad;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,78 +12,67 @@ import java.util.function.Consumer;
 
 public class CatalagoPanel extends JPanel {
     public List<ProductoCard> productoCardList;
-
-    // callback que notifica al seleccionar un producto (devuelve id)
     private Consumer<String> onProductoSelected;
+    private ProductoCard productoSeleccionado;
+    private ProductoDAO productoDAO;
 
     public CatalagoPanel(String Producto) {
         setOpaque(false);
         setPreferredSize(new Dimension(740, 650));
         setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
         productoCardList = new ArrayList<>();
-        // No cargar datos por defecto; la UI pedirá al servicio cuando sea necesario
-        // cargarLista(Producto);
-
+        productoDAO = new ProductoDAO();
     }
 
     public void setOnProductoSelected(Consumer<String> callback) {
         this.onProductoSelected = callback;
     }
 
-    // Debe recibir que tipo de producto va a cargar. Esto se debe cambiar al momento
-    // de implementar la base de datos
-    public void cargarLista(String nombreProcuto) {
-        // limpiar
+    public void cargarLista(String nombreProducto) {
         removeAll();
         productoCardList.clear();
+        productoSeleccionado = null;
 
-        switch (nombreProcuto) {
-            case "Procesador":
-                ProductoCard card1 = new ProductoCard(
-                        "P001",
-                        "Procesador AMD Ryzen 7 5700G Octa Core 3.8GHz 20MB Socket AM4 100-100000263BOX",
-                        1419.00,
-                        "/img/productos/procesadores/Ryzen5.jpg"
-                );
-                ProductoCard card2 = new ProductoCard(
-                        "P002",
-                        "Procesador Intel i7 11700K",
-                        1999.00,
-                        "/img/productos/procesadores/Intel_i7.jpg"
-                );
+        try {
+            List<ProductoEntidad> productos = productoDAO.obtenerPorCategoria(nombreProducto);
 
-                if (onProductoSelected != null) card1.setOnSelect(onProductoSelected);
-                if (onProductoSelected != null) card2.setOnSelect(onProductoSelected);
+            if (productos == null || productos.isEmpty()) {
+                JLabel mensajeVacio = new JLabel("No hay productos disponibles en esta categoría");
+                mensajeVacio.setForeground(Color.WHITE);
+                mensajeVacio.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+                add(mensajeVacio);
+            } else {
+                for (ProductoEntidad producto : productos) {
+                    ProductoCard card = new ProductoCard(
+                            producto.getId().toString(),
+                            producto.getNombre(),
+                            producto.getPrecio(),
+                            "/img/productos/default.png"
+                    );
 
-                productoCardList.add(card1);
-                productoCardList.add(card2);
+                    card.setOnSelect(id -> {
+                        if (productoSeleccionado != null) {
+                            productoSeleccionado.setSeleccionado(false);
+                        }
+                        card.setSeleccionado(true);
+                        productoSeleccionado = card;
 
-                add(card1);
-                add(card2);
-                break;
-            case "Tarjeta madre":
-                break;
-            case "Memoria RAM":
-                break;
-            case "Almacenamiento":
-                break;
-            case "Unidad SSD":
-                break;
-            case "Tarjeta de video":
-                break;
-            case "Fuente de poder":
-                break;
-            case "Disipador":
-                break;
-            case "Ventilador":
-                break;
-            case "Monitor":
-                break;
-            case "Teclado/Ratón":
-                break;
-            case "Red":
-                break;
+                        if (onProductoSelected != null) {
+                            onProductoSelected.accept(id);
+                        }
+                    });
 
+                    productoCardList.add(card);
+                    add(card);
+                }
+            }
+        } catch (Exception e) {
+            JLabel mensajeError = new JLabel("Error: " + e.getMessage());
+            mensajeError.setForeground(Color.RED);
+            mensajeError.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            add(mensajeError);
+            System.err.println("Error al cargar productos de categoría: " + nombreProducto);
+            e.printStackTrace();
         }
 
         revalidate();
@@ -90,28 +80,57 @@ public class CatalagoPanel extends JPanel {
 
     }
 
-    // Nueva sobrecarga: cargar desde una lista de DTOs
     public void cargarLista(java.util.List<dto.ComponenteDTO> componentes) {
-        // limpiar componentes anteriores
         removeAll();
         productoCardList.clear();
+        productoSeleccionado = null;
 
         if (componentes == null || componentes.isEmpty()) {
+            JLabel mensajeVacio = new JLabel("No hay productos disponibles");
+            mensajeVacio.setForeground(Color.WHITE);
+            mensajeVacio.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            add(mensajeVacio);
             revalidate();
             repaint();
             return;
         }
 
         for (dto.ComponenteDTO dto : componentes) {
-            ProductoCard card = new ProductoCard(dto.getId(), dto.getNombre(), dto.getPrecio(),
-                    dto.getCategoria() != null ? "/img/productos/default.png" : "/img/productos/default.png");
-            if (onProductoSelected != null) card.setOnSelect(onProductoSelected);
+            ProductoCard card = new ProductoCard(
+                    dto.getId(),
+                    dto.getNombre(),
+                    dto.getPrecio(),
+                    "/img/productos/default.png");
+
+            card.setOnSelect(id -> {
+                if (productoSeleccionado != null) {
+                    productoSeleccionado.setSeleccionado(false);
+                }
+                card.setSeleccionado(true);
+                productoSeleccionado = card;
+
+                if (onProductoSelected != null) {
+                    onProductoSelected.accept(id);
+                }
+            });
+
             productoCardList.add(card);
             add(card);
         }
 
         revalidate();
         repaint();
+    }
+
+    public ProductoCard getProductoSeleccionado() {
+        return productoSeleccionado;
+    }
+
+    public void limpiarSeleccion() {
+        if (productoSeleccionado != null) {
+            productoSeleccionado.setSeleccionado(false);
+            productoSeleccionado = null;
+        }
     }
 
     @Override

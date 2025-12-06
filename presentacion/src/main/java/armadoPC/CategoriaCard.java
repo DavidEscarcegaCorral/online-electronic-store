@@ -13,7 +13,6 @@ public class CategoriaCard extends JPanel {
 
     private String nombreCategoria;
     private String imagenUrl;
-    // callback que notifica la seleccion de categoria
     private java.util.function.Consumer<String> onCategoriaSelected;
 
     public CategoriaCard(String nombreCategoria, String imagenUrl) {
@@ -23,7 +22,6 @@ public class CategoriaCard extends JPanel {
         initComponents();
         añadirComponentes();
         setupListeners();
-
     }
 
     public void setOnCategoriaSelected(java.util.function.Consumer<String> callback) {
@@ -59,7 +57,6 @@ public class CategoriaCard extends JPanel {
         nombreCategoriaLbl.setForeground(Color.BLACK);
         nombreCategoriaLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         nombreCategoriaLbl.setHorizontalAlignment(SwingConstants.CENTER);
-
     }
 
     private void añadirComponentes() {
@@ -67,7 +64,6 @@ public class CategoriaCard extends JPanel {
         add(imagenCategoriaLbl);
         add(Box.createVerticalStrut(20));
         add(nombreCategoriaLbl);
-
     }
 
     private void cargarImagen(String path, int targetWidth, int targetHeight) {

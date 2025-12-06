@@ -1,4 +1,4 @@
-package objetosnegocio.interfaces;
+package objetosnegocio.componenteON;
 
 import dto.ComponenteDTO;
 
@@ -7,12 +7,14 @@ import java.util.List;
 public interface IComponenteON {
     /**
      * Obtiene una lista de todos los componentes disponibles.
+     *
      * @return Lista de ComponenteDTO.
      */
     List<ComponenteDTO> obtenerTodos();
 
     /**
      * Obtiene una lista de componentes filtrados por categoría.
+     *
      * @param categoria La categoría a buscar (ej. "Procesador", "RAM").
      * @return Lista de ComponenteDTO que coinciden.
      */
@@ -20,6 +22,7 @@ public interface IComponenteON {
 
     /**
      * Obtiene un componente específico usando su ID.
+     *
      * @param id El ID único del componente.
      * @return El ComponenteDTO encontrado, o null si no existe.
      */
