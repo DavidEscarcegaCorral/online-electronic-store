@@ -21,20 +21,35 @@ public class ScrollPaneCustom extends JScrollPane {
     }
 
     private void aplicarEstilo() {
+        setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
         setOpaque(false);
         getViewport().setOpaque(false);
-        getVerticalScrollBar().setUnitIncrement(20);
-        getHorizontalScrollBar().setUnitIncrement(20);
-        setBorder(null);
-
-        ScrollBarCustom miUI = new ScrollBarCustom();
 
         JScrollBar vertical = getVerticalScrollBar();
-        vertical.setUI(miUI);
-
         JScrollBar horizontal = getHorizontalScrollBar();
-        horizontal.setUI(miUI);
 
-        this.setBorder(BorderFactory.createEmptyBorder());
+        vertical.setUnitIncrement(20);
+        horizontal.setUnitIncrement(20);
+
+        vertical.setUI(new ScrollBarCustom());
+        horizontal.setUI(new ScrollBarCustom());
+
+        vertical.setOpaque(true);
+        horizontal.setOpaque(true);
+        vertical.setVisible(true);
+        horizontal.setVisible(true);
+        setBorder(null);
+
+        Dimension prefV = vertical.getPreferredSize();
+        int minWidth = Math.max(prefV.width, 12);
+        vertical.setPreferredSize(new Dimension(minWidth, prefV.height));
+        Dimension prefH = horizontal.getPreferredSize();
+        int minHeight = Math.max(prefH.height, 12);
+        horizontal.setPreferredSize(new Dimension(prefH.width, minHeight));
+
+        revalidate();
+        repaint();
     }
 }

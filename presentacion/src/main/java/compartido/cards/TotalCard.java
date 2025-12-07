@@ -7,17 +7,21 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TotalCard extends JPanel {
-    private JLabel tituloLbl;
+    private JLabel totalLbl;
 
     public TotalCard() {
         setOpaque(false);
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new FlowLayout(FlowLayout.CENTER));
         setPreferredSize(new Dimension(220, 40));
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        tituloLbl = new JLabel("Total: ");
-        tituloLbl.setForeground(Color.white);
-        tituloLbl.setFont(FontUtil.loadFont(16, "Inter_SemiBold"));
-        add(tituloLbl);
+        totalLbl = new JLabel("Total: $0.00");
+        totalLbl.setForeground(Color.white);
+        totalLbl.setFont(FontUtil.loadFont(16, "Inter_SemiBold"));
+        add(totalLbl);
+    }
+
+    public void setTotal(double total) {
+        totalLbl.setText(String.format("Total: $%,.2f", total));
     }
 
     @Override
