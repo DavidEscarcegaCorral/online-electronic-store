@@ -2,8 +2,8 @@ package fachada;
 
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
-import objetosnegocio.componenteON.ComponenteON;
-import objetosnegocio.componenteON.IComponenteON;
+import objetosNegocio.componenteON.ComponenteON;
+import objetosNegocio.componenteON.IComponenteON;
 
 import java.util.ArrayList;
 import java.util.List;
