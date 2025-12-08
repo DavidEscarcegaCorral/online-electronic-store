@@ -3,7 +3,9 @@ package carrito;
 import compartido.estilos.CustomRadioButton;
 import compartido.estilos.Estilos;
 import compartido.estilos.FontUtil;
-
+import Sesion.SesionManager;
+import dto.TipoEntregaDTO;
+import compartido.TotalPanel;
 import javax.swing.*;
 import java.awt.*;
 
@@ -16,8 +18,12 @@ public class OpcionEntregaPanel extends JPanel {
     private CustomRadioButton rb1;
     private CustomRadioButton rb2;
     private ButtonGroup grupo;
+    private SesionManager sesion;
+    private TotalPanel totalPanel;
 
     public OpcionEntregaPanel(){
+        sesion=SesionManager.getInstance();
+        this.totalPanel = new TotalPanel();
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setPreferredSize(new Dimension(320,350));
@@ -40,19 +46,12 @@ public class OpcionEntregaPanel extends JPanel {
         rb1 = new CustomRadioButton("Recoger en sucursal: Gratis");
         rb2 = new CustomRadioButton("Envio estandar: $224.00 mxn");
 
+        rb1.setSelected(true);
+
         grupo = new ButtonGroup();
         grupo.add(rb1);
         grupo.add(rb2);
 
-        rb1.addActionListener(e -> {
-            rb1.setSelected(true);
-            rb2.setSelected(false);
-        });
-
-        rb2.addActionListener(e -> {
-            rb2.setSelected(true);
-            rb1.setSelected(false);
-        });
 
         panelTitulo.add(tituloLbl);
         panelOpciones.add(rb1);
@@ -61,7 +60,7 @@ public class OpcionEntregaPanel extends JPanel {
         add(panelTitulo);
         add(panelOpciones);
 
-
+        configurarListeners();
     }
 
     @Override
@@ -75,4 +74,31 @@ public class OpcionEntregaPanel extends JPanel {
         g2d.dispose();
     }
 
+    private void configurarListeners(){
+        rb1.addActionListener(e -> {
+            rb1.setSelected(true);
+            rb2.setSelected(false);
+            TipoEntregaDTO tipoEntrega = new TipoEntregaDTO(
+                    0.00,
+                    TipoEntregaDTO.Tipo.RETIRO_TIENDA);
+            SesionManager.getInstance().setTipoEntrega(tipoEntrega);
+
+            if(totalPanel != null){
+                totalPanel.actualizarTotales();
+            }
+        });
+
+        rb2.addActionListener(e -> {
+            rb2.setSelected(true);
+            rb1.setSelected(false);
+            sesion.setTipoEntrega(new TipoEntregaDTO(
+                    224.00,
+                    TipoEntregaDTO.Tipo.ENVIO_ESTANDAR
+            ));
+
+            if(totalPanel != null){
+                totalPanel.actualizarTotales();
+            }
+        });
+    }
 }
