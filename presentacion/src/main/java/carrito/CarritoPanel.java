@@ -43,10 +43,13 @@ public class CarritoPanel extends PanelBase {
         totalPanel = new TotalPanel();
         metodoPagoPanel = new metodoPagoPanel();
 
+        CarritoDTO carritoDTO = new CarritoDTO();
         IventaFacade = VentaFacade.getInstance();
         sesion = SesionManager.getInstance();
-        rellenarTabla(sesion.getCarritoActual().getItems());
+        sesion.setCarritoActual(carritoDTO);
 
+        rellenarTabla(sesion.getCarritoActual().getItems());
+        tablaResumen= new Tabla(model,new FramePrincipal());
         scroll = new ScrollPaneCustom(tablaResumen);
         scroll.setOpaque(false);
 
@@ -65,16 +68,15 @@ public class CarritoPanel extends PanelBase {
         panelEste.add(metodoPagoPanel);
 
         actualizarCarrito();
-    }
+        }
 
-    }
 
-    void rellenarTabla(List<ItemCarritoDTO> items){
+    public void rellenarTabla(List<ItemCarritoDTO> items) {
         String[] columns = {"Producto", "Precio unitario", "Cantidad", "Costo total", "Eliminar"};
 
-        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        model = new DefaultTableModel(columns, 0);
 
-        for(ItemCarritoDTO item : items){
+        for (ItemCarritoDTO item : items) {
             Object[] fila = {
                     item.getNombre(),
                     item.getPrecioUnitario(),
@@ -84,8 +86,8 @@ public class CarritoPanel extends PanelBase {
             };
             model.addRow(fila);
         }
+    }
 
-        tablaResumen=new Tabla(model, new FramePrincipal());
     public void actualizarCarrito() {
         model.setRowCount(0);
 
