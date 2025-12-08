@@ -10,6 +10,7 @@ public class MarcaProcesadorPanel extends JPanel {
     private static MarcaProcesadorCard intel = new MarcaProcesadorCard("Intel", "/img/marcas/intelLogo.png");
     private static MarcaProcesadorCard amd = new MarcaProcesadorCard("AMD", "/img/marcas/AMDLogo.png");
     private java.util.function.Consumer<String> onMarcaSelected;
+    private String seleccionActual = null;
 
     public MarcaProcesadorPanel() {
         setOpaque(false);
@@ -24,8 +25,15 @@ public class MarcaProcesadorPanel extends JPanel {
         intel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (onMarcaSelected != null) {
-                    onMarcaSelected.accept("Intel");
+                if ("Intel".equals(seleccionActual)) {
+                    intel.setSeleccionado(false);
+                    seleccionActual = null;
+                    if (onMarcaSelected != null) onMarcaSelected.accept(null);
+                } else {
+                    intel.setSeleccionado(true);
+                    amd.setSeleccionado(false);
+                    seleccionActual = "Intel";
+                    if (onMarcaSelected != null) onMarcaSelected.accept("Intel");
                 }
             }
         });
@@ -33,8 +41,15 @@ public class MarcaProcesadorPanel extends JPanel {
         amd.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (onMarcaSelected != null) {
-                    onMarcaSelected.accept("AMD");
+                if ("AMD".equals(seleccionActual)) {
+                    amd.setSeleccionado(false);
+                    seleccionActual = null;
+                    if (onMarcaSelected != null) onMarcaSelected.accept(null);
+                } else {
+                    amd.setSeleccionado(true);
+                    intel.setSeleccionado(false);
+                    seleccionActual = "AMD";
+                    if (onMarcaSelected != null) onMarcaSelected.accept("AMD");
                 }
             }
         });
@@ -42,6 +57,17 @@ public class MarcaProcesadorPanel extends JPanel {
 
     public void setOnMarcaSelected(Consumer<String> callback) {
         this.onMarcaSelected = callback;
+    }
+
+    public String getSeleccionActual() {
+        return seleccionActual;
+    }
+
+    public void limpiarSeleccion() {
+        intel.setSeleccionado(false);
+        amd.setSeleccionado(false);
+        seleccionActual = null;
+        repaint();
     }
 
     @Override

@@ -1,6 +1,6 @@
-# online-electronic-store — Tienda Online de Componentes Electrónicos
+# online-electronic-store
 
-Este repositorio contiene una aplicación modular Java (Maven) para una tienda online especializada en armado de PCs con validación de compatibilidad de componentes y gestión de ventas.
+Aplicación modular Java (Maven) para una tienda online especializada en armado de PCs con validación de compatibilidad y gestión de ventas.
 
 ## Requisitos
 - Java JDK 23+
@@ -8,128 +8,89 @@ Este repositorio contiene una aplicación modular Java (Maven) para una tienda o
 - MongoDB 4.x+ (corriendo en localhost:27017)
 
 ## Arquitectura del Proyecto
-
 La aplicación utiliza una arquitectura en capas modular con los siguientes subsistemas:
 
 ### Módulos de Datos
-
-- **`dominio_datos`** — Entidades de dominio mapeadas a MongoDB:
-  - ProductoEntidad: Productos del catálogo
-  - PedidoEntidad: Órdenes de compra
-
-- **`dao_datos`** — Capa de acceso a datos:
-  - ProductoDAO: CRUD de productos con filtros por categoría y marca
-  - PedidoDAO: Gestión de pedidos
-  - ConexionMongoDB: Singleton para conexión a base de datos
+- `dominio_datos` — Entidades de dominio mapeadas a MongoDB (por ejemplo `ProductoEntidad`, `PedidoEntidad`, `ConfiguracionEntidad`).
+- `dao_datos` — Capa de acceso a datos: `ProductoDAO`, `PedidoDAO`, `CarritoDAO`, `ConexionMongoDB`.
 
 ### Módulos de Negocio
-
-- **`dto_negocios`** — Objetos de transferencia de datos (DTOs):
-  - ComponenteDTO, EnsamblajeDTO, CarritoDTO, ItemCarritoDTO, CompraDTO, MetodoPagoDTO, ClienteDTO
-
-- **`objetos_negocio`** — Capa de lógica de negocio:
-  - ComponenteON: Gestión del catálogo de componentes
-  - Interfaces de negocio (IComponenteON)
-
-- **`negocio_configuracion`** — Subsistema de configuración secuencial:
-  - Flujo: Categoría → Marca → Productos
-  - Validación de disponibilidad de productos
-  - ConfiguracionFacade: Punto de entrada único
-
-- **`negocio_venta`** — Subsistema de ventas y pago:
-  - Gestión de carrito de compras
-  - Proceso de pago (mock - happy path)
-  - Actualización de stock
-  - VentaFacade: Punto de entrada único
-
-- **`negocio_armarPC`** — Fachada de armado de PC:
-  - Validación de compatibilidad entre componentes
-  - Filtrado por tipo de uso (GAMER, OFFICE)
-  - Soporte para cambiar componentes ya seleccionados
-  - Revalidación de ensamblaje completo
-  - ArmadoFacade: Punto de entrada único
+- `dto_negocios` — DTOs (ComponenteDTO, EnsamblajeDTO, CarritoDTO, ItemCarritoDTO, ClienteDTO, etc.).
+- `objetos_negocio` — Lógica de negocio central.
+- `negocio_configuracion` — Subsistema que gestiona el flujo de configuración paso a paso y expone una fachada (`ConfiguracionFacade`).
+- `negocio_venta` — Subsistema de ventas y carrito, con su fachada (`VentaFacade` o similar).
+- `negocio_armarPC` — Validación de compatibilidad entre componentes y revalidación de ensamblaje (`ArmadoFacade`).
 
 ### Módulo de Presentación
+- `presentacion` — Interfaz gráfica en Swing. Contiene panels por pasos, cards de productos, panel lateral de resumen y `MenuOpcionesPanel`.
 
-- **`presentacion`** — Interfaz gráfica de usuario (Swing):
-  - Paneles de armado de PC paso a paso
-  - Catálogos de componentes con cards
-  - Sistema de navegación por tarjetas (CardLayout)
-  - Carrito de compras interactivo
-  - Estilos personalizados y componentes reutilizables
+## Flujo de configuración y reglas de negocio
+- Flujo guiado por pasos: Categoría → Marca → Producto(s) → Evaluar Configuración.
+- Persistencia de selección en catálogos: cada pantalla de catálogo recuerda la selección realizada y la restaura al volver.
+- Las cards (categoría, marca, producto) funcionan en modo toggle: hacer clic selecciona; volver a hacer clic quita la selección.
+- El borde de selección para cards de categoría y marca de CPU es morado (mismo estilo que cards de producto).
 
-## Características Principales
+### Validaciones al avanzar
+- Al seleccionar una categoría, el sistema valida que exista una cantidad mínima de productos en la base de datos que permitan conformar una configuración válida. Si no existen suficientes productos no se permite avanzar y se muestra un mensaje explicativo.
+- Componentes obligatorios para considerar una configuración válida y poder guardarla:
+  - Procesador
+  - Tarjeta madre
+  - Memoria RAM
+  - Gabinete
+  - Tarjeta de video
+  - Fuente de poder
+  - Disipador
+- Los demás componentes son opcionales y no bloquean la navegación.
+- La navegación (botones de avanzar/retroceder y botones del menú lateral) está habilitada sólo cuando el paso actual tiene una selección válida; al volver atrás, la habilitación se basa en el estado de la selección en ese paso (si existe selección permanece habilitado).
 
-### Flujo de Configuración Secuencial
-1. Usuario selecciona categoría de componente
-2. Sistema muestra marcas disponibles
-3. Usuario selecciona marca
-4. Sistema muestra productos disponibles
-5. Si no hay productos → Notificación y fin del flujo
-6. Usuario hace clic en ProductCard → Resaltado visual
-7. Flecha de avance habilitada solo con componente seleccionado
-8. Validación de compatibilidad al agregar componente
+## Presentación y panel lateral
+- En el paso "Evaluar configuración" el panel lateral derecho se reemplaza por `MenuOpcionesPanel` (en vez del panel `Resumen`).
+- `MenuOpcionesPanel.totalCard` muestra exactamente el mismo precio total del ensamblaje que el `Resumen`.
+- `MenuOpcionesPanel` contiene:
+  - Un botón "Guardar configuración" (por encima del `totalCard`) que persiste la entidad `ConfiguracionEntidad` en la DB cuando se cumplen los requisitos mínimos.
+  - Si el usuario intenta guardar sin cumplir los requisitos, aparecerá un `JDialog` explicando por qué no se puede guardar.
+  - Un botón adicional que añade la configuración actual al carrito del cliente (singleton). Al añadir la configuración al carrito, el ensamblaje actual se limpia (se borran todas las selecciones en la UI y en el objeto ensamblaje).
 
-### Sistema de Ventas
-- Carrito de compras con gestión de items
-- Verificación de stock en tiempo real
-- Proceso de pago mock (happy path)
-- Creación automática de pedidos
-- Actualización de inventario
+## Carrito y persistencia
+- El carrito es una entidad manejada como singleton por cliente; actualmente el flujo añade configuraciones como objetos en el carrito (sin proceso de pago implementado todavía).
+- Guardar configuración persiste la entidad `ConfiguracionEntidad` en la colección correspondiente de MongoDB.
+- Nombre y representación en la UI:
+  - Asegúrate de que el campo nombre de la configuración se asigne antes de persistir si deseas que se muestre correctamente en el carrito y en la UI.
+  - El `precio unitario` en la vista de carrito debe reflejar el precio del ensamblaje; si aparece un texto genérico como "Configuración PC" revisa dónde se setea la descripción y el cálculo del precio antes de persistir.
 
-### Validaciones de Compatibilidad
-- Socket de procesador vs tarjeta madre
-- Tipo de RAM (DDR4/DDR5)
-- Form factor (ATX/Micro-ATX)
-- Consumo eléctrico vs fuente de poder
+## Errores comunes y soluciones rápidas
+- `java: cannot find symbol: class ConfiguracionEntidad`:
+  - Verifica la existencia de `ConfiguracionEntidad` en `dominio_datos/src/main/java/entidades/` y que su declaración de paquete coincide con `entidades`. Recompila el módulo.
 
-## Tecnologías Utilizadas
+- `java: cannot find symbol: method entrySet() location: interface java.util.List<dto.ComponenteDTO>`:
+  - `entrySet()` es de `Map`. Para listas usa iteración con `for`, `forEach` o `ListIterator`.
 
-- **Java 23**
-- **Maven** — Gestión de dependencias y construcción
-- **MongoDB** — Base de datos NoSQL
-- **MongoDB Java Driver 4.11.1** — Conexión a base de datos
-- **Swing** — Interfaz gráfica de usuario
-- **Patrón Facade** — Aislamiento de subsistemas
-- **Patrón Singleton** — Gestión de instancias únicas
-- **Patrón DAO** — Acceso a datos
+- `java: cannot find symbol: method getPanelContenido() location: compartido.FramePrincipal`:
+  - Se añadió el getter `getPanelContenido()` en `compartido.FramePrincipal`. Usa la clase actualizada y recompila `presentacion`.
 
-## Estructura del Proyecto
+- `armadoFacade already declared`:
+  - Evita redeclaraciones; inyecta o comparte la instancia desde el control de presentación.
 
-```
-online-electronic-store/
-├── dominio_datos/          # Entidades MongoDB
-├── dao_datos/              # Acceso a datos
-├── dto_negocios/           # DTOs
-├── objetos_negocio/        # Lógica de negocio base
-├── negocio_configuracion/  # Flujo secuencial
-├── negocio_venta/          # Gestión de ventas
-├── negocio_armarPC/        # Validación de compatibilidad
-├── presentacion/           # UI (Swing)
-└── README.md               # Este archivo
-```
-## Notas Importantes
+- Problemas de paquetes en entidades o DTOs:
+  - Corrige la declaración de paquete o los imports y recompila el módulo correspondiente.
 
-1. MongoDB debe estar corriendo antes de ejecutar la aplicación
-2. Ejecutar el script para tener datos de prueba
-3. Las imágenes deben estar en `presentacion/src/main/resources/img/`
-4. Conexión a MongoDB: `mongodb://localhost:27017/highspecs_db`
+## Buenas prácticas y recomendaciones
+- Control de presentación centralizado: usar un `ControlPresentacion` (naming) que actúe como puente entre la UI y los subsistemas (negocio_configuracion, negocio_venta, negocio_armarPC) para mantener responsabilidades claras.
+- El control de navegación puede implementar una interfaz (`ControlNavegacion`) para facilitar pruebas y desacoplar la lógica de UI.
+- Mantener la gestión de componentes Swing (add/remove/revalidate/repaint) centralizada en `FramePrincipal`.
+- Evitar campos públicos; usar getters/setters o métodos de acceso controlados.
 
-## Funcionalidades Principales
+## Instrucciones de compilación y ejecución
+1. Desde la raíz del proyecto:
 
-1. **Armado de PC Guiado**:
-   - Selección de tipo de PC (Gamer, Office, etc.)
-   - Validación de stock suficiente
-   - Selección de componentes paso a paso
-   - Validación automática de compatibilidad
+   mvn clean install
 
-2. **Validaciones de Compatibilidad**:
-   - Socket del procesador con tarjeta madre
-   - Tipo de RAM (DDR4, DDR5)
-   - Form factor (ATX, Micro-ATX)
-   - Otros criterios específicos por categoría
+## Registro de cambios
+- Integración de persistencia de selección en catálogos y toggle de selección en cards.
+- Validación de disponibilidad mínima al elegir categoría.
+- Control de habilitado/deshabilitado de navegación basado en selección por paso.
+- Unificación del color de borde de selección (morado) para categorías y marca de CPU.
+- `MenuOpcionesPanel`: botones para guardar configuración y añadir al carrito; `totalCard` sincronizado con resumen.
+- Añadido `getPanelContenido()` en `compartido.FramePrincipal` para acceder de forma controlada al panel de contenido.
 
-3. **Filtrado**:
-   - Solo se muestran componentes compatibles con la selección actual
-   - Prevención de selecciones incompatibles
-
+---

@@ -60,7 +60,7 @@ public interface IVentaFacade {
      * Realiza el proceso de pago (mock - happy path).
      * Crea un pedido y actualiza el stock.
      *
-     * @param metodoPago El método de pago seleccionado.
+     * @param metodoPago El mwtodo de pago seleccionado.
      * @return El ID del pedido creado, o null si hubo error.
      */
     String realizarPago(MetodoPagoDTO metodoPago);
@@ -71,5 +71,29 @@ public interface IVentaFacade {
      * @return true si hay stock, false si no.
      */
     boolean verificarStockCarrito();
+
+    /**
+     * Agrega una configuración completa de PC al carrito.
+     * Guarda la configuración en la BD y añade su referencia al carrito.
+     *
+     * @param ensamblaje El ensamblaje/configuración a agregar.
+     * @return El ID de la configuración guardada, o null si hubo error.
+     */
+    String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje);
+
+    /**
+     * Obtiene todas las configuraciones que están en el carrito actual.
+     *
+     * @return Lista de configuraciones en el carrito.
+     */
+    java.util.List<entidades.ConfiguracionEntidad> obtenerConfiguracionesEnCarrito();
+
+    /**
+     * Remueve una configuración del carrito.
+     *
+     * @param configuracionId El ID de la configuración a remover.
+     * @return true si se removió correctamente, false si no existe.
+     */
+    boolean removerConfiguracionDelCarrito(String configuracionId);
 }
 

@@ -3,6 +3,7 @@ package armadoPC;
 import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
 import compartido.estilos.FontUtil;
+import compartido.estilos.scroll.ScrollPaneCustom;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +21,7 @@ public class MenuComponentesPanel extends JPanel {
     private Boton unidadSSDBtn;
     private Boton tarjetaDeVideoBtn;
     private Boton fuenteDePoderBtn;
+    private Boton gabineteBtn;
     private Boton disipadorBtn;
     private Boton VentiladorBtn;
     private Boton MonitorBtn;
@@ -63,6 +65,8 @@ public class MenuComponentesPanel extends JPanel {
         panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(fuenteDePoderBtn);
         panelCentro.add(Box.createVerticalStrut(10));
+        panelCentro.add(gabineteBtn);
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(disipadorBtn);
         panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(VentiladorBtn);
@@ -76,10 +80,18 @@ public class MenuComponentesPanel extends JPanel {
         panelCentro.add(resumenConfiguracionBtn);
 
         add(panelMenu);
-        add(panelCentro);
+
+        ScrollPaneCustom scrollPane = new ScrollPaneCustom(panelCentro);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(230, 610));
+        add(scrollPane);
     }
 
-    public void iniciarBotones(){
+    public void iniciarBotones() {
         titulo = new JLabel("Menú");
         titulo.setFont(FontUtil.loadFont(32, "Iceland-Regular"));
         titulo.setForeground(Color.white);
@@ -110,6 +122,9 @@ public class MenuComponentesPanel extends JPanel {
 
         fuenteDePoderBtn = new Boton("Fuente de poder", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
         fuenteDePoderBtn.setNewFont();
+
+        gabineteBtn = new Boton("Gabinete", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
+        gabineteBtn.setNewFont();
 
         disipadorBtn = new Boton("Disipador", 200, 30, 16, 12, Color.white, Estilos.COLOR_NAV_INF, Estilos.COLOR_BACKGROUND);
         disipadorBtn.setNewFont();
@@ -150,6 +165,14 @@ public class MenuComponentesPanel extends JPanel {
         return tarjetaMadreBtn;
     }
 
+    public Boton getCategoriasBtn() {
+        return categoriasBtn;
+    }
+
+    public Boton getMarcaProcesadorBtn() {
+        return marcaProcesadorBtn;
+    }
+
     public Boton getMemoriaRAMBtn() {
         return memoriaRAMBtn;
     }
@@ -170,6 +193,10 @@ public class MenuComponentesPanel extends JPanel {
         return fuenteDePoderBtn;
     }
 
+    public Boton getGabineteBtn() {
+        return gabineteBtn;
+    }
+
     public Boton getDisipadorBtn() {
         return disipadorBtn;
     }
@@ -188,6 +215,10 @@ public class MenuComponentesPanel extends JPanel {
 
     public Boton getRedBtn() {
         return redBtn;
+    }
+
+    public Boton getResumenConfiguracionBtn() {
+        return resumenConfiguracionBtn;
     }
 
 }

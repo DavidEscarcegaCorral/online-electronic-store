@@ -24,5 +24,12 @@ public interface IArmadoFacade {
     void removerComponente(String categoria);
 
     List<String> revalidarEnsamblaje();
-}
 
+    /**
+     * Obtiene el componente actualmente seleccionado en el ensamblaje para la categoría indicada.
+     * Devuelve null si no hay componente para esa categoría.
+     */
+    ComponenteDTO getComponenteSeleccionado(String categoria);
+
+    void limpiarEnsamblaje();
+}

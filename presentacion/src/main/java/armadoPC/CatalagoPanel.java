@@ -4,6 +4,8 @@ import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
 import dao.ProductoDAO;
 import entidades.ProductoEntidad;
+import fachada.ArmadoFacade;
+import fachada.IArmadoFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,8 +47,18 @@ public class CatalagoPanel extends JPanel {
                 mensajeVacio.setFont(new Font("Segoe UI", Font.PLAIN, 16));
                 add(mensajeVacio);
             } else {
+                IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
+                dto.ComponenteDTO seleccionadoDTO = armadoFacade.getComponenteSeleccionado(nombreProducto);
+                String seleccionadoId = seleccionadoDTO != null ? seleccionadoDTO.getId() : null;
+
                 for (ProductoEntidad producto : productos) {
                     ProductoCard card = crearProductoCard(producto);
+
+                    if (seleccionadoId != null && seleccionadoId.equals(producto.getId().toString())) {
+                        card.setSeleccionado(true);
+                        productoSeleccionado = card;
+                    }
+
                     productoCardList.add(card);
                     add(card);
                 }
