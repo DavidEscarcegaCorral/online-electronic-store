@@ -2,8 +2,8 @@ package fachada;
 
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
-import objetosnegocio.componenteON.ComponenteON;
-import objetosnegocio.componenteON.IComponenteON;
+import objetosNegocio.componenteON.ComponenteON;
+import objetosNegocio.componenteON.IComponenteON;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ public class ArmadoFacade implements IArmadoFacade {
 
     private ArmadoFacade() {
         this.componenteON = ComponenteON.getInstance();
+        this.ensamblajeActual = new EnsamblajeDTO();
     }
 
     @Override
@@ -108,11 +109,26 @@ public class ArmadoFacade implements IArmadoFacade {
 
     @Override
     public boolean verificarStockSuficiente(String tipoUso) {
-        String[] categoriasCriticas = {"Procesador", "Tarjeta Madre", "Memoria RAM", "Tarjeta de video",
-                "Fuente de poder", "Gabinete"};
+        // Todas las categorías que conforman una configuración completa
+        String[] categoriasCriticas = {
+            "Procesador",
+            "Tarjeta Madre",
+            "RAM",
+            "Tarjeta de video",
+            "Almacenamiento",
+            "Fuente de poder",
+            "Gabinete",
+            "Disipador",
+            "Ventilador",
+            "Monitor",
+            "Kit de teclado/raton",
+            "Redes e internet"
+        };
+
         for (String cat : categoriasCriticas) {
             List<ComponenteDTO> disponibles = obtenerComponentesCompatibles(cat, tipoUso);
             if (disponibles.isEmpty()) {
+                // La tarjeta de video es opcional para configuraciones de oficina
                 if (tipoUso.equalsIgnoreCase("OFFICE") && cat.equals("Tarjeta de video")) {
                     continue;
                 }
@@ -192,5 +208,16 @@ public class ArmadoFacade implements IArmadoFacade {
 
         return errores;
     }
-}
 
+    @Override
+    public ComponenteDTO getComponenteSeleccionado(String categoria) {
+        if (this.ensamblajeActual == null) return null;
+        return this.ensamblajeActual.getComponente(categoria);
+    }
+
+    @Override
+    public void limpiarEnsamblaje() {
+        this.ensamblajeActual = new EnsamblajeDTO();
+    }
+
+}

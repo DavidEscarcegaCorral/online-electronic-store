@@ -203,5 +203,91 @@ public class VentaFacade implements IVentaFacade {
                 .findFirst()
                 .orElse(null);
     }
-}
 
+    @Override
+    public String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje) {
+        if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
+            return null;
+        }
+
+        try {
+            entidades.ConfiguracionEntidad configuracion = new entidades.ConfiguracionEntidad();
+            configuracion.setNombre("Configuración " + java.time.LocalDateTime.now());
+
+            java.util.List<java.util.Map<String, Object>> componentesList = new java.util.ArrayList<>();
+            for (dto.ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
+                java.util.Map<String, Object> compMap = new java.util.HashMap<>();
+                compMap.put("categoria", comp.getCategoria());
+                compMap.put("id", comp.getId());
+                compMap.put("nombre", comp.getNombre());
+                compMap.put("precio", comp.getPrecio());
+                compMap.put("marca", comp.getMarca());
+                componentesList.add(compMap);
+            }
+            configuracion.setComponentes(componentesList);
+            configuracion.setPrecioTotal(ensamblaje.getPrecioTotal());
+
+            dao.ConfiguracionDAO configuracionDAO = new dao.ConfiguracionDAO();
+            configuracionDAO.guardar(configuracion);
+
+            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+            carrito.agregarConfiguracion(configuracion.getId());
+
+            dao.CarritoDAO carritoDAO = new dao.CarritoDAO();
+            carritoDAO.guardar(carrito);
+
+            return configuracion.getId().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public java.util.List<entidades.ConfiguracionEntidad> obtenerConfiguracionesEnCarrito() {
+        java.util.List<entidades.ConfiguracionEntidad> configuraciones = new java.util.ArrayList<>();
+
+        try {
+            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+            dao.ConfiguracionDAO configuracionDAO = new dao.ConfiguracionDAO();
+
+            if (carrito.getConfiguracionesIds() != null) {
+                for (org.bson.types.ObjectId configId : carrito.getConfiguracionesIds()) {
+                    entidades.ConfiguracionEntidad config = configuracionDAO.obtenerPorId(configId);
+                    if (config != null) {
+                        configuraciones.add(config);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return configuraciones;
+    }
+
+    @Override
+    public boolean removerConfiguracionDelCarrito(String configuracionId) {
+        try {
+            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+
+            if (carrito.getConfiguracionesIds() == null) {
+                return false;
+            }
+
+            org.bson.types.ObjectId objectId = new org.bson.types.ObjectId(configuracionId);
+            boolean removed = carrito.getConfiguracionesIds().remove(objectId);
+
+            if (removed) {
+                dao.CarritoDAO carritoDAO = new dao.CarritoDAO();
+                carritoDAO.guardar(carrito);
+                return true;
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}

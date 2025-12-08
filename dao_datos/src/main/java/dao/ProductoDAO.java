@@ -89,6 +89,15 @@ public class ProductoDAO implements IProductoDAO {
         ).getModifiedCount() > 0;
     }
 
+    @Override
+    public long contarDisponiblesPorCategoria(String categoria) {
+        // Contar documentos con categoria y stock > 0
+        return coleccion.countDocuments(Filters.and(
+                Filters.eq("categoria", categoria),
+                Filters.gt("stock", 0)
+        ));
+    }
+
     private ProductoEntidad documentoAEntidad(Document doc) {
         ProductoEntidad producto = new ProductoEntidad();
         producto.setId(doc.getObjectId("_id"));
@@ -112,4 +121,3 @@ public class ProductoDAO implements IProductoDAO {
         return producto;
     }
 }
-

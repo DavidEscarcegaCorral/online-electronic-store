@@ -1,6 +1,7 @@
 package armadoPC;
 
 import compartido.estilos.FontUtil;
+import compartido.estilos.Estilos;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,7 @@ public class CategoriaCard extends JPanel {
     private String nombreCategoria;
     private String imagenUrl;
     private java.util.function.Consumer<String> onCategoriaSelected;
+    private boolean seleccionado = false;
 
     public CategoriaCard(String nombreCategoria, String imagenUrl) {
         this.nombreCategoria = nombreCategoria;
@@ -26,6 +28,11 @@ public class CategoriaCard extends JPanel {
 
     public void setOnCategoriaSelected(java.util.function.Consumer<String> callback) {
         this.onCategoriaSelected = callback;
+    }
+
+    public void setSeleccionado(boolean seleccionado) {
+        this.seleccionado = seleccionado;
+        repaint();
     }
 
     private void initComponents() {
@@ -108,7 +115,6 @@ public class CategoriaCard extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Categoria clickeada: " + nombreCategoria);
                 if (onCategoriaSelected != null) {
                     onCategoriaSelected.accept(nombreCategoria);
                 }
@@ -124,6 +130,11 @@ public class CategoriaCard extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.WHITE);
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+        if (seleccionado) {
+            g2d.setColor(Estilos.COLOR_ENFASIS);
+            g2d.setStroke(new BasicStroke(4));
+            g2d.drawRoundRect(2, 2, getWidth()-5, getHeight()-5, 25, 25);
+        }
         g2d.dispose();
     }
 

@@ -5,8 +5,6 @@ import compartido.estilos.Estilos;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
 public class ProductoCard extends JPanel {
@@ -41,17 +39,9 @@ public class ProductoCard extends JPanel {
         this.onSelect = onSelect;
     }
 
-    public String getId() {
-        return id;
-    }
-
     public void setSeleccionado(boolean seleccionado) {
         this.seleccionado = seleccionado;
         repaint();
-    }
-
-    public boolean isSeleccionado() {
-        return seleccionado;
     }
 
     private void initComponents(){
@@ -78,14 +68,13 @@ public class ProductoCard extends JPanel {
         precioProductoLbl.setForeground(Color.BLACK);
         precioProductoLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //  Label del enlace al producto
         productoLinkLbl = new JLabel("<html><u>ir al producto</u></html>");
         productoLinkLbl.setFont(new Font("Arial", Font.PLAIN, 12));
         productoLinkLbl.setForeground(new Color(138, 43, 226));
         productoLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         productoLinkLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        productoLinkBtn = new Boton("Ir al producto", 85, 30, 14, 10, Color.white, Estilos.COLOR_ENFASIS,  Estilos.COLOR_ENFASIS_HOOVER);
+        productoLinkBtn = new Boton("Seleccionar", 85, 30, 14, 10, Color.white, Estilos.COLOR_ENFASIS,  Estilos.COLOR_ENFASIS_HOOVER);
         productoLinkBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
@@ -102,18 +91,6 @@ public class ProductoCard extends JPanel {
     }
 
     private void setupListeners() {
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("Tarjeta de producto clickeada: " + nombreProducto);
-                if (onSelect != null) {
-                    onSelect.accept(id);
-                }
-
-            }
-        });
-
-        // también permitir seleccionar con el botón "Ir al producto"
         productoLinkBtn.addActionListener(e -> {
             if (onSelect != null) onSelect.accept(id);
         });

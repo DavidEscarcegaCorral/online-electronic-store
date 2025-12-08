@@ -3,6 +3,7 @@ package fachada;
 import dao.IProductoDAO;
 import dao.ProductoDAO;
 import dto.ComponenteDTO;
+import dto.EnsamblajeDTO;
 import entidades.ProductoEntidad;
 
 import java.util.ArrayList;
@@ -15,18 +16,20 @@ import java.util.Map;
  * Gestiona el flujo secuencial de selección de componentes.
  */
 public class ConfiguracionFacade implements IConfiguracionFacade {
-    private static ConfiguracionFacade instancia;
+    private static ConfiguracionFacade configInstancia;
     private final IProductoDAO productoDAO;
+    private final IArmadoFacade armadoFacade;
 
     private ConfiguracionFacade() {
         this.productoDAO = new ProductoDAO();
+        this.armadoFacade = ArmadoFacade.getInstance();
     }
 
     public static synchronized ConfiguracionFacade getInstance() {
-        if (instancia == null) {
-            instancia = new ConfiguracionFacade();
+        if (configInstancia == null) {
+            configInstancia = new ConfiguracionFacade();
         }
-        return instancia;
+        return configInstancia;
     }
 
     @Override
@@ -65,6 +68,53 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
     }
 
     /**
+     * Aplica una configuración completa: crea un nuevo ensamblaje en el ArmadoFacade
+     * y agrega cada componente presente en el EnsamblajeDTO. Se devuelven todos los
+     * errores encontrados durante la inserción (compatibilidad, etc.).
+     *
+     * @param ensamblaje Ensamblaje con componentes por categoría.
+     * @return Lista de errores encontrados; lista vacía si la configuración fue aplicada correctamente.
+     */
+    @Override
+    public List<String> aplicarConfiguracion(EnsamblajeDTO ensamblaje) {
+        List<String> errores = new ArrayList<>();
+
+        if (ensamblaje == null) {
+            errores.add("Ensamblaje nulo");
+            return errores;
+        }
+
+        // Reiniciamos el ensamblaje actual en el subsistema de armado para aplicar la nueva configuración
+        armadoFacade.iniciarNuevoEnsamblaje();
+
+        // Agregamos cada componente del ensamblaje; si hay errores de compatibilidad se acumulan
+        for (ComponenteDTO componente : ensamblaje.obtenerTodosComponentes()) {
+            if (componente == null || componente.getCategoria() == null) {
+                errores.add("Componente o categoría nula en la configuración");
+                continue;
+            }
+
+            List<String> erroresComponente = armadoFacade.agregarComponente(componente);
+            for (String e : erroresComponente) {
+                errores.add(componente.getCategoria() + ": " + e);
+            }
+        }
+
+        // Revalidamos ensamblaje completo y añadimos errores adicionales si los hay
+        List<String> revalidacion = armadoFacade.revalidarEnsamblaje();
+        errores.addAll(revalidacion);
+
+        return errores;
+    }
+
+    @Override
+    public boolean tieneMinimoPorCategoria(String categoria, int minimo) {
+        if (categoria == null || minimo <= 0) return false;
+        long disponibles = productoDAO.contarDisponiblesPorCategoria(categoria);
+        return disponibles >= minimo;
+    }
+
+    /**
      * Convierte una entidad de producto a DTO.
      */
     private ComponenteDTO convertirADTO(ProductoEntidad entidad) {
@@ -95,4 +145,3 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
         return dto;
     }
 }
-

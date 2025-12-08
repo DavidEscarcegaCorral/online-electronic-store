@@ -1,6 +1,7 @@
 package fachada;
 
 import dto.ComponenteDTO;
+import dto.EnsamblajeDTO;
 
 import java.util.List;
 
@@ -42,5 +43,23 @@ public interface IConfiguracionFacade {
      * @return true si hay productos, false si no hay.
      */
     boolean hayProductosDisponibles(String categoria, String marca);
-}
 
+    /**
+     * Aplica (recibe) una configuración completa representada por un EnsamblajeDTO.
+     * El metodo intentará cargar la configuración en el subsistema de armado y
+     * devolverá una lista de errores de compatibilidad o validación si existen.
+     *
+     * @param ensamblaje Ensamblaje completo con componentes por categoría.
+     * @return Lista de errores detectados; si está vacía, la configuración es válida.
+     */
+    List<String> aplicarConfiguracion(EnsamblajeDTO ensamblaje);
+
+    /**
+     * Verifica si hay al menos `minimo` productos disponibles (stock>0) para la categoría.
+     *
+     * @param categoria categoría a verificar
+     * @param minimo cantidad mínima requerida
+     * @return true si hay al menos `minimo` productos disponibles
+     */
+    boolean tieneMinimoPorCategoria(String categoria, int minimo);
+}
