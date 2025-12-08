@@ -39,8 +39,8 @@ public class CarritoPanel extends PanelBase {
         tituloLbl.setFont(FontUtil.loadFont(28, "Inter_SemiBold"));
         tituloLbl.setForeground(Color.white);
 
-        opcionEntregaPanel = new OpcionEntregaPanel();
         totalPanel = new TotalPanel();
+        opcionEntregaPanel = new OpcionEntregaPanel(totalPanel);
         metodoPagoPanel = new metodoPagoPanel();
 
         CarritoDTO carritoDTO = new CarritoDTO();

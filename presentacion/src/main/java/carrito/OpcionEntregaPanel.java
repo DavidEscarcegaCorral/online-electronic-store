@@ -21,9 +21,9 @@ public class OpcionEntregaPanel extends JPanel {
     private SesionManager sesion;
     private TotalPanel totalPanel;
 
-    public OpcionEntregaPanel(){
+    public OpcionEntregaPanel(TotalPanel totalPanel){
         sesion=SesionManager.getInstance();
-        this.totalPanel = new TotalPanel();
+        this.totalPanel = totalPanel;
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setPreferredSize(new Dimension(320,350));

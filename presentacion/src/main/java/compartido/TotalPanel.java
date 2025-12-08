@@ -52,7 +52,7 @@ public class TotalPanel extends JPanel {
 
 
         totalLabel = new JLabel();
-        totalLabel.setText("Total: $"+ sesion.getTotalCarrito());
+        totalLabel.setText("Total: $"+ sesion.getTotalFinal());
         totalLabel.setForeground(Color.WHITE);
         totalLabel.setFont(FontUtil.loadFont(18, "Inter_Light"));
         panelSur = new JPanel() {
