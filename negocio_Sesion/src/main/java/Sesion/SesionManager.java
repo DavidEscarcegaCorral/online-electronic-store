@@ -3,6 +3,7 @@ package Sesion;
 import dto.ClienteDTO;
 import dto.CarritoDTO;
 import dto.EnsamblajeDTO;
+import dto.TipoEntregaDTO;
 
 public class SesionManager {
     private static SesionManager instance;
@@ -10,8 +11,14 @@ public class SesionManager {
     private ClienteDTO clienteActual;
     private CarritoDTO carritoActual;
     private EnsamblajeDTO ensamblajeActual;
+    private TipoEntregaDTO tipoEntregaActual;
 
-    public SesionManager() {}
+    public SesionManager() {
+        this.tipoEntregaActual= new  TipoEntregaDTO(
+                0.0,
+                TipoEntregaDTO.Tipo.RETIRO_TIENDA
+        );
+    }
 
     public static synchronized SesionManager getInstance() {
         if(instance == null) {
@@ -19,6 +26,8 @@ public class SesionManager {
         }
         return instance;
     }
+
+    //CLIENTE
 
     public void setClienteActual(ClienteDTO cliente){
         this.clienteActual = cliente;
@@ -81,9 +90,32 @@ public class SesionManager {
         this.ensamblajeActual = null;
     }
 
+    //ENTREGA
+
+    public void setTipoEntrega(TipoEntregaDTO tipoEntrega){
+        this.tipoEntregaActual=tipoEntrega;
+    }
+
+    public TipoEntregaDTO getTipoEntrega(){
+        return this.tipoEntregaActual;
+    }
+
+    public double getCostoEnvio(){
+        return this.tipoEntregaActual != null ?
+                this.tipoEntregaActual.getCostoAdicional() : 0.0;
+    }
+
+    public double getTotalFinal(){
+        return getTotalCarrito() + getCostoEnvio();
+    }
+
     public void cerrarSesion(){
         this.clienteActual=null;
         this.carritoActual=null;
         this.ensamblajeActual=null;
+        this.tipoEntregaActual=new  TipoEntregaDTO(
+                0.0,
+                TipoEntregaDTO.Tipo.RETIRO_TIENDA
+        );
     }
 }

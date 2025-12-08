@@ -5,7 +5,7 @@ import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
 import compartido.estilos.textfields.PsswrdFieldPh;
 import compartido.estilos.textfields.TxtFieldPh;
-
+import Sesion.SesionManager;
 import javax.swing.*;
 import java.awt.*;
 
@@ -22,7 +22,9 @@ public class InicioDeSesionPanel extends PanelBase {
     private Boton iniciarSesionBtn;
     private Boton registrarseBtn;
 
+    private SesionManager sesion;
     public InicioDeSesionPanel() {
+        sesion = SesionManager.getInstance();
         setOpaque(false);
         iniciarPanel = new JPanel();
         registroPanel = new JPanel();

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import dao.ProductoDAO;
 import fachada.ArmadoFacade;
 import fachada.IArmadoFacade;
-
+import Sesion.SesionManager;
 /**
  * Controlador principal de navegación entre pantallas y gestión del flujo de armado de PC.
  * Coordina la comunicación entre la vista y las fachadas de negocio.
@@ -62,6 +62,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private final ArmarPcPanel armarEquipoPantalla;
     private final CarritoPanel carritoPantalla;
 
+    private SesionManager sesion;
 
     private int indiceActual = 0;
     private String seleccionCategoria = null;
@@ -74,6 +75,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         this.menuPrincipalPanel = new MenuPrincipalPanel();
         this.armarEquipoPantalla = new ArmarPcPanel();
         this.carritoPantalla = new CarritoPanel();
+
+        sesion=SesionManager.getInstance();
 
         inicializarVista();
         configurarBarraNavegacion();
