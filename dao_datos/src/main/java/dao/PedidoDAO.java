@@ -115,7 +115,7 @@ public class PedidoDAO implements IPedidoDAO {
             pedido.setItems(items);
         }
 
-        // Convertir método de pago
+        // Convertir metodo de pago
         Document pagoDoc = doc.get("metodoPago", Document.class);
         if (pagoDoc != null) {
             PedidoEntidad.MetodoPagoInfo metodoPago = new PedidoEntidad.MetodoPagoInfo();

@@ -1,5 +1,7 @@
 package armadoPC;
 
+import compartido.estilos.Estilos;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,6 +12,7 @@ public class MarcaProcesadorCard extends JPanel {
     private String nombreMarca;
     private String imagenUrl;
     private java.util.function.Consumer<String> onMarcaSelected;
+    private boolean seleccionado = false;
 
     public MarcaProcesadorCard(String nombreMarca, String imagenUrl) {
         this.nombreMarca = nombreMarca;
@@ -22,6 +25,11 @@ public class MarcaProcesadorCard extends JPanel {
 
     public void setOnMarcaSelected(java.util.function.Consumer<String> callback) {
         this.onMarcaSelected = callback;
+    }
+
+    public void setSeleccionado(boolean seleccionado) {
+        this.seleccionado = seleccionado;
+        repaint();
     }
 
     private void initComponentes() {
@@ -61,7 +69,6 @@ public class MarcaProcesadorCard extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Marca seleccionada: " + nombreMarca);
                 if (onMarcaSelected != null) {
                     onMarcaSelected.accept(nombreMarca);
                 }
@@ -76,6 +83,11 @@ public class MarcaProcesadorCard extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.WHITE);
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+        if (seleccionado) {
+            g2d.setColor(Estilos.COLOR_ENFASIS);
+            g2d.setStroke(new BasicStroke(4));
+            g2d.drawRoundRect(2, 2, getWidth()-5, getHeight()-5, 25, 25);
+        }
         g2d.dispose();
     }
 }

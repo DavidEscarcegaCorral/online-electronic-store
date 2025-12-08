@@ -12,10 +12,6 @@ public class PanelBase extends JPanel {
     protected JPanel panelSur;
     protected JPanel panelEste;
     protected JPanel panelOeste;
-    protected Boton atrasBtn;
-    protected TituloLabel tituloLabel;
-
-    protected Boton boton;
 
     public PanelBase() {
         setOpaque(false);
@@ -38,7 +34,6 @@ public class PanelBase extends JPanel {
 
         panelOeste = new JPanel();
         panelOeste.setOpaque(false);
-//        panelOeste.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         add(panelNorte,  BorderLayout.NORTH);
         add(panelCentro,   BorderLayout.CENTER);

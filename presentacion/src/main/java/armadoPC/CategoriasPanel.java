@@ -12,6 +12,57 @@ public class CategoriasPanel extends JPanel {
     private static CategoriaCard categoriaCardDesing = new CategoriaCard("DESING", "/img/categorias/desing.png");
     private static CategoriaCard categoriaCardCustom = new CategoriaCard("CUSTOM", "/img/categorias/custom.png");
 
+    private java.util.function.Consumer<String> onCategoriaSeleccionada;
+    private String seleccionActual = null;
+
+    public String getSeleccionActual() {
+        return seleccionActual;
+    }
+
+    public void limpiarSeleccion() {
+        categoriaCardGamer.setSeleccionado(false);
+        categoriaCardOffice.setSeleccionado(false);
+        categoriaCardDesing.setSeleccionado(false);
+        categoriaCardCustom.setSeleccionado(false);
+        seleccionActual = null;
+        repaint();
+    }
+
+    public void setOnCategoriaSeleccionada(java.util.function.Consumer<String> callback) {
+        this.onCategoriaSeleccionada = callback;
+        categoriaCardGamer.setOnCategoriaSelected(this::categoriaClick);
+        categoriaCardOffice.setOnCategoriaSelected(this::categoriaClick);
+        categoriaCardDesing.setOnCategoriaSelected(this::categoriaClick);
+        categoriaCardCustom.setOnCategoriaSelected(this::categoriaClick);
+    }
+
+    private void categoriaClick(String nombre) {
+        if (nombre != null && nombre.equals(seleccionActual)) {
+            categoriaCardGamer.setSeleccionado(false);
+            categoriaCardOffice.setSeleccionado(false);
+            categoriaCardDesing.setSeleccionado(false);
+            categoriaCardCustom.setSeleccionado(false);
+            seleccionActual = null;
+            if (onCategoriaSeleccionada != null) onCategoriaSeleccionada.accept(null);
+            return;
+        }
+
+        categoriaCardGamer.setSeleccionado(false);
+        categoriaCardOffice.setSeleccionado(false);
+        categoriaCardDesing.setSeleccionado(false);
+        categoriaCardCustom.setSeleccionado(false);
+
+        switch (nombre) {
+            case "GAMER": categoriaCardGamer.setSeleccionado(true); break;
+            case "OFFICE": categoriaCardOffice.setSeleccionado(true); break;
+            case "DESING": categoriaCardDesing.setSeleccionado(true); break;
+            case "CUSTOM": categoriaCardCustom.setSeleccionado(true); break;
+        }
+
+        seleccionActual = nombre;
+        if (onCategoriaSeleccionada != null) onCategoriaSeleccionada.accept(nombre);
+    }
+
     public CategoriasPanel() {
         setOpaque(false);
         setLayout(new FlowLayout(FlowLayout.CENTER, 25, 25));

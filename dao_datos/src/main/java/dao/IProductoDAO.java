@@ -19,5 +19,12 @@ public interface IProductoDAO {
     ProductoEntidad obtenerPorId(String id);
 
     boolean actualizarStock(String id, int cantidad);
-}
 
+    /**
+     * Cuenta la cantidad de productos disponibles (stock > 0) para una categoría.
+     *
+     * @param categoria la categoría a consultar
+     * @return número de productos con stock > 0 en esa categoría
+     */
+    long contarDisponiblesPorCategoria(String categoria);
+}

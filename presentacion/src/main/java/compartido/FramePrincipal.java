@@ -50,4 +50,8 @@ public class FramePrincipal extends JFrame {
         panelContenedor.repaint();
     }
 
+    public JPanel getPanelContenido() {
+        return panelContenido;
+    }
+
 }

@@ -1,12 +1,14 @@
 package compartido.estilos.scroll;
 
+import compartido.estilos.Estilos;
+
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 
 public class ScrollBarCustom extends BasicScrollBarUI {
-    private final Color colorThumb = new Color(130, 130, 130);
-    private final Color colorTrack = new Color(240, 240, 240);
+    private final Color colorThumb = new Color(170, 170, 170);
+    private final Color colorTrack = Estilos.COLOR_NAV_INF;
     private final int anchoBarra = 12;
 
     @Override

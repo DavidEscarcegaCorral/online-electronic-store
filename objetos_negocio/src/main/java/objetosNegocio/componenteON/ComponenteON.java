@@ -12,7 +12,7 @@ public class ComponenteON implements IComponenteON {
     private static ComponenteON componenteON;
     private final ProductoDAO productoDAO;
 
-    public static synchronized ComponenteON getInstance() {
+    public static synchronized IComponenteON getInstance() {
         if (componenteON == null) {
             componenteON = new ComponenteON();
         }
