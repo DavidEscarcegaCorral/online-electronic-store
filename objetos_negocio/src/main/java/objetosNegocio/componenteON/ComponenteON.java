@@ -1,4 +1,4 @@
-package objetosnegocio.componenteON;
+package objetosNegocio.componenteON;
 
 import dao.ProductoDAO;
 import dto.ComponenteDTO;
