@@ -6,10 +6,15 @@ import compartido.estilos.scroll.ScrollPaneCustom;
 import compartido.estilos.tabla.Tabla;
 import compartido.FramePrincipal;
 import compartido.PanelBase;
-
+import dto.CarritoDTO;
+import dto.ItemCarritoDTO;
+import fachada.IVentaFacade;
+import fachada.VentaFacade;
+import Sesion.SesionManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class CarritoPanel extends PanelBase {
     private static String titulo = "Carrito";
@@ -18,12 +23,18 @@ public class CarritoPanel extends PanelBase {
     private TotalPanel totalPanel;
     private metodoPagoPanel metodoPagoPanel;
 
+    private CarritoDTO carritoDTO;
+
+    private final IVentaFacade IventaFacade;
+
     private ScrollPaneCustom scroll;
     private DefaultTableModel model;
     private Tabla tablaResumen;
 
+    private SesionManager sesion;
     public CarritoPanel() {
         super();
+        sesion = SesionManager.getInstance();
         tituloLbl = new JLabel(titulo);
         tituloLbl.setFont(FontUtil.loadFont(28, "Inter_SemiBold"));
         tituloLbl.setForeground(Color.white);
@@ -32,10 +43,9 @@ public class CarritoPanel extends PanelBase {
         totalPanel = new TotalPanel();
         metodoPagoPanel = new metodoPagoPanel();
 
-        String[] columns = {"id", "Precio unitario", "Cantidad", "Costo total", "Eliminar"};
-
-        model =  new DefaultTableModel(columns, 0);
-        tablaResumen = new Tabla(model, new FramePrincipal());
+        IventaFacade = VentaFacade.getInstance();
+        sesion = SesionManager.getInstance();
+        rellenarTabla(sesion.getCarritoActual().getItems());
 
         scroll = new ScrollPaneCustom(tablaResumen);
         scroll.setOpaque(false);
@@ -57,6 +67,25 @@ public class CarritoPanel extends PanelBase {
         actualizarCarrito();
     }
 
+    }
+
+    void rellenarTabla(List<ItemCarritoDTO> items){
+        String[] columns = {"Producto", "Precio unitario", "Cantidad", "Costo total", "Eliminar"};
+
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+
+        for(ItemCarritoDTO item : items){
+            Object[] fila = {
+                    item.getNombre(),
+                    item.getPrecioUnitario(),
+                    item.getCantidad(),
+                    item.getSubtotal(),
+                    new JLabel("X")
+            };
+            model.addRow(fila);
+        }
+
+        tablaResumen=new Tabla(model, new FramePrincipal());
     public void actualizarCarrito() {
         model.setRowCount(0);
 

@@ -15,6 +15,8 @@ public class metodoPagoPanel extends JPanel {
     private CustomRadioButton rd1;
     private CustomRadioButton rd2;
 
+    private ButtonGroup grupo;
+
     private Boton realziarPedidoBtn;
     private Boton vaciarCarritoBtn;
 
@@ -40,8 +42,23 @@ public class metodoPagoPanel extends JPanel {
         rd1 = new CustomRadioButton("En efectivo en sucursal");
         rd2 = new CustomRadioButton("Tarjeta de creido/debito");
 
+        grupo = new ButtonGroup();
+
         realziarPedidoBtn = new Boton("Realizar pedido", 145, 30, 14, 10, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
         vaciarCarritoBtn = new Boton("Vaciar Carrito", 145, 30, 14, 10, Color.white, Estilos.COLOR_VACIAR_CARITO, Estilos.COLOR_VACIAR_CARRITO_HOOVER);
+
+        grupo.add(rd1);
+        grupo.add(rd2);
+
+        rd1.addActionListener(e -> {
+            rd1.setSelected(true);
+            rd2.setSelected(false);
+        });
+
+        rd2.addActionListener(e -> {
+            rd2.setSelected(true);
+            rd1.setSelected(false);
+        });
 
         panelCentro.add(rd1);
         panelCentro.add(rd2);
