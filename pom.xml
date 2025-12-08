@@ -23,6 +23,7 @@
         <module>negocio_configuracion</module>
         <module>negocio_venta</module>
         <module>presentacion</module>
+        <module>negocio_Sesion</module>
     </modules>
 
 </project>
