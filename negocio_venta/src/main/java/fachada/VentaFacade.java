@@ -39,6 +39,22 @@ public class VentaFacade implements IVentaFacade {
     @Override
     public CarritoDTO crearCarrito(String clienteId) {
         this.carritoActual = new CarritoDTO();
+        if (clienteId == null) {
+            // Obtener o crear usuario por defecto y usar su id
+            try {
+                dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
+                entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+                if (usuario == null) {
+                    usuario = new entidades.UsuarioEntidad();
+                    usuario.setNombre("Cliente Default");
+                    usuario.setEmail("cliente_default@local");
+                    usuarioDAO.guardar(usuario);
+                }
+                clienteId = usuario.getId() != null ? usuario.getId().toString() : "cliente_default";
+            } catch (Exception ignored) {
+                clienteId = "cliente_default";
+            }
+        }
         this.carritoActual.setClienteId(clienteId);
         this.carritoActual.setItems(new ArrayList<>());
         return this.carritoActual;
@@ -47,6 +63,22 @@ public class VentaFacade implements IVentaFacade {
     @Override
     public CarritoDTO getCarritoActual() {
         return this.carritoActual;
+    }
+
+    @Override
+    public entidades.UsuarioEntidad getUsuarioActual() {
+        try {
+            if (this.carritoActual == null) {
+                crearCarrito(null);
+            }
+            String clienteId = this.carritoActual != null ? this.carritoActual.getClienteId() : null;
+            if (clienteId == null) return null;
+            dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
+            entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorId(clienteId);
+            return usuario;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -172,6 +204,42 @@ public class VentaFacade implements IVentaFacade {
         this.carritoActual = null;
 
         return pedidoId;
+    }
+
+    @Override
+    public void vaciarCarrito() {
+        // Reinicializar el carrito actual y persistir el cambio asociado al usuario por defecto
+        try {
+            dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
+            entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+            String clienteId = "cliente_default";
+            if (usuario == null) {
+                usuario = new entidades.UsuarioEntidad();
+                usuario.setNombre("Cliente Default");
+                usuario.setEmail("cliente_default@local");
+                usuarioDAO.guardar(usuario);
+            }
+            if (usuario.getId() != null) clienteId = usuario.getId().toString();
+
+            this.carritoActual = new CarritoDTO();
+            this.carritoActual.setClienteId(clienteId);
+            this.carritoActual.setItems(new ArrayList<>());
+
+            // Persistir mediante CarritoDAO: limpiar configuraciones del carrito asociado al usuario
+            dao.CarritoDAO carritoDAO = new dao.CarritoDAO();
+            entidades.CarritoEntidad carritoEntidad = carritoDAO.obtenerPorClienteId(clienteId);
+            if (carritoEntidad != null) {
+                carritoEntidad.setConfiguracionesIds(new java.util.ArrayList<>());
+                carritoDAO.guardar(carritoEntidad);
+            } else {
+                // crear un nuevo carrito persistido vacío
+                carritoEntidad = new entidades.CarritoEntidad();
+                carritoEntidad.setClienteId(clienteId);
+                carritoDAO.guardar(carritoEntidad);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

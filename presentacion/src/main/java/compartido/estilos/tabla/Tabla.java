@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public class Tabla extends JTable {
@@ -28,19 +29,21 @@ public class Tabla extends JTable {
     private void configStyle() {
         //Background, foreground, font, row height
         setOpaque(true);
-        this.setForeground(Color.BLACK);
+        this.setForeground(Color.white);
         this.setBackground(Estilos.COLOR_BACKGROUND);
-        this.setFont(FontUtil.loadFont(16, "IBMPlexSans-Light"));
+        this.setFont(FontUtil.loadFont(16, "Inter_Regular"));
         this.setRowHeight(60);
 
-        //Grid
+        this.setShowGrid(false);
         this.setShowHorizontalLines(false);
         this.setShowVerticalLines(false);
         this.setGridColor(Estilos.COLOR_BACKGROUND);
-        setIntercellSpacing(new Dimension(10, 10));
+        setIntercellSpacing(new Dimension(0, 0));
+        setBorder(null);
 
-        //Selection colors
-        this.setSelectionBackground(Color.white);
+        // Hacer que la selección use el mismo color que el fondo para que no destaque
+        this.setSelectionBackground(Estilos.COLOR_BACKGROUND);
+        this.setSelectionForeground(this.getForeground());
         this.setFillsViewportHeight(true);
 
         //Header
@@ -56,7 +59,7 @@ public class Tabla extends JTable {
                 label.setOpaque(true);
                 label.setBackground(Estilos.COLOR_BACKGROUND);
                 label.setForeground(Color.WHITE);
-//                label.setFont(FontUtil.loadFont(15, "Inter_18pt-ExtraLight"));
+                label.setFont(FontUtil.loadFont(18, "Inter_Regular"));
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 return label;
@@ -64,6 +67,20 @@ public class Tabla extends JTable {
         });
 
         header.setReorderingAllowed(false);
+    }
+
+    @Override
+    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+        Component c = super.prepareRenderer(renderer, row, column);
+        // Forzar mismo fondo/foreground si está seleccionado (evita color distinto al seleccionar)
+        if (isCellSelected(row, column)) {
+            c.setBackground(getBackground());
+            c.setForeground(getForeground());
+        } else {
+            c.setBackground(getBackground());
+            c.setForeground(getForeground());
+        }
+        return c;
     }
 
     public void alingColumn() {

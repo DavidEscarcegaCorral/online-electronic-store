@@ -5,10 +5,8 @@ import armadoPC.ArmarPcPanel;
 import carrito.CarritoPanel;
 import compartido.BarraNavegacion;
 import menuprincipal.MenuPrincipalPanel;
-
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -87,7 +85,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private void inicializarVista() {
         framePrincipal.setPanelContenido(menuPrincipalPanel);
         framePrincipal.setVisible(true);
-
         armarEquipoPantalla.mostrarMenusLaterales();
     }
 
@@ -96,20 +93,12 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
         barra.getBoton().addActionListener(e -> mostrarNuevaPantalla(menuPrincipalPanel));
 
-        barra.getArmarPcLbl().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                mostrarNuevaPantalla(armarEquipoPantalla);
-                mostrarPasoInicialArmar();
-            }
+        barra.getArmarPcBtn().addActionListener(e -> {
+            mostrarNuevaPantalla(armarEquipoPantalla);
+            mostrarPasoInicialArmar();
         });
 
-        barra.getCarritoLbl().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                mostrarNuevaPantalla(carritoPantalla);
-            }
-        });
+        barra.getCarritoBtn().addActionListener(e -> mostrarNuevaPantalla(carritoPantalla));
     }
 
     private void configurarBotonesComponentes() {
@@ -194,7 +183,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             }
 
             IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-            java.util.List<String> errores = armadoFacade.agregarComponente(componente);
+            List<String> errores = armadoFacade.agregarComponente(componente);
 
             if (!errores.isEmpty()) {
                 mostrarMensaje(String.join("\n", errores), MENSAJE_ERROR_COMPATIBILIDAD, JOptionPane.ERROR_MESSAGE);

@@ -6,6 +6,7 @@ import compartido.estilos.scroll.ScrollPaneCustom;
 import compartido.estilos.tabla.Tabla;
 import compartido.FramePrincipal;
 import compartido.PanelBase;
+import fachada.IVentaFacade;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -37,8 +38,15 @@ public class CarritoPanel extends PanelBase {
         model =  new DefaultTableModel(columns, 0);
         tablaResumen = new Tabla(model, new FramePrincipal());
 
+        // Ajustar tamaño deseado de la tabla y su viewport
+        Dimension tablaSize = new Dimension(780, 510);
+        tablaResumen.setPreferredScrollableViewportSize(tablaSize);
+        tablaResumen.setPreferredSize(tablaSize);
+
         scroll = new ScrollPaneCustom(tablaResumen);
         scroll.setOpaque(false);
+        // Asegurar que el scroll respete el tamaño
+        scroll.setPreferredSize(tablaSize);
 
         // Panel Norte
         panelNorte.add(tituloLbl);
@@ -49,10 +57,36 @@ public class CarritoPanel extends PanelBase {
         // Panel Oeste
         panelOeste.add(opcionEntregaPanel);
 
-        // Panel Este
-        panelEste.add(totalPanel);
+        Box esteBox = Box.createVerticalBox();
+        esteBox.setOpaque(false);
+        esteBox.add(totalPanel);
+        esteBox.add(Box.createVerticalStrut(10));
+        esteBox.add(metodoPagoPanel);
+        panelEste.add(esteBox);
 
-        panelEste.add(metodoPagoPanel);
+        try {
+            var vaciarBtn = metodoPagoPanel.getVaciarCarritoBtn();
+            if (vaciarBtn != null) {
+                vaciarBtn.addActionListener(e -> {
+                    try {
+                        IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                        ventaFacade.vaciarCarrito();
+
+                        // Limpiar la tabla y actualizar total
+                        model.setRowCount(0);
+                        if (totalPanel != null) totalPanel.actualizarTotal();
+
+                        revalidate();
+                        repaint();
+
+                        JOptionPane.showMessageDialog(this, "Carrito vaciado correctamente.", "Listo", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Error al vaciar el carrito: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }
+        } catch (Exception ignored) {}
 
         actualizarCarrito();
     }
@@ -61,7 +95,7 @@ public class CarritoPanel extends PanelBase {
         model.setRowCount(0);
 
         try {
-            fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+            IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
             java.util.List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
 
             for (entidades.ConfiguracionEntidad config : configuraciones) {
@@ -83,6 +117,13 @@ public class CarritoPanel extends PanelBase {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
+
+        // Actualizar totalPanel
+        try {
+            if (totalPanel != null) {
+                totalPanel.actualizarTotal();
+            }
+        } catch (Exception ignored) {}
 
         revalidate();
         repaint();

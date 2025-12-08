@@ -5,7 +5,9 @@ import java.awt.*;
 public class Estilos {
     public static final Color COLOR_BACKGROUND = new Color(56, 56, 56);
     public static final Color COLOR_NAV_SUP = new Color(92, 92, 92);
+    public static final Color COLOR_NAV_SUP_HOOVER = new Color(108, 108, 108);
     public static final Color COLOR_NAV_INF = new Color(44, 44, 44);
+    public static final Color COLOR_NAV_INF_HOOVER = new Color(53, 53, 53);
     public static final Color COLOR_TITULO_LABEL = new Color(27, 27, 27);
     public static final Color COLOR_ENFASIS = new Color(177, 90, 252);
     public static final Color COLOR_ENFASIS_HOOVER = new Color(185, 109, 250);

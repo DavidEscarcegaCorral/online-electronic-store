@@ -1,6 +1,7 @@
 package compartido;
 
 import compartido.estilos.Estilos;
+import compartido.estilos.FontUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,11 +14,22 @@ public class TotalPanel extends JPanel {
     private JLabel subtotalLabel;
     private JLabel envioLabel;
     private JLabel totalLabel;
+    private JLabel totalValueLabel;
 
     public TotalPanel() {
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setPreferredSize(new Dimension(220,350));
+
+        panelNorte = new JPanel();
+        panelNorte.setOpaque(false);
+        panelNorte.setPreferredSize(new Dimension(220, 40));
+        panelNorte.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 8));
+        JLabel titulo = new JLabel("Total");
+        titulo.setFont(FontUtil.loadFont(18, "Inter_SemiBold"));
+        titulo.setForeground(Color.WHITE);
+        titulo.setHorizontalAlignment(SwingConstants.CENTER);
+        panelNorte.add(titulo);
 
         panelSur = new JPanel() {
             @Override
@@ -33,8 +45,31 @@ public class TotalPanel extends JPanel {
         };
         panelSur.setOpaque(false);
         panelSur.setPreferredSize(new Dimension(190,40));
+        panelSur.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 8));
 
+        totalLabel = new JLabel("Total:");
+        totalLabel.setFont(FontUtil.loadFont(14, "Inter_SemiBold"));
+        totalLabel.setForeground(Color.WHITE);
+
+        totalValueLabel = new JLabel("$0.00");
+        totalValueLabel.setFont(FontUtil.loadFont(16, "Inter_SemiBold"));
+        totalValueLabel.setForeground(Color.WHITE);
+
+        panelSur.add(totalLabel);
+        panelSur.add(totalValueLabel);
+
+        add(panelNorte);
         add(panelSur);
+    }
+
+    public void actualizarTotal() {
+        try {
+            fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+            double total = ventaFacade.calcularTotalCarrito();
+            totalValueLabel.setText(String.format("$%,.2f", total));
+        } catch (Exception e) {
+            totalValueLabel.setText("$0.00");
+        }
     }
 
     @Override

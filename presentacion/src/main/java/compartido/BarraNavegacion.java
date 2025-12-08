@@ -3,6 +3,7 @@ package compartido;
 import compartido.estilos.BotonHighSpecs;
 import compartido.estilos.Estilos;
 import compartido.estilos.FontUtil;
+import compartido.estilos.Boton;
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,22 +12,22 @@ public class BarraNavegacion extends JPanel {
     private JPanel panelInf;
 
     private BotonHighSpecs boton;
-    private JLabel armarPcLbl;
-    private JLabel pedidosLbl;
-    private JLabel carritoLbl;
-    private JLabel cuentaLbl;
-    private JLabel equiposLbl;
-    private JLabel componentesLbl;
-    private JLabel almacenamientoLbl;
-    private JLabel redesLbl;
-    private JLabel accesoriosLbl;
+    private Boton armarPcBtn;
+    private Boton pedidosBtn;
+    private Boton carritoBtn;
+    private Boton cuentaBtn;
+    private Boton equiposBtn;
+    private Boton componentesBtn;
+    private Boton almacenamientoBtn;
+    private Boton redesBtn;
+    private Boton accesoriosBtn;
 
     public BarraNavegacion() {
         setPreferredSize(new Dimension(900, 160));
         setLayout(new FlowLayout(FlowLayout.CENTER, 50, 20));
         setOpaque(false);
-        Font font = FontUtil.loadFont(28, "Iceland-Regular");
-        Font font2 = FontUtil.loadFont(18, "IBMPlexSans-Regular");
+        Font btnSupLbl = FontUtil.loadFont(28, "Iceland-Regular");
+        Font btnInfLbl = FontUtil.loadFont(18, "Inter_Light");
 
         panelSup = new JPanel() {
             @Override
@@ -40,7 +41,7 @@ public class BarraNavegacion extends JPanel {
                 g2d.dispose();
             }
         };
-        panelSup.setLayout(new FlowLayout(FlowLayout.CENTER, 70, 0));
+        panelSup.setLayout(new FlowLayout(FlowLayout.CENTER, 35, 0));
         panelSup.setOpaque(false);
 
         panelInf = new JPanel() {
@@ -55,59 +56,47 @@ public class BarraNavegacion extends JPanel {
                 g2d.dispose();
             }
         };
-        panelInf.setLayout(new FlowLayout(FlowLayout.CENTER, 60, 8));
-        panelInf.setPreferredSize(new Dimension(900, 40));
+        panelInf.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 8));
+        panelInf.setPreferredSize(new Dimension(900, 45));
         panelInf.setOpaque(false);
 
         boton = new BotonHighSpecs();
-        armarPcLbl = new JLabel("Armar Pc");
-        armarPcLbl.setFont(font);
-        armarPcLbl.setForeground(Color.white);
-        pedidosLbl = new JLabel("Pedidos");
-        pedidosLbl.setFont(font);
-        pedidosLbl.setForeground(Color.white);
-        carritoLbl = new JLabel("Carrito");
-        carritoLbl.setFont(font);
-        carritoLbl.setForeground(Color.white);
-        cuentaLbl = new JLabel("Cuenta");
-        cuentaLbl.setFont(font);
-        cuentaLbl.setForeground(Color.white);
 
-        equiposLbl = new JLabel("Equipos");
-        equiposLbl.setFont(font2);
-        equiposLbl.setForeground(Color.white);
-        componentesLbl = new JLabel("Componentes");
-        componentesLbl.setFont(font2);
-        componentesLbl.setForeground(Color.white);
-        almacenamientoLbl = new JLabel("Almacenamiento");
-        almacenamientoLbl.setFont(font2);
-        almacenamientoLbl.setForeground(Color.white);
-        redesLbl = new JLabel("Redes");
-        redesLbl.setFont(font2);
-        redesLbl.setForeground(Color.white);
-        accesoriosLbl = new JLabel("Accesorios");
-        accesoriosLbl.setFont(font2);
-        accesoriosLbl.setForeground(Color.white);
+        armarPcBtn = new Boton("Armar Pc", 140, 45, 20, 10, Color.WHITE, Estilos.COLOR_NAV_SUP, Estilos.COLOR_NAV_SUP_HOOVER);
+        pedidosBtn = new Boton("Pedidos", 140, 45, 20, 10, Color.WHITE, Estilos.COLOR_NAV_SUP, Estilos.COLOR_NAV_SUP_HOOVER);
+        carritoBtn = new Boton("Carrito", 140, 45, 20, 10, Color.WHITE, Estilos.COLOR_NAV_SUP, Estilos.COLOR_NAV_SUP_HOOVER);
+        cuentaBtn = new Boton("Cuenta", 140, 45, 20, 10, Color.WHITE, Estilos.COLOR_NAV_SUP, Estilos.COLOR_NAV_SUP_HOOVER);
 
-        Cursor cursorMano = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-        armarPcLbl.setCursor(cursorMano);
-        pedidosLbl.setCursor(cursorMano);
-        carritoLbl.setCursor(cursorMano);
-        cuentaLbl.setCursor(cursorMano);
+        equiposBtn = new Boton("Equipos", 160, 30, 16, 10, Color.WHITE, Estilos.COLOR_NAV_INF,  Estilos.COLOR_NAV_INF_HOOVER);
+        componentesBtn = new Boton("Componentes", 160, 30, 16, 10, Color.WHITE, Estilos.COLOR_NAV_INF,  Estilos.COLOR_NAV_INF_HOOVER);
+        almacenamientoBtn = new Boton("Almacenamiento", 180, 30, 16, 10, Color.WHITE, Estilos.COLOR_NAV_INF,  Estilos.COLOR_NAV_INF_HOOVER);
+        redesBtn = new Boton("Redes", 120, 30, 16, 10, Color.WHITE, Estilos.COLOR_NAV_INF,  Estilos.COLOR_NAV_INF_HOOVER);
+        accesoriosBtn = new Boton("Accesorios", 140, 30, 16, 10, Color.WHITE, Estilos.COLOR_NAV_INF,  Estilos.COLOR_NAV_INF_HOOVER);
 
-        //Menu superior
+        armarPcBtn.setFont(btnSupLbl);
+        pedidosBtn.setFont(btnSupLbl);
+        carritoBtn.setFont(btnSupLbl);
+        cuentaBtn.setFont(btnSupLbl);
+
+        equiposBtn.setFont(btnInfLbl);
+        componentesBtn.setFont(btnInfLbl);
+        almacenamientoBtn.setFont(btnInfLbl);
+        redesBtn.setFont(btnInfLbl);
+        accesoriosBtn.setFont(btnInfLbl);
+
+        //Menu superior: usar botones en lugar de labels
         panelSup.add(boton);
-        panelSup.add(armarPcLbl);
-        panelSup.add(pedidosLbl);
-        panelSup.add(carritoLbl);
-        panelSup.add(cuentaLbl);
+        panelSup.add(armarPcBtn);
+        panelSup.add(pedidosBtn);
+        panelSup.add(carritoBtn);
+        panelSup.add(cuentaBtn);
 
-        //Menu inferior
-        panelInf.add(equiposLbl);
-        panelInf.add(componentesLbl);
-        panelInf.add(almacenamientoLbl);
-        panelInf.add(redesLbl);
-        panelInf.add(accesoriosLbl);
+        //Menu inferior: ahora con botones
+        panelInf.add(equiposBtn);
+        panelInf.add(componentesBtn);
+        panelInf.add(almacenamientoBtn);
+        panelInf.add(redesBtn);
+        panelInf.add(accesoriosBtn);
 
         add(panelSup);
         add(panelInf);
@@ -118,39 +107,39 @@ public class BarraNavegacion extends JPanel {
         return boton;
     }
 
-    public JLabel getArmarPcLbl() {
-        return armarPcLbl;
+    public Boton getArmarPcBtn() {
+        return armarPcBtn;
     }
 
-    public JLabel getPedidosLbl() {
-        return pedidosLbl;
+    public Boton getPedidosBtn() {
+        return pedidosBtn;
     }
 
-    public JLabel getCarritoLbl() {
-        return carritoLbl;
+    public Boton getCarritoBtn() {
+        return carritoBtn;
     }
 
-    public JLabel getCuentaLbl() {
-        return cuentaLbl;
+    public Boton getCuentaBtn() {
+        return cuentaBtn;
     }
 
-    public JLabel getEquiposLbl() {
-        return equiposLbl;
+    public Boton getEquiposBtn() {
+        return equiposBtn;
     }
 
-    public JLabel getComponentesLbl() {
-        return componentesLbl;
+    public Boton getComponentesBtn() {
+        return componentesBtn;
     }
 
-    public JLabel getAlmacenamientoLbl() {
-        return almacenamientoLbl;
+    public Boton getAlmacenamientoBtn() {
+        return almacenamientoBtn;
     }
 
-    public JLabel getRedesLbl() {
-        return redesLbl;
+    public Boton getRedesBtn() {
+        return redesBtn;
     }
 
-    public JLabel getAccesoriosLbl() {
-        return accesoriosLbl;
+    public Boton getAccesoriosBtn() {
+        return accesoriosBtn;
     }
 }

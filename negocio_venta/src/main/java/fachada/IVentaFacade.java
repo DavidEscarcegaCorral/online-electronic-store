@@ -26,6 +26,16 @@ public interface IVentaFacade {
     CarritoDTO getCarritoActual();
 
     /**
+     * Devuelve el usuario actualmente asociado al carrito/sesión (si existe).
+     */
+    entidades.UsuarioEntidad getUsuarioActual();
+
+    /**
+     * Vacía el carrito actual (elimina todos los items/configuraciones y persiste el cambio).
+     */
+    void vaciarCarrito();
+
+    /**
      * Agrega un item al carrito.
      *
      * @param item El item a agregar.
@@ -96,4 +106,3 @@ public interface IVentaFacade {
      */
     boolean removerConfiguracionDelCarrito(String configuracionId);
 }
-
