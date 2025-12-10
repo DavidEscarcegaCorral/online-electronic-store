@@ -62,4 +62,13 @@ public interface IConfiguracionFacade {
      * @return true si hay al menos `minimo` productos disponibles
      */
     boolean tieneMinimoPorCategoria(String categoria, int minimo);
+
+    /**
+     * Verifica si hay productos disponibles para una marca específica en una categoría.
+     *
+     * @param categoria La categoría a verificar
+     * @param marca La marca a verificar
+     * @return true si hay al menos un producto disponible con esa marca y categoría
+     */
+    boolean tieneMarcaEnCategoria(String categoria, String marca);
 }

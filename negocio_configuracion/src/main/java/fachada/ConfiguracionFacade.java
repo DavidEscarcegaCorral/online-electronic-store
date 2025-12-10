@@ -113,6 +113,13 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
         return disponibles >= minimo;
     }
 
+    @Override
+    public boolean tieneMarcaEnCategoria(String categoria, String marca) {
+        if (categoria == null || marca == null) return false;
+        List<ProductoEntidad> productos = productoDAO.obtenerPorCategoriaYMarca(categoria, marca);
+        return !productos.isEmpty();
+    }
+
     /**
      * Convierte una entidad de producto a DTO.
      */

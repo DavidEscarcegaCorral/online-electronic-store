@@ -155,6 +155,17 @@ public class ArmarPcPanel extends PanelBase {
         catalogo.cargarLista(categoria);
     }
 
+    public void cargarCatalogoConMarca(String categoria, String marca) {
+        CatalagoPanel catalogo = catalogos.get(categoria);
+        if (catalogo == null) return;
+
+        catalogo.setOnProductoSelected(id -> {
+            if (onProductoSelected != null) onProductoSelected.accept(id);
+        });
+
+        catalogo.cargarListaConMarca(categoria, marca);
+    }
+
     public void setOnProductoSelected(Consumer<String> callback) {
         this.onProductoSelected = callback;
     }

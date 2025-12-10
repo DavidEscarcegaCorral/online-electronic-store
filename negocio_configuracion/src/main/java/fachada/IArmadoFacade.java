@@ -32,4 +32,12 @@ public interface IArmadoFacade {
     ComponenteDTO getComponenteSeleccionado(String categoria);
 
     void limpiarEnsamblaje();
+
+    /**
+     * Remueve todos los componentes posteriores a una categoría específica en el orden de construcción.
+     * Útil cuando el usuario retrocede para cambiar un componente previo.
+     *
+     * @param categoria La categoría desde donde se eliminan componentes posteriores
+     */
+    void removerComponentesPosteriores(String categoria);
 }

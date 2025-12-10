@@ -220,4 +220,41 @@ public class ArmadoFacade implements IArmadoFacade {
         this.ensamblajeActual = new EnsamblajeDTO();
     }
 
+    @Override
+    public void removerComponentesPosteriores(String categoria) {
+        if (this.ensamblajeActual == null) return;
+
+        // Orden de construcción de componentes
+        String[] ordenConstruccion = {
+            "Procesador",
+            "Tarjeta Madre",
+            "RAM",
+            "Tarjeta de video",
+            "Almacenamiento",
+            "Fuente de poder",
+            "Gabinete",
+            "Disipador",
+            "Ventilador",
+            "Monitor",
+            "Kit de teclado/raton",
+            "Redes e internet"
+        };
+
+        // Encontrar el índice de la categoría actual
+        int indiceCategoria = -1;
+        for (int i = 0; i < ordenConstruccion.length; i++) {
+            if (ordenConstruccion[i].equals(categoria)) {
+                indiceCategoria = i;
+                break;
+            }
+        }
+
+        // Si se encontró la categoría, remover todos los componentes posteriores
+        if (indiceCategoria >= 0) {
+            for (int i = indiceCategoria + 1; i < ordenConstruccion.length; i++) {
+                this.ensamblajeActual.removerComponente(ordenConstruccion[i]);
+            }
+        }
+    }
+
 }

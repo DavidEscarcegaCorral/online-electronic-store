@@ -51,7 +51,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private static final int MINIMO_POR_CATEGORIA = 2;
 
     private static final String MENSAJE_ERROR_PRODUCTO_NO_ENCONTRADO = "Producto no encontrado";
-    private static final String MENSAJE_ERROR_COMPATIBILIDAD = "Error de compatibilidad";
     private static final String MENSAJE_CONFIG_VACIA = "No hay configuración para ";
     private static final String TITULO_EXITO = "Éxito";
     private static final String TITULO_ERROR = "Error";
@@ -189,13 +188,16 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
             List<String> errores = armadoFacade.agregarComponente(componente);
 
+            // Los errores no deberían ocurrir ya que el catálogo muestra solo productos compatibles
+            // Pero los manejamos por si acaso
             if (!errores.isEmpty()) {
-                mostrarMensaje(String.join("\n", errores), MENSAJE_ERROR_COMPATIBILIDAD, JOptionPane.ERROR_MESSAGE);
-            } else {
-                armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
-                var btn = armarEquipoPantalla.getContinuarBtn();
-                if (btn != null) btn.setEnabled(true);
+                System.err.println("Advertencia: Se encontraron errores de compatibilidad inesperados: " + String.join(", ", errores));
+                // No mostramos mensaje al usuario, ya que el catálogo debería prevenir esto
             }
+
+            armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
+            var btn = armarEquipoPantalla.getContinuarBtn();
+            if (btn != null) btn.setEnabled(true);
         } catch (Exception ex) {
             manejarExcepcion("Error procesando selección", ex);
         }
@@ -203,30 +205,90 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
     private void procesarSeleccionCategoria(String categoria) {
         this.seleccionCategoria = categoria;
-        this.categoriaConfirmada = categoria != null;
+        this.categoriaConfirmada = false;
 
-        if (categoria != null) {
-            armarEquipoPantalla.habilitarCategoriasYMarca();
-        } else {
+        if (categoria == null) {
             armarEquipoPantalla.habilitarSoloCategorias();
+            controlpresentacion.ControlPresentacion.getInstance().seleccionarCategoria(null);
+            SwingUtilities.invokeLater(armarEquipoPantalla::actualizarEstadoContinuarDesdeUI);
+            return;
         }
 
+        // Validar que hay suficientes productos para configuración básica
+        fachada.ConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
+        if (!configuracionFacade.tieneMinimoPorCategoria("Procesador", MINIMO_POR_CATEGORIA)) {
+            mostrarMensaje(
+                "No hay suficientes procesadores disponibles para la categoría seleccionada.",
+                "Inventario Insuficiente",
+                JOptionPane.WARNING_MESSAGE
+            );
+            armarEquipoPantalla.getCategoriasPanel().limpiarSeleccion();
+            armarEquipoPantalla.habilitarSoloCategorias();
+            return;
+        }
+
+        // Validar componentes mínimos necesarios
+        String[] componentesObligatorios = {"Procesador", "Tarjeta Madre", "RAM", "Gabinete", "Tarjeta de video", "Fuente de poder", "Disipador"};
+        for (String componente : componentesObligatorios) {
+            if (!configuracionFacade.tieneMinimoPorCategoria(componente, MINIMO_POR_CATEGORIA)) {
+                mostrarMensaje(
+                    "No hay suficientes productos de '" + componente + "' disponibles para armar una configuración básica.",
+                    "Inventario Insuficiente",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                armarEquipoPantalla.getCategoriasPanel().limpiarSeleccion();
+                armarEquipoPantalla.habilitarSoloCategorias();
+                return;
+            }
+        }
+
+        // Si pasa las validaciones, confirmar categoría
+        this.categoriaConfirmada = true;
+        armarEquipoPantalla.habilitarCategoriasYMarca();
         controlpresentacion.ControlPresentacion.getInstance().seleccionarCategoria(categoria);
         SwingUtilities.invokeLater(armarEquipoPantalla::actualizarEstadoContinuarDesdeUI);
     }
 
     private void procesarSeleccionMarca(String marca) {
         this.seleccionMarca = marca;
-        this.marcaConfirmada = marca != null;
+        this.marcaConfirmada = false;
 
-        controlpresentacion.ControlPresentacion.getInstance().seleccionarMarca(marca);
-
-        if (marca != null) {
-            armarEquipoPantalla.habilitarTodo();
-        } else {
+        if (marca == null) {
             armarEquipoPantalla.habilitarCategoriasYMarca();
+            controlpresentacion.ControlPresentacion.getInstance().seleccionarMarca(null);
+            SwingUtilities.invokeLater(armarEquipoPantalla::actualizarEstadoContinuarDesdeUI);
+            return;
         }
 
+        // Validar que hay categoría seleccionada primero
+        if (!categoriaConfirmada || seleccionCategoria == null) {
+            mostrarMensaje(
+                "Debe seleccionar una categoría antes de elegir marca de procesador.",
+                "Categoría no seleccionada",
+                JOptionPane.WARNING_MESSAGE
+            );
+            armarEquipoPantalla.getMarcasPanel().limpiarSeleccion();
+            armarEquipoPantalla.habilitarCategoriasYMarca();
+            return;
+        }
+
+        // Validar que hay procesadores de esa marca en inventario para la categoría seleccionada
+        fachada.ConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
+        if (!configuracionFacade.tieneMarcaEnCategoria("Procesador", marca)) {
+            mostrarMensaje(
+                "No hay procesadores de la marca '" + marca + "' disponibles en inventario.",
+                "Marca no disponible",
+                JOptionPane.WARNING_MESSAGE
+            );
+            armarEquipoPantalla.getMarcasPanel().limpiarSeleccion();
+            armarEquipoPantalla.habilitarCategoriasYMarca();
+            return;
+        }
+
+        // Si pasa las validaciones, confirmar marca
+        this.marcaConfirmada = true;
+        controlpresentacion.ControlPresentacion.getInstance().seleccionarMarca(marca);
+        armarEquipoPantalla.habilitarTodo();
         SwingUtilities.invokeLater(armarEquipoPantalla::actualizarEstadoContinuarDesdeUI);
     }
 
@@ -347,9 +409,43 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     public void navegarAIndice(int nuevoIndice) {
         if (!esIndiceValido(nuevoIndice)) return;
 
+        // Validar que no se puede avanzar más allá de categoría sin seleccionarla
+        if (nuevoIndice > INDICE_CATEGORIA && !categoriaConfirmada) {
+            mostrarMensaje(
+                "Debe seleccionar una categoría antes de continuar.",
+                "Categoría requerida",
+                JOptionPane.WARNING_MESSAGE
+            );
+            navegarAIndice(INDICE_CATEGORIA);
+            return;
+        }
+
+        // Validar que no se puede avanzar más allá de marca sin seleccionarla
+        if (nuevoIndice > INDICE_MARCA_PROCESADOR && !marcaConfirmada) {
+            mostrarMensaje(
+                "Debe seleccionar una marca de procesador antes de continuar.",
+                "Marca requerida",
+                JOptionPane.WARNING_MESSAGE
+            );
+            navegarAIndice(INDICE_MARCA_PROCESADOR);
+            return;
+        }
+
+        // Si retrocede a un paso anterior, limpiar componentes posteriores
+        String[] pasos = armarEquipoPantalla.getListaPasosArmado();
+        if (nuevoIndice < indiceActual && nuevoIndice >= INDICE_PROCESADOR) {
+            IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
+            String categoriaActual = pasos[nuevoIndice];
+
+            // Remover componentes posteriores para evitar incompatibilidades
+            armadoFacade.removerComponentesPosteriores(categoriaActual);
+
+            // Actualizar resumen después de limpiar
+            armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
+        }
+
         armarEquipoPantalla.mostrarMenusLaterales();
 
-        String[] pasos = armarEquipoPantalla.getListaPasosArmado();
         indiceActual = nuevoIndice;
         armarEquipoPantalla.mostrarPaso(nuevoIndice);
 
@@ -360,12 +456,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         String cfgCategoria = cfg.getCategoriaActual();
         String cfgMarca = cfg.getMarcaActual();
         IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-        boolean ensamblajeTieneComponentes = false;
-        try {
-            ensamblajeTieneComponentes = !armadoFacade.getEnsamblajeActual().obtenerTodosComponentes().isEmpty();
-        } catch (Exception ex) {
-            ensamblajeTieneComponentes = false;
-        }
 
         if (nuevoIndice == 0) {
             armarEquipoPantalla.habilitarSoloCategorias();
@@ -407,7 +497,23 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                 return;
             }
 
-            armarEquipoPantalla.cargarCatalogo(pasos[nuevoIndice]);
+            // Validación especial para procesadores: verificar que haya productos de la marca seleccionada
+            if (nuevoIndice == INDICE_PROCESADOR && marcaConfirmada && seleccionMarca != null) {
+                if (!configuracionFacade.tieneMarcaEnCategoria("Procesador", seleccionMarca)) {
+                    mostrarMensaje(
+                        "No hay procesadores de la marca '" + seleccionMarca + "' disponibles en inventario.",
+                        "Marca no disponible",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    navegarAIndice(INDICE_MARCA_PROCESADOR);
+                    return;
+                }
+                // Cargar catálogo filtrado por marca
+                armarEquipoPantalla.cargarCatalogoConMarca(pasos[nuevoIndice], seleccionMarca);
+            } else {
+                // Para otras categorías, cargar sin filtro de marca
+                armarEquipoPantalla.cargarCatalogo(pasos[nuevoIndice]);
+            }
         }
 
         if (nuevoIndice == INDICE_RESUMEN) {
@@ -455,6 +561,30 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
     @Override
     public void avanzarPaso() {
+        // Validaciones antes de avanzar desde categoría
+        if (indiceActual == INDICE_CATEGORIA) {
+            if (!categoriaConfirmada) {
+                mostrarMensaje(
+                    "Debe seleccionar una categoría antes de continuar.",
+                    "Categoría requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+        }
+
+        // Validaciones antes de avanzar desde marca
+        if (indiceActual == INDICE_MARCA_PROCESADOR) {
+            if (!marcaConfirmada) {
+                mostrarMensaje(
+                    "Debe seleccionar una marca de procesador antes de continuar.",
+                    "Marca requerida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+        }
+
         int siguiente = Math.min(indiceActual + 1, armarEquipoPantalla.getListaPasosArmado().length - 1);
         navegarAIndice(siguiente);
     }

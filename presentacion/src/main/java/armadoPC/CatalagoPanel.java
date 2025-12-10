@@ -3,8 +3,6 @@ package armadoPC;
 import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
-import dao.ProductoDAO;
-import entidades.ProductoEntidad;
 import fachada.ArmadoFacade;
 import fachada.IArmadoFacade;
 
@@ -15,13 +13,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CatalagoPanel extends JPanel {
-    private final ProductoDAO productoDAO;
     private Consumer<String> onProductoSelected;
     private ProductoCard productoSeleccionado;
     public List<ProductoCard> productoCardList;
 
-    private JPanel itemsPanel;
-    private ScrollPaneCustom scroll;
+    private final JPanel itemsPanel;
+    private final ScrollPaneCustom scroll;
 
     public CatalagoPanel() {
         setOpaque(false);
@@ -30,7 +27,6 @@ public class CatalagoPanel extends JPanel {
         setLayout(new BorderLayout());
 
         productoCardList = new ArrayList<>();
-        productoDAO = new ProductoDAO();
 
         itemsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 25));
         itemsPanel.setOpaque(false);
@@ -52,15 +48,36 @@ public class CatalagoPanel extends JPanel {
     }
 
     public void cargarLista(String nombreProducto) {
+        cargarListaConMarca(nombreProducto, null);
+    }
+
+    public void cargarListaConMarca(String nombreProducto, String marca) {
         itemsPanel.removeAll();
         productoCardList.clear();
         productoSeleccionado = null;
 
         try {
-            List<ProductoEntidad> productos = productoDAO.obtenerPorCategoria(nombreProducto);
+            IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
 
-            if (productos == null || productos.isEmpty()) {
-                JLabel mensajeVacio = new JLabel("No hay productos disponibles en esta categoría");
+            // Obtener productos compatibles con el ensamblaje actual
+            List<dto.ComponenteDTO> productosCompatibles = armadoFacade.obtenerComponentesCompatibles(nombreProducto, null);
+
+            // Filtrar por marca si se especifica
+            if (marca != null && !marca.isEmpty()) {
+                List<dto.ComponenteDTO> productosFiltrados = new ArrayList<>();
+                for (dto.ComponenteDTO componente : productosCompatibles) {
+                    if (marca.equals(componente.getMarca())) {
+                        productosFiltrados.add(componente);
+                    }
+                }
+                productosCompatibles = productosFiltrados;
+            }
+
+            if (productosCompatibles == null || productosCompatibles.isEmpty()) {
+                String mensaje = marca != null && !marca.isEmpty()
+                    ? "No hay productos compatibles de la marca '" + marca + "' disponibles"
+                    : "No hay productos compatibles disponibles en esta categoría";
+                JLabel mensajeVacio = new JLabel(mensaje);
                 mensajeVacio.setForeground(Color.WHITE);
                 mensajeVacio.setFont(new Font("Segoe UI", Font.PLAIN, 16));
                 itemsPanel.add(mensajeVacio);
@@ -70,14 +87,13 @@ public class CatalagoPanel extends JPanel {
                 return;
             }
 
-            IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
             dto.ComponenteDTO seleccionadoDTO = armadoFacade.getComponenteSeleccionado(nombreProducto);
             String seleccionadoId = seleccionadoDTO != null ? seleccionadoDTO.getId() : null;
 
-            for (ProductoEntidad producto : productos) {
-                ProductoCard card = crearProductoCard(producto);
+            for (dto.ComponenteDTO componente : productosCompatibles) {
+                ProductoCard card = crearProductoCardDesdeDTO(componente);
 
-                if (seleccionadoId != null && seleccionadoId.equals(producto.getId().toString())) {
+                if (seleccionadoId != null && seleccionadoId.equals(componente.getId())) {
                     card.setSeleccionado(true);
                     productoSeleccionado = card;
                 }
@@ -86,8 +102,8 @@ public class CatalagoPanel extends JPanel {
                 itemsPanel.add(card);
             }
 
+            final int numProductos = productosCompatibles.size();
             SwingUtilities.invokeLater(() -> {
-                int numProductos = productos.size();
                 int cardsPerRow = 3;
                 int numRows = (int) Math.ceil((double) numProductos / cardsPerRow);
                 int cardHeight = 310;
@@ -105,17 +121,17 @@ public class CatalagoPanel extends JPanel {
             mensajeError.setForeground(Color.RED);
             mensajeError.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             itemsPanel.add(mensajeError);
-            System.err.println("Error al cargar productos de categoría: " + nombreProducto);
+            System.err.println("Error al cargar productos compatibles de categoría: " + nombreProducto + (marca != null ? " y marca: " + marca : ""));
             e.printStackTrace();
         }
     }
 
-    private ProductoCard crearProductoCard(ProductoEntidad producto) {
+    private ProductoCard crearProductoCardDesdeDTO(dto.ComponenteDTO componente) {
         ProductoCard card = new ProductoCard(
-                producto.getId().toString(),
-                producto.getNombre(),
-                producto.getPrecio(),
-                "/img/productos/default.png"
+                componente.getId(),
+                componente.getNombre(),
+                componente.getPrecio(),
+                componente.getImagenUrl() != null ? componente.getImagenUrl() : "/img/productos/default.png"
         );
 
         card.setOnSelect(id -> {

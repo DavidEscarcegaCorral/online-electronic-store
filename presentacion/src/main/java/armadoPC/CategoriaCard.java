@@ -75,11 +75,32 @@ public class CategoriaCard extends JPanel {
 
     private void cargarImagen(String path, int targetWidth, int targetHeight) {
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
+            java.net.URL imageURL = getClass().getResource(path);
+
+            if (imageURL == null) {
+                System.err.println("Error: No se pudo encontrar la imagen en: " + path);
+                System.err.println("Intentando buscar en classpath...");
+
+                // Intentar con ClassLoader
+                imageURL = Thread.currentThread().getContextClassLoader().getResource(path.startsWith("/") ? path.substring(1) : path);
+
+                if (imageURL == null) {
+                    throw new java.io.FileNotFoundException("No se encontró la imagen: " + path);
+                }
+            }
+
+            ImageIcon originalIcon = new ImageIcon(imageURL);
+
+            // Validar que la imagen se cargó correctamente
+            if (originalIcon.getIconWidth() <= 0 || originalIcon.getIconHeight() <= 0) {
+                throw new IllegalStateException("La imagen no se cargó correctamente (dimensiones inválidas)");
+            }
+
             ImageIcon scaledIcon = getScaledIcon(originalIcon, targetWidth, targetHeight);
             imagenCategoriaLbl.setIcon(scaledIcon);
         } catch (Exception e) {
             System.err.println("Error al cargar la imagen para " + nombreCategoria + ": " + path);
+            System.err.println("Mensaje de error: " + e.getMessage());
             imagenCategoriaLbl.setText("No Image");
             imagenCategoriaLbl.setIcon(null);
             e.printStackTrace();
