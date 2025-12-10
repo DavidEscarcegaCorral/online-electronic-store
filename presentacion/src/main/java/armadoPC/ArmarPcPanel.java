@@ -4,7 +4,6 @@ import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
 import compartido.estilos.TituloLabel;
 import compartido.PanelBase;
-import compartido.estilos.scroll.ScrollPaneCustom;
 import dto.EnsamblajeDTO;
 
 import javax.swing.*;
@@ -142,15 +141,7 @@ public class ArmarPcPanel extends PanelBase {
         panelNorte.add(subTituloLabel);
         panelNorte.add(continuarBtn);
 
-        ScrollPaneCustom scrollPane = new ScrollPaneCustom(cardsPanel);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(null);
-        scrollPane.setPreferredSize(new Dimension(720, 600));
-
-        panelCentro.add(scrollPane);
+        panelCentro.add(cardsPanel);
     }
 
     public void cargarCatalogo(String categoria) {
