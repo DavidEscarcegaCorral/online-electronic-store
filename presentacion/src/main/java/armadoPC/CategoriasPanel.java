@@ -5,6 +5,7 @@ import compartido.estilos.Estilos;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 public class CategoriasPanel extends JPanel {
     private static CategoriaCard categoriaCardGamer = new CategoriaCard("GAMER", "/img/categorias/gamer.png");
@@ -12,7 +13,7 @@ public class CategoriasPanel extends JPanel {
     private static CategoriaCard categoriaCardDesing = new CategoriaCard("DESING", "/img/categorias/desing.png");
     private static CategoriaCard categoriaCardCustom = new CategoriaCard("CUSTOM", "/img/categorias/custom.png");
 
-    private java.util.function.Consumer<String> onCategoriaSeleccionada;
+    private Consumer<String> onCategoriaSeleccionada;
     private String seleccionActual = null;
 
     public String getSeleccionActual() {
@@ -28,7 +29,7 @@ public class CategoriasPanel extends JPanel {
         repaint();
     }
 
-    public void setOnCategoriaSeleccionada(java.util.function.Consumer<String> callback) {
+    public void setOnCategoriaSeleccionada(Consumer<String> callback) {
         this.onCategoriaSeleccionada = callback;
         categoriaCardGamer.setOnCategoriaSelected(this::categoriaClick);
         categoriaCardOffice.setOnCategoriaSelected(this::categoriaClick);

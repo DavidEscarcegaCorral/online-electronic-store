@@ -11,7 +11,6 @@ public class Estilos {
     public static final Color COLOR_TITULO_LABEL = new Color(27, 27, 27);
     public static final Color COLOR_ENFASIS = new Color(177, 90, 252);
     public static final Color COLOR_ENFASIS_HOOVER = new Color(185, 109, 250);
-    public static final Color COLOR_ATRAS_BOTON = new Color(44, 44, 44);
     public static final Color COLOR_ATRAS_BOTON_HOOVER = new Color(64, 64, 64);
     public static final Color COLOR_VACIAR_CARITO = new Color(223, 40, 40);
     public static final Color COLOR_VACIAR_CARRITO_HOOVER = new Color(221, 50, 50);

@@ -18,7 +18,7 @@ La aplicación utiliza una arquitectura en capas modular con los siguientes subs
 - `dto_negocios` — DTOs (ComponenteDTO, EnsamblajeDTO, CarritoDTO, ItemCarritoDTO, ClienteDTO, etc.).
 - `objetos_negocio` — Lógica de negocio central.
 - `negocio_configuracion` — Subsistema que gestiona el flujo de configuración paso a paso y expone una fachada (`ConfiguracionFacade`).
-- `negocio_venta` — Subsistema de ventas y carrito, con su fachada (`VentaFacade` o similar).
+- `negocio_venta` — Subsistema de ventas y venta, con su fachada (`VentaFacade` o similar).
 - `negocio_armarPC` — Validación de compatibilidad entre componentes y revalidación de ensamblaje (`ArmadoFacade`).
 
 ### Módulo de Presentación
@@ -49,14 +49,14 @@ La aplicación utiliza una arquitectura en capas modular con los siguientes subs
 - `MenuOpcionesPanel` contiene:
   - Un botón "Guardar configuración" (por encima del `totalCard`) que persiste la entidad `ConfiguracionEntidad` en la DB cuando se cumplen los requisitos mínimos.
   - Si el usuario intenta guardar sin cumplir los requisitos, aparecerá un `JDialog` explicando por qué no se puede guardar.
-  - Un botón adicional que añade la configuración actual al carrito del cliente (singleton). Al añadir la configuración al carrito, el ensamblaje actual se limpia (se borran todas las selecciones en la UI y en el objeto ensamblaje).
+  - Un botón adicional que añade la configuración actual al venta del cliente (singleton). Al añadir la configuración al venta, el ensamblaje actual se limpia (se borran todas las selecciones en la UI y en el objeto ensamblaje).
 
 ## Carrito y persistencia
-- El carrito es una entidad manejada como singleton por cliente; actualmente el flujo añade configuraciones como objetos en el carrito (sin proceso de pago implementado todavía).
+- El venta es una entidad manejada como singleton por cliente; actualmente el flujo añade configuraciones como objetos en el venta (sin proceso de pago implementado todavía).
 - Guardar configuración persiste la entidad `ConfiguracionEntidad` en la colección correspondiente de MongoDB.
 - Nombre y representación en la UI:
-  - Asegúrate de que el campo nombre de la configuración se asigne antes de persistir si deseas que se muestre correctamente en el carrito y en la UI.
-  - El `precio unitario` en la vista de carrito debe reflejar el precio del ensamblaje; si aparece un texto genérico como "Configuración PC" revisa dónde se setea la descripción y el cálculo del precio antes de persistir.
+  - Asegúrate de que el campo nombre de la configuración se asigne antes de persistir si deseas que se muestre correctamente en el venta y en la UI.
+  - El `precio unitario` en la vista de venta debe reflejar el precio del ensamblaje; si aparece un texto genérico como "Configuración PC" revisa dónde se setea la descripción y el cálculo del precio antes de persistir.
 
 ## Errores comunes y soluciones rápidas
 - `java: cannot find symbol: class ConfiguracionEntidad`:
@@ -90,7 +90,7 @@ La aplicación utiliza una arquitectura en capas modular con los siguientes subs
 - Validación de disponibilidad mínima al elegir categoría.
 - Control de habilitado/deshabilitado de navegación basado en selección por paso.
 - Unificación del color de borde de selección (morado) para categorías y marca de CPU.
-- `MenuOpcionesPanel`: botones para guardar configuración y añadir al carrito; `totalCard` sincronizado con resumen.
+- `MenuOpcionesPanel`: botones para guardar configuración y añadir al venta; `totalCard` sincronizado con resumen.
 - Añadido `getPanelContenido()` en `compartido.FramePrincipal` para acceder de forma controlada al panel de contenido.
 
 ---

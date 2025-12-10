@@ -3,6 +3,9 @@ package fachada;
 import dto.CarritoDTO;
 import dto.ItemCarritoDTO;
 import dto.MetodoPagoDTO;
+import entidades.ConfiguracionEntidad;
+
+import java.util.List;
 
 /**
  * Interfaz que define la fachada para el subsistema de Venta.
@@ -96,7 +99,7 @@ public interface IVentaFacade {
      *
      * @return Lista de configuraciones en el carrito.
      */
-    java.util.List<entidades.ConfiguracionEntidad> obtenerConfiguracionesEnCarrito();
+    List<ConfiguracionEntidad> obtenerConfiguracionesEnCarrito();
 
     /**
      * Remueve una configuración del carrito.

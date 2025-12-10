@@ -1,4 +1,4 @@
-package carrito;
+package venta.pedido;
 
 import compartido.FramePrincipal;
 
@@ -7,9 +7,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MetodoPagoDialog extends JDialog {
+public class CambiarMetodoPagoDialog extends JDialog {
 
-    public MetodoPagoDialog(FramePrincipal owner) {
+    public CambiarMetodoPagoDialog(FramePrincipal owner) {
 
         super(owner, "Metodo de pago", true);
 
@@ -17,7 +17,7 @@ public class MetodoPagoDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // Alinea el botón a la derecha
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         JButton okButton = new JButton("Aceptar");
         okButton.addActionListener(new ActionListener() {

@@ -10,7 +10,6 @@ import java.util.Map;
 
 /**
  * Clase para insertar productos masivamente en la base de datos MongoDB.
- * Ejecutar el metodo main() para poblar la base de datos con productos de todas las categorías.
  */
 public class ProductoSeeder {
 
@@ -28,18 +27,18 @@ public class ProductoSeeder {
         System.out.println("Iniciando carga de productos...\n");
 
         // Insertar productos por categoría
-//        seeder.insertarProcesadores();
+        seeder.insertarProcesadores();
 //        seeder.insertarTarjetasMadre();
 //        seeder.insertarMemoriasRAM();
 //        seeder.insertarTarjetasVideo();
 //        seeder.insertarAlmacenamiento();
 //        seeder.insertarFuentesPoder();
-//        seeder.insertarGabinetes();3
-        seeder.insertarDisipadores();
-        seeder.insertarVentiladores();
-        seeder.insertarMonitores();
-        seeder.insertarKitsTecladoRaton();
-        seeder.insertarRedes();
+//        seeder.insertarGabinetes();
+//        seeder.insertarDisipadores();
+//        seeder.insertarVentiladores();
+//        seeder.insertarMonitores();
+//        seeder.insertarKitsTecladoRaton();
+//        seeder.insertarRedes();
 
         System.out.println();
         System.out.println("Carga de productos completada exitosamente!\n");
@@ -78,6 +77,44 @@ public class ProductoSeeder {
         procesadores.add(crearProducto("AMD Ryzen 9 7950X", "Procesador", "AMD", 699.99, 12,
             "Procesador de 16 núcleos y 32 hilos, 4.5GHz base / 5.7GHz turbo",
             Map.of("socket", "AM5", "nucleos", "16", "hilos", "32", "frecuencia", "4.5-5.7 GHz")));
+
+        // Intel adicionales
+        procesadores.add(crearProducto("Intel Core i5-13600K", "Procesador", "Intel", 289.99, 20,
+            "Procesador de 14 núcleos (6P+8E) y 20 hilos, 3.5GHz base / 5.1GHz turbo",
+            Map.of("socket", "LGA1700", "nucleos", "14", "hilos", "20", "frecuencia", "3.5-5.1 GHz")));
+
+        procesadores.add(crearProducto("Intel Core i7-12700", "Procesador", "Intel", 349.99, 18,
+            "Procesador de 12 núcleos (8P+4E) y 20 hilos, 3.2GHz base / 4.9GHz turbo",
+            Map.of("socket", "LGA1700", "nucleos", "12", "hilos", "20", "frecuencia", "3.2-4.9 GHz")));
+
+        procesadores.add(crearProducto("Intel Core i3-13100F", "Procesador", "Intel", 109.99, 40,
+            "Procesador de 4 núcleos y 8 hilos, 3.4GHz base / 4.5GHz turbo",
+            Map.of("socket", "LGA1700", "nucleos", "4", "hilos", "8", "frecuencia", "3.4-4.5 GHz")));
+
+        // AMD adicionales
+        procesadores.add(crearProducto("AMD Ryzen 7 5700X", "Procesador", "AMD", 249.99, 25,
+            "Procesador de 8 núcleos y 16 hilos, 3.6GHz base / 4.7GHz turbo",
+            Map.of("socket", "AM4", "nucleos", "8", "hilos", "16", "frecuencia", "3.6-4.7 GHz")));
+
+        procesadores.add(crearProducto("AMD Ryzen 5 5500", "Procesador", "AMD", 139.99, 35,
+            "Procesador de 6 núcleos y 12 hilos, 3.6GHz base / 4.2GHz turbo",
+            Map.of("socket", "AM4", "nucleos", "6", "hilos", "12", "frecuencia", "3.6-4.2 GHz")));
+
+        procesadores.add(crearProducto("AMD Ryzen 9 5900X", "Procesador", "AMD", 449.99, 16,
+            "Procesador de 12 núcleos y 24 hilos, 3.7GHz base / 4.7GHz turbo",
+            Map.of("socket", "AM4", "nucleos", "12", "hilos", "24", "frecuencia", "3.7-4.7 GHz")));
+
+        procesadores.add(crearProducto("AMD Ryzen 5 7600", "Procesador", "AMD", 229.99, 22,
+            "Procesador de 6 núcleos y 12 hilos, 3.8GHz base / 5.3GHz turbo",
+            Map.of("socket", "AM5", "nucleos", "6", "hilos", "12", "frecuencia", "3.8-5.3 GHz")));
+
+        procesadores.add(crearProducto("Intel Core i9-13900KS", "Procesador", "Intel", 699.99, 8,
+            "Procesador de 24 núcleos (8P+16E) y 32 hilos, 3.2GHz base / 6.0GHz turbo",
+            Map.of("socket", "LGA1700", "nucleos", "24", "hilos", "32", "frecuencia", "3.2-6.0 GHz")));
+
+        procesadores.add(crearProducto("AMD Ryzen 7 5800X3D", "Procesador", "AMD", 399.99, 14,
+            "Procesador de 8 núcleos y 16 hilos con cache 3D V-Cache, 3.4GHz base / 4.5GHz turbo",
+            Map.of("socket", "AM4", "nucleos", "8", "hilos", "16", "frecuencia", "3.4-4.5 GHz")));
 
         insertarDocumentos(procesadores);
     }

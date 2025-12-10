@@ -1,6 +1,7 @@
 package compartido;
 
 import compartido.estilos.Boton;
+import compartido.estilos.Estilos;
 import compartido.estilos.TituloLabel;
 
 import javax.swing.*;

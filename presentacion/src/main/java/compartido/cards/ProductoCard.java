@@ -15,9 +15,9 @@ public class ProductoCard extends JPanel {
     private Boton productoLinkBtn;
 
     private String id;
+    private String imagenUrl;
     private String nombreProducto;
     private double precioProducto;
-    private String imagenUrl;
 
     // callback para notificar selección
     private Consumer<String> onSelect;

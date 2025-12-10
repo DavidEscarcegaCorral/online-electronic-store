@@ -2,7 +2,8 @@ package controlvista;
 
 import compartido.FramePrincipal;
 import armadoPC.ArmarPcPanel;
-import carrito.CarritoPanel;
+import venta.carrito.CarritoPanel;
+import venta.pedido.ConfirmarDetallesPedidoPanel;
 import compartido.BarraNavegacion;
 import menuprincipal.MenuPrincipalPanel;
 import javax.swing.*;
@@ -59,6 +60,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private final MenuPrincipalPanel menuPrincipalPanel;
     private final ArmarPcPanel armarEquipoPantalla;
     private final CarritoPanel carritoPantalla;
+    private final ConfirmarDetallesPedidoPanel confirmarDetallesPedidoPanel;
 
 
     private int indiceActual = 0;
@@ -72,6 +74,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         this.menuPrincipalPanel = new MenuPrincipalPanel();
         this.armarEquipoPantalla = new ArmarPcPanel();
         this.carritoPantalla = new CarritoPanel();
+        this.confirmarDetallesPedidoPanel = new ConfirmarDetallesPedidoPanel();
 
         inicializarVista();
         configurarBarraNavegacion();
@@ -80,6 +83,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         configurarCallbacksNegocio();
         configurarCallbacksGuardarConfiguracion();
         configurarCallbacksAgregarAlCarrito();
+        configurarCallbacksCarrito();
     }
 
     private void inicializarVista() {
@@ -281,6 +285,36 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         };
 
         armarEquipoPantalla.getMenuOpcionesPanel().setOnAgregarAlCarrito(agregarCarritoHandler);
+    }
+
+    private void configurarCallbacksCarrito() {
+        carritoPantalla.setOnRealizarPedido(() -> {
+            try {
+                fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                java.util.List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
+
+                if (configuraciones == null || configuraciones.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        framePrincipal,
+                        "No hay productos en el carrito para realizar el pedido.",
+                        "Carrito vacío",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                mostrarNuevaPantalla(confirmarDetallesPedidoPanel);
+                confirmarDetallesPedidoPanel.actualizarContenido();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    framePrincipal,
+                    "Error al verificar el carrito: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
     }
 
     private void mostrarNuevaPantalla(JPanel nuevoPanel) {

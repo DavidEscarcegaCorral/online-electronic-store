@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 public class CatalagoPanel extends JPanel {
     private final ProductoDAO productoDAO;
     private Consumer<String> onProductoSelected;
-
     private ProductoCard productoSeleccionado;
     public List<ProductoCard> productoCardList;
 
@@ -101,13 +100,6 @@ public class CatalagoPanel extends JPanel {
 
     public ProductoCard getProductoSeleccionado() {
         return productoSeleccionado;
-    }
-
-    public void limpiarSeleccion() {
-        if (productoSeleccionado != null) {
-            productoSeleccionado.setSeleccionado(false);
-            productoSeleccionado = null;
-        }
     }
 
     @Override

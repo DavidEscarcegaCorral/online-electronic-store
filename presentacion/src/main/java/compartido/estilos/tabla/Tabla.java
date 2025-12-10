@@ -39,9 +39,8 @@ public class Tabla extends JTable {
         this.setShowVerticalLines(false);
         this.setGridColor(Estilos.COLOR_BACKGROUND);
         setIntercellSpacing(new Dimension(0, 0));
-        setBorder(null);
+//        setBorder(null);
 
-        // Hacer que la selección use el mismo color que el fondo para que no destaque
         this.setSelectionBackground(Estilos.COLOR_BACKGROUND);
         this.setSelectionForeground(this.getForeground());
         this.setFillsViewportHeight(true);
@@ -59,7 +58,7 @@ public class Tabla extends JTable {
                 label.setOpaque(true);
                 label.setBackground(Estilos.COLOR_BACKGROUND);
                 label.setForeground(Color.WHITE);
-                label.setFont(FontUtil.loadFont(18, "Inter_Regular"));
+                label.setFont(FontUtil.loadFont(18, "IBMPlexSans-Light"));
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                 return label;
@@ -72,7 +71,6 @@ public class Tabla extends JTable {
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
-        // Forzar mismo fondo/foreground si está seleccionado (evita color distinto al seleccionar)
         if (isCellSelected(row, column)) {
             c.setBackground(getBackground());
             c.setForeground(getForeground());

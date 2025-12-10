@@ -1,14 +1,13 @@
 package fachada;
 
-import dao.IProductoDAO;
-import dao.ProductoDAO;
-import dao.IPedidoDAO;
-import dao.PedidoDAO;
+import dao.*;
 import dto.CarritoDTO;
 import dto.ItemCarritoDTO;
 import dto.MetodoPagoDTO;
 import entidades.PedidoEntidad;
 import entidades.ProductoEntidad;
+import entidades.UsuarioEntidad;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,17 +39,11 @@ public class VentaFacade implements IVentaFacade {
     public CarritoDTO crearCarrito(String clienteId) {
         this.carritoActual = new CarritoDTO();
         if (clienteId == null) {
-            // Obtener o crear usuario por defecto y usar su id
             try {
-                dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
-                entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
-                if (usuario == null) {
-                    usuario = new entidades.UsuarioEntidad();
-                    usuario.setNombre("Cliente Default");
-                    usuario.setEmail("cliente_default@local");
-                    usuarioDAO.guardar(usuario);
-                }
-                clienteId = usuario.getId() != null ? usuario.getId().toString() : "cliente_default";
+                entidades.UsuarioEntidad usuario = obtenerOCrearUsuarioDefault();
+                clienteId = usuario != null && usuario.getId() != null
+                    ? usuario.getId().toString()
+                    : "cliente_default";
             } catch (Exception ignored) {
                 clienteId = "cliente_default";
             }
@@ -66,15 +59,15 @@ public class VentaFacade implements IVentaFacade {
     }
 
     @Override
-    public entidades.UsuarioEntidad getUsuarioActual() {
+    public UsuarioEntidad getUsuarioActual() {
         try {
             if (this.carritoActual == null) {
                 crearCarrito(null);
             }
             String clienteId = this.carritoActual != null ? this.carritoActual.getClienteId() : null;
             if (clienteId == null) return null;
-            dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
-            entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorId(clienteId);
+            UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
+            UsuarioEntidad usuario = usuarioDAO.obtenerPorId(clienteId);
             return usuario;
         } catch (Exception e) {
             return null;
@@ -87,13 +80,11 @@ public class VentaFacade implements IVentaFacade {
             return false;
         }
 
-        // Verificar stock disponible
         ProductoEntidad producto = productoDAO.obtenerPorId(item.getProductoId());
         if (producto == null || producto.getStock() < item.getCantidad()) {
             return false;
         }
 
-        // Verificar si el item ya está en el carrito
         ItemCarritoDTO itemExistente = buscarItemEnCarrito(item.getProductoId());
         if (itemExistente != null) {
             int nuevaCantidad = itemExistente.getCantidad() + item.getCantidad();
@@ -127,7 +118,6 @@ public class VentaFacade implements IVentaFacade {
             return true;
         }
 
-        // Verificar stock
         ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
         if (producto == null || producto.getStock() < nuevaCantidad) {
             return false;
@@ -159,25 +149,21 @@ public class VentaFacade implements IVentaFacade {
             return null;
         }
 
-        // Verificar stock antes de procesar
         if (!verificarStockCarrito()) {
             return null;
         }
 
-        // Crear el pedido
         PedidoEntidad pedido = new PedidoEntidad();
         pedido.setClienteId(this.carritoActual.getClienteId());
         pedido.setTotal(calcularTotalCarrito());
         pedido.setEstado("PROCESANDO");
         pedido.setFechaCreacion(new Date());
 
-        // Metodo de pago
         PedidoEntidad.MetodoPagoInfo metodoPagoInfo = new PedidoEntidad.MetodoPagoInfo();
         metodoPagoInfo.setTipo(metodoPago.getTipo().toString());
         metodoPagoInfo.setDetalles("Mock - Pago procesado exitosamente");
         pedido.setMetodoPago(metodoPagoInfo);
 
-        // Gestionar items del carrito
         List<PedidoEntidad.ItemPedido> itemsPedido = new ArrayList<>();
         for (ItemCarritoDTO item : this.carritoActual.getItems()) {
             PedidoEntidad.ItemPedido itemPedido = new PedidoEntidad.ItemPedido();
@@ -189,10 +175,8 @@ public class VentaFacade implements IVentaFacade {
         }
         pedido.setItems(itemsPedido);
 
-        // Guardar el pedido
         String pedidoId = pedidoDAO.crearPedido(pedido);
 
-        // Actualizar stock
         for (ItemCarritoDTO item : this.carritoActual.getItems()) {
             productoDAO.actualizarStock(item.getProductoId(), item.getCantidad());
         }
@@ -200,7 +184,6 @@ public class VentaFacade implements IVentaFacade {
         // Mock: Simular proceso de pago exitoso
         pedidoDAO.actualizarEstado(pedidoId, "COMPLETADO");
 
-        // Limpiar el carrito
         this.carritoActual = null;
 
         return pedidoId;
@@ -208,31 +191,22 @@ public class VentaFacade implements IVentaFacade {
 
     @Override
     public void vaciarCarrito() {
-        // Reinicializar el carrito actual y persistir el cambio asociado al usuario por defecto
         try {
-            dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
-            entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
-            String clienteId = "cliente_default";
-            if (usuario == null) {
-                usuario = new entidades.UsuarioEntidad();
-                usuario.setNombre("Cliente Default");
-                usuario.setEmail("cliente_default@local");
-                usuarioDAO.guardar(usuario);
-            }
-            if (usuario.getId() != null) clienteId = usuario.getId().toString();
+            entidades.UsuarioEntidad usuario = obtenerOCrearUsuarioDefault();
+            String clienteId = usuario != null && usuario.getId() != null
+                ? usuario.getId().toString()
+                : "cliente_default";
 
             this.carritoActual = new CarritoDTO();
             this.carritoActual.setClienteId(clienteId);
             this.carritoActual.setItems(new ArrayList<>());
 
-            // Persistir mediante CarritoDAO: limpiar configuraciones del carrito asociado al usuario
             dao.CarritoDAO carritoDAO = new dao.CarritoDAO();
             entidades.CarritoEntidad carritoEntidad = carritoDAO.obtenerPorClienteId(clienteId);
             if (carritoEntidad != null) {
                 carritoEntidad.setConfiguracionesIds(new java.util.ArrayList<>());
                 carritoDAO.guardar(carritoEntidad);
             } else {
-                // crear un nuevo carrito persistido vacío
                 carritoEntidad = new entidades.CarritoEntidad();
                 carritoEntidad.setClienteId(clienteId);
                 carritoDAO.guardar(carritoEntidad);
@@ -256,6 +230,44 @@ public class VentaFacade implements IVentaFacade {
         }
 
         return true;
+    }
+
+    /**
+     * Obtiene o crea el usuario por defecto con sus métodos de pago registrados.
+     */
+    private UsuarioEntidad obtenerOCrearUsuarioDefault() {
+        try {
+            dao.UsuarioDAO usuarioDAO = new dao.UsuarioDAO();
+            entidades.UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+
+            if (usuario == null) {
+                usuario = new entidades.UsuarioEntidad();
+                usuario.setNombre("Cliente Default");
+                usuario.setEmail("cliente_default@local");
+
+                entidades.UsuarioEntidad.MetodoPagoRegistrado efectivo = new entidades.UsuarioEntidad.MetodoPagoRegistrado();
+                efectivo.setId("mp_efectivo_001");
+                efectivo.setTipo("Efectivo en sucursal");
+                efectivo.setAlias("Pago en efectivo");
+                efectivo.setEsPredeterminado(true);
+                usuario.agregarMetodoPago(efectivo);
+
+                entidades.UsuarioEntidad.MetodoPagoRegistrado tarjeta = new entidades.UsuarioEntidad.MetodoPagoRegistrado();
+                tarjeta.setId("mp_tarjeta_001");
+                tarjeta.setTipo("Tarjeta de crédito/débito");
+                tarjeta.setAlias("Tarjeta principal");
+                tarjeta.setUltimos4Digitos("1234");
+                tarjeta.setNombreTitular("Cliente Default");
+                tarjeta.setEsPredeterminado(false);
+                usuario.agregarMetodoPago(tarjeta);
+
+                usuarioDAO.guardar(usuario);
+            }
+
+            return usuario;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -312,15 +324,15 @@ public class VentaFacade implements IVentaFacade {
     }
 
     @Override
-    public java.util.List<entidades.ConfiguracionEntidad> obtenerConfiguracionesEnCarrito() {
-        java.util.List<entidades.ConfiguracionEntidad> configuraciones = new java.util.ArrayList<>();
+    public List<entidades.ConfiguracionEntidad> obtenerConfiguracionesEnCarrito() {
+        List<entidades.ConfiguracionEntidad> configuraciones = new ArrayList<>();
 
         try {
             entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
             dao.ConfiguracionDAO configuracionDAO = new dao.ConfiguracionDAO();
 
             if (carrito.getConfiguracionesIds() != null) {
-                for (org.bson.types.ObjectId configId : carrito.getConfiguracionesIds()) {
+                for (ObjectId configId : carrito.getConfiguracionesIds()) {
                     entidades.ConfiguracionEntidad config = configuracionDAO.obtenerPorId(configId);
                     if (config != null) {
                         configuraciones.add(config);
@@ -343,7 +355,7 @@ public class VentaFacade implements IVentaFacade {
                 return false;
             }
 
-            org.bson.types.ObjectId objectId = new org.bson.types.ObjectId(configuracionId);
+            ObjectId objectId = new ObjectId(configuracionId);
             boolean removed = carrito.getConfiguracionesIds().remove(objectId);
 
             if (removed) {

@@ -1,4 +1,4 @@
-package carrito;
+package venta.carrito;
 
 import compartido.estilos.CustomRadioButton;
 import compartido.estilos.Estilos;
@@ -9,12 +9,11 @@ import java.awt.*;
 
 public class OpcionEntregaPanel extends JPanel {
     private JLabel tituloLbl;
-    private JLabel rb1Label;
-    private JLabel rb2Label;
     private JPanel panelTitulo;
     private JPanel panelOpciones;
     private CustomRadioButton rb1;
     private CustomRadioButton rb2;
+    private ButtonGroup grupoOpciones;
 
     public OpcionEntregaPanel(){
         setOpaque(false);
@@ -38,6 +37,10 @@ public class OpcionEntregaPanel extends JPanel {
 
         rb1 = new CustomRadioButton("Recoger en sucursal: Gratis");
         rb2 = new CustomRadioButton("Envio estandar: $224.00 mxn");
+
+        grupoOpciones = new ButtonGroup();
+        grupoOpciones.add(rb1);
+        grupoOpciones.add(rb2);
 
         panelTitulo.add(tituloLbl);
         panelOpciones.add(rb1);

@@ -1,6 +1,8 @@
 package menuprincipal;
 
 import compartido.PanelBase;
+import compartido.cards.ProductoCard;
+import compartido.cards.ProductoPedidoCard;
 import compartido.estilos.FontUtil;
 
 import javax.swing.*;
@@ -18,7 +20,12 @@ public class MenuPrincipalPanel extends PanelBase {
         tituloLbl.setFont(FontUtil.loadFont(28, "Inter_SemiBold"));
         tituloLbl.setForeground(Color.white);
 
+        masVendidosPanel = new JPanel();
+        masVendidosPanel.setOpaque(false);
+
         panelNorte.add(tituloLbl);
+
+        panelCentro.add(masVendidosPanel);
 
     }
 

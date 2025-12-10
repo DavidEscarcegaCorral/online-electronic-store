@@ -83,10 +83,10 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
             return errores;
         }
 
-        // Reiniciamos el ensamblaje actual en el subsistema de armado para aplicar la nueva configuración
+        // Reiniciamos el ensamblaje
         armadoFacade.iniciarNuevoEnsamblaje();
 
-        // Agregamos cada componente del ensamblaje; si hay errores de compatibilidad se acumulan
+        // Agregamos cada componente del ensamblaje
         for (ComponenteDTO componente : ensamblaje.obtenerTodosComponentes()) {
             if (componente == null || componente.getCategoria() == null) {
                 errores.add("Componente o categoría nula en la configuración");
@@ -99,7 +99,7 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
             }
         }
 
-        // Revalidamos ensamblaje completo y añadimos errores adicionales si los hay
+        // Revalidamos ensamblaje
         List<String> revalidacion = armadoFacade.revalidarEnsamblaje();
         errores.addAll(revalidacion);
 
@@ -140,7 +140,6 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
                 }
             }
         }
-
         return dto;
     }
 }

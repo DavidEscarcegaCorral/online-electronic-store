@@ -1,4 +1,4 @@
-package carrito;
+package venta.carrito;
 
 import compartido.estilos.Boton;
 import compartido.estilos.CustomRadioButton;
@@ -8,7 +8,7 @@ import compartido.estilos.FontUtil;
 import javax.swing.*;
 import java.awt.*;
 
-public class metodoPagoPanel extends JPanel {
+public class OpcionPagoPanel extends JPanel {
     private JPanel panelNorte;
     private JPanel panelCentro;
     private JPanel panelSur;
@@ -20,7 +20,7 @@ public class metodoPagoPanel extends JPanel {
     private Boton realziarPedidoBtn;
     private Boton vaciarCarritoBtn;
 
-    public metodoPagoPanel() {
+    public OpcionPagoPanel() {
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setPreferredSize(new Dimension(220, 260));
@@ -70,6 +70,10 @@ public class metodoPagoPanel extends JPanel {
 
     public Boton getVaciarCarritoBtn() {
         return vaciarCarritoBtn;
+    }
+
+    public Boton getRealizarPedidoBtn() {
+        return realziarPedidoBtn;
     }
 
     @Override

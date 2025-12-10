@@ -22,7 +22,6 @@ public class CarritoDAO {
 
     public static CarritoEntidad getCarritoActual() {
         if (carritoActual == null) {
-            // Asegurar que exista un usuario por defecto
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
             if (usuario == null) {
@@ -33,12 +32,10 @@ public class CarritoDAO {
             }
 
             CarritoDAO dao = new CarritoDAO();
-            // Buscar carrito por clienteId (usamos el id del usuario como string)
             String clienteId = usuario.getId() != null ? usuario.getId().toString() : "cliente_default";
             carritoActual = dao.obtenerPorClienteId(clienteId);
 
             if (carritoActual == null) {
-                // Si existe un carrito con el antiguo identificador "cliente_default", migrarlo
                 CarritoEntidad antiguo = dao.obtenerPorClienteId("cliente_default");
                 if (antiguo != null) {
                     antiguo.setClienteId(clienteId);
@@ -47,7 +44,6 @@ public class CarritoDAO {
                 } else {
                     carritoActual = new CarritoEntidad();
                     carritoActual.setClienteId(clienteId);
-                    // Persistir nuevo carrito
                     dao.guardar(carritoActual);
                 }
             }
