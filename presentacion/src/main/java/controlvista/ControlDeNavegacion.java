@@ -89,7 +89,16 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     }
 
     private void inicializarVista() {
-        menuPrincipalPanel.setControlDeNavegacion(this);
+        menuPrincipalPanel.setOnProductoSeleccionado(productId -> {
+            try {
+                dao.ProductoDAO productoDAO = new dao.ProductoDAO();
+                entidades.ProductoEntidad producto = productoDAO.obtenerPorId(productId);
+                if (producto != null) {
+                    mostrarProducto(producto);
+                }
+            } catch (Exception e) {
+            }
+        });
         framePrincipal.setPanelContenido(menuPrincipalPanel);
         framePrincipal.setVisible(true);
         armarEquipoPantalla.mostrarMenusLaterales();
@@ -420,7 +429,52 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
     public void mostrarProducto(Object producto) {
         productoPantalla.cargarProducto(producto);
+        configurarListenerAgregarAlCarrito();
         mostrarNuevaPantalla(productoPantalla);
+    }
+
+    private void configurarListenerAgregarAlCarrito() {
+        productoPantalla.limpiarListeners();
+
+        productoPantalla.setOnAgregarAlCarrito(e -> {
+            try {
+                Object productoActual = productoPantalla.getProductoActual();
+                int cantidad = productoPantalla.getCantidadSeleccionada();
+
+                if (productoActual != null) {
+                    Object idObj = productoActual.getClass().getMethod("getId").invoke(productoActual);
+                    String productoId = idObj.toString();
+                    String nombreProducto = (String) productoActual.getClass().getMethod("getNombre").invoke(productoActual);
+
+                    fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                    boolean agregado = ventaFacade.agregarProductoAlCarrito(productoId, cantidad);
+
+                    if (agregado) {
+                        JOptionPane.showMessageDialog(
+                            framePrincipal,
+                            cantidad + " unidad(es) de " + nombreProducto + " agregadas al carrito",
+                            "Producto Agregado",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                        carritoPantalla.actualizarCarrito();
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            framePrincipal,
+                            "Error al agregar el producto al carrito",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                    framePrincipal,
+                    "Error al agregar el producto: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
     }
 
     @Override

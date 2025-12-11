@@ -44,29 +44,55 @@ public class TablaPanel extends JPanel {
 
         try {
             IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+
             List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
+            if (configuraciones != null && !configuraciones.isEmpty()) {
+                for (entidades.ConfiguracionEntidad config : configuraciones) {
+                    String nombreConfig = config.getNombre() != null ? config.getNombre() : "Configuración PC";
+                    Double precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : 0.0;
+                    int cantidad = 1;
 
-            if (configuraciones == null || configuraciones.isEmpty()) {
-                System.out.println("No hay configuraciones en el carrito");
-                return;
+                    model.addRow(new Object[]{
+                        nombreConfig,
+                        String.format("$%,.2f", precio),
+                        String.valueOf(cantidad),
+                        String.format("$%,.2f", precio * cantidad),
+                        "Eliminar"
+                    });
+                }
+                System.out.println("Tabla actualizada con " + configuraciones.size() + " configuración(es)");
             }
 
-            // Mostrar cada configuración completa como una sola fila
-            for (entidades.ConfiguracionEntidad config : configuraciones) {
-                String nombreConfig = config.getNombre() != null ? config.getNombre() : "Configuración PC";
-                Double precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : 0.0;
-                int cantidad = 1;
+            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+            if (carrito.getProductos() != null && !carrito.getProductos().isEmpty()) {
+                dao.ProductoDAO productoDAO = new dao.ProductoDAO();
+                for (java.util.Map<String, Object> prod : carrito.getProductos()) {
+                    String productoId = (String) prod.get("productoId");
+                    Integer cantidad = (Integer) prod.get("cantidad");
 
-                model.addRow(new Object[]{
-                    nombreConfig,
-                    String.format("$%,.2f", precio),
-                    String.valueOf(cantidad),
-                    String.format("$%,.2f", precio * cantidad),
-                    "Eliminar"
-                });
+                    entidades.ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
+                    if (producto != null) {
+                        String nombreProducto = producto.getNombre();
+                        Double precioUnitario = producto.getPrecio();
+                        Double precioTotal = precioUnitario * cantidad;
+
+                        model.addRow(new Object[]{
+                            nombreProducto,
+                            String.format("$%,.2f", precioUnitario),
+                            String.valueOf(cantidad),
+                            String.format("$%,.2f", precioTotal),
+                            "Eliminar"
+                        });
+                    }
+                }
+                System.out.println("Tabla actualizada con " + carrito.getProductos().size() + " producto(s)");
             }
 
-            System.out.println("Tabla actualizada con " + configuraciones.size() + " configuración(es)");
+            if ((configuraciones == null || configuraciones.isEmpty()) &&
+                (carrito.getProductos() == null || carrito.getProductos().isEmpty())) {
+                System.out.println("No hay items en el carrito");
+            }
+
         } catch (Exception e) {
             System.err.println("Error al actualizar carrito: " + e.getMessage());
             e.printStackTrace();

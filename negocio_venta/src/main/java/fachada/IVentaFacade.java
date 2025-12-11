@@ -88,12 +88,21 @@ public interface IVentaFacade {
 
     /**
      * Agrega una configuración completa de PC al carrito.
-     * Guarda la configuración en la BD y añade su referencia al carrito.
+     * Primero guarda la configuración en BD y luego la agrega al carrito.
      *
      * @param ensamblaje El ensamblaje/configuración a agregar.
-     * @return El ID de la configuración guardada, o null si hubo error.
+     * @return El ID de la configuración agregada, o null si hubo error.
      */
     String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje);
+
+    /**
+     * Agrega un producto individual al carrito.
+     *
+     * @param productoId El ID del producto.
+     * @param cantidad La cantidad a agregar.
+     * @return true si se agregó correctamente, false si hubo error.
+     */
+    boolean agregarProductoAlCarrito(String productoId, int cantidad);
 
     /**
      * Obtiene todas las configuraciones que están en el carrito actual.

@@ -292,6 +292,11 @@ public class VentaFacade implements IVentaFacade {
     }
 
     @Override
+    public boolean agregarProductoAlCarrito(String productoId, int cantidad) {
+        return ventaControl.agregarProductoAlCarrito(productoId, cantidad);
+    }
+
+    @Override
     public String confirmarPedidoConConfiguraciones(MetodoPagoDTO metodoPago) {
         System.out.println("VentaFacade: Delegando confirmación de pedido a VentaControl");
         return ventaControl.confirmarPedido(metodoPago);

@@ -31,6 +31,7 @@ public class ProductoPanel extends PanelBase {
     private JLabel precioProductoLbl;
     private JSpinner spinnerCantidad;
     private Boton btnAgregarCarrito;
+    private Object productoActual;
 
     public ProductoPanel() {
         super();
@@ -80,12 +81,12 @@ public class ProductoPanel extends PanelBase {
 
         // contenido p2
         precioProductoLbl = new JLabel("$0.00");
-        precioProductoLbl.setFont(new Font("Inter", Font.BOLD, 20));
-        precioProductoLbl.setForeground(Estilos.COLOR_ENFASIS);
+        precioProductoLbl.setFont(FontUtil.loadFont(36, "Inter_SemiBold"));
+        precioProductoLbl.setForeground(Color.white);
 
         // contenido p3
         JLabel lblCantidad = new JLabel("Cantidad:");
-        lblCantidad.setFont(new Font("Inter", Font.PLAIN, 12));
+        lblCantidad.setFont(FontUtil.loadFont(14, "Inter_SemiBold"));
         lblCantidad.setForeground(Color.WHITE);
 
         spinnerCantidad = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
@@ -113,11 +114,11 @@ public class ProductoPanel extends PanelBase {
         p4.add(detallesPanel);
 
         panelCentro.add(p1);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(p2);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(p3);
-        panelCentro.add(Box.createVerticalStrut(15));
+        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(p4);
 
     }
@@ -149,6 +150,8 @@ public class ProductoPanel extends PanelBase {
             return;
         }
 
+        this.productoActual = producto;
+
         try {
             String categoria = (String) obtenerValorProducto(producto, "getCategoria");
             String marca = (String) obtenerValorProducto(producto, "getMarca");
@@ -178,16 +181,28 @@ public class ProductoPanel extends PanelBase {
     }
 
     private void limpiarUI() {
-        tituloLabel.setText("null");
+        tituloLabel.setText("Categoría - Componente");
         fotoPorductoLbl.setIcon(null);
         fotoPorductoLbl.setText("");
         nombreProductoLbl.setText("Nombre del Producto");
         precioProductoLbl.setText("$0.00");
         spinnerCantidad.setValue(1);
+        productoActual = null;
+    }
+
+    public Object getProductoActual() {
+        return productoActual;
     }
 
     public int getCantidadSeleccionada() {
         return (Integer) spinnerCantidad.getValue();
+    }
+
+    public void limpiarListeners() {
+        java.awt.event.ActionListener[] listeners = btnAgregarCarrito.getActionListeners();
+        for (java.awt.event.ActionListener listener : listeners) {
+            btnAgregarCarrito.removeActionListener(listener);
+        }
     }
 
     public void setOnAgregarAlCarrito(java.awt.event.ActionListener listener) {

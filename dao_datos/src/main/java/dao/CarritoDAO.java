@@ -105,11 +105,22 @@ public class CarritoDAO {
             ? new ArrayList<>(carrito.getConfiguracionesIds())
             : new ArrayList<>();
 
+        List<Document> productos = new ArrayList<>();
+        if (carrito.getProductos() != null) {
+            for (java.util.Map<String, Object> prod : carrito.getProductos()) {
+                Document prodDoc = new Document();
+                prodDoc.append("productoId", prod.get("productoId"));
+                prodDoc.append("cantidad", prod.get("cantidad"));
+                productos.add(prodDoc);
+            }
+        }
+
         if (carrito.getId() == null) {
             Document doc = new Document();
             doc.append("clienteId", carrito.getClienteId())
                .append("fechaActualizacion", fechaActualizacion)
-               .append("configuracionesIds", ids);
+               .append("configuracionesIds", ids)
+               .append("productos", productos);
 
             System.out.println("Insertando nuevo carrito...");
             System.out.println("Documento a insertar: " + doc.toJson());
@@ -120,7 +131,8 @@ public class CarritoDAO {
             Document updateDoc = new Document("$set", new Document()
                .append("clienteId", carrito.getClienteId())
                .append("fechaActualizacion", fechaActualizacion)
-               .append("configuracionesIds", ids));
+               .append("configuracionesIds", ids)
+               .append("productos", productos));
 
             System.out.println("Actualizando carrito existente con $set...");
             System.out.println("Filtro: _id = " + carrito.getId());
@@ -141,7 +153,8 @@ public class CarritoDAO {
                 Document docReplace = new Document();
                 docReplace.append("clienteId", carrito.getClienteId())
                    .append("fechaActualizacion", fechaActualizacion)
-                   .append("configuracionesIds", ids);
+                   .append("configuracionesIds", ids)
+                   .append("productos", productos);
 
                 var resultReplace = coleccion.replaceOne(
                     new Document("_id", carrito.getId()),
@@ -181,6 +194,21 @@ public class CarritoDAO {
             System.out.println("ConfiguracionesIds cargados: " + ids.size() + " configuraciones");
         } else {
             System.out.println("ConfiguracionesIds es null en BD");
+        }
+
+        List<Document> productosDoc = (List<Document>) doc.get("productos");
+        if (productosDoc != null) {
+            List<java.util.Map<String, Object>> productos = new ArrayList<>();
+            for (Document prodDoc : productosDoc) {
+                java.util.Map<String, Object> prod = new java.util.HashMap<>();
+                prod.put("productoId", prodDoc.getString("productoId"));
+                prod.put("cantidad", prodDoc.getInteger("cantidad"));
+                productos.add(prod);
+            }
+            carrito.setProductos(productos);
+            System.out.println("Productos cargados: " + productos.size() + " productos");
+        } else {
+            System.out.println("Productos es null en BD");
         }
 
         return carrito;

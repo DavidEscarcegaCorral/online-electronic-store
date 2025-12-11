@@ -19,6 +19,15 @@ public interface IVentaControl {
     String agregarConfiguracionAlCarrito(String configuracionId);
 
     /**
+     * Agrega un producto individual al carrito.
+     *
+     * @param productoId El ID del producto a agregar.
+     * @param cantidad La cantidad a agregar.
+     * @return true si se agregó correctamente, false si hubo error.
+     */
+    boolean agregarProductoAlCarrito(String productoId, int cantidad);
+
+    /**
      * Vacía completamente el carrito del usuario.
      * Elimina todas las configuraciones y limpia las referencias en la BD.
      */

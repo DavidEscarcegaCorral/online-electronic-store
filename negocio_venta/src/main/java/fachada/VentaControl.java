@@ -48,6 +48,22 @@ public class VentaControl implements IVentaControl {
     }
 
     @Override
+    public boolean agregarProductoAlCarrito(String productoId, int cantidad) {
+        if (productoId == null || cantidad <= 0) {
+            return false;
+        }
+
+        try {
+            CarritoEntidad carrito = CarritoDAO.getCarritoActual();
+            carrito.agregarProducto(productoId, cantidad);
+            carritoDAO.guardar(carrito);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public void vaciarCarrito() {
         try {
             CarritoEntidad carritoEntidad = CarritoDAO.getCarritoActual();
@@ -58,6 +74,7 @@ public class VentaControl implements IVentaControl {
             }
 
             carritoEntidad.setConfiguracionesIds(new ArrayList<>());
+            carritoEntidad.setProductos(new ArrayList<>());
             carritoEntidad.setFechaActualizacion(java.time.LocalDateTime.now());
             carritoDAO.guardar(carritoEntidad);
 
