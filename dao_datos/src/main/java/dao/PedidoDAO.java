@@ -27,29 +27,50 @@ public class PedidoDAO implements IPedidoDAO {
 
     @Override
     public String crearPedido(PedidoEntidad pedido) {
-        Document doc = new Document();
-        doc.append("clienteId", pedido.getClienteId());
-        doc.append("items", convertirItems(pedido.getItems()));
-        doc.append("total", pedido.getTotal());
-        doc.append("estado", pedido.getEstado());
-        doc.append("fechaCreacion", new Date());
+        System.out.println("=== CREANDO PEDIDO EN BD ===");
+        System.out.println("ClienteId: " + pedido.getClienteId());
+        System.out.println("Total: $" + pedido.getTotal());
+        System.out.println("Estado: " + pedido.getEstado());
+        System.out.println("Items: " + (pedido.getItems() != null ? pedido.getItems().size() : 0));
 
-        if (pedido.getMetodoPago() != null) {
-            doc.append("metodoPago", new Document()
-                    .append("tipo", pedido.getMetodoPago().getTipo())
-                    .append("detalles", pedido.getMetodoPago().getDetalles()));
+        try {
+            Document doc = new Document();
+            doc.append("clienteId", pedido.getClienteId());
+            doc.append("items", convertirItems(pedido.getItems()));
+            doc.append("total", pedido.getTotal());
+            doc.append("estado", pedido.getEstado());
+            doc.append("fechaCreacion", new Date());
+
+            if (pedido.getMetodoPago() != null) {
+                doc.append("metodoPago", new Document()
+                        .append("tipo", pedido.getMetodoPago().getTipo())
+                        .append("detalles", pedido.getMetodoPago().getDetalles()));
+                System.out.println("Método de pago: " + pedido.getMetodoPago().getTipo());
+            }
+
+            if (pedido.getDireccionEntrega() != null) {
+                doc.append("direccionEntrega", new Document()
+                        .append("calle", pedido.getDireccionEntrega().getCalle())
+                        .append("ciudad", pedido.getDireccionEntrega().getCiudad())
+                        .append("estado", pedido.getDireccionEntrega().getEstado())
+                        .append("codigoPostal", pedido.getDireccionEntrega().getCodigoPostal()));
+            }
+
+            System.out.println("Documento del pedido: " + doc.toJson());
+            System.out.println("Insertando en colección 'pedidos'...");
+
+            coleccion.insertOne(doc);
+
+            ObjectId pedidoId = doc.getObjectId("_id");
+            System.out.println("Pedido insertado con ID: " + pedidoId);
+            System.out.println("=== PEDIDO CREADO EXITOSAMENTE ===\n");
+
+            return pedidoId.toString();
+        } catch (Exception e) {
+            System.err.println("ERROR al crear pedido:");
+            e.printStackTrace();
+            return null;
         }
-
-        if (pedido.getDireccionEntrega() != null) {
-            doc.append("direccionEntrega", new Document()
-                    .append("calle", pedido.getDireccionEntrega().getCalle())
-                    .append("ciudad", pedido.getDireccionEntrega().getCiudad())
-                    .append("estado", pedido.getDireccionEntrega().getEstado())
-                    .append("codigoPostal", pedido.getDireccionEntrega().getCodigoPostal()));
-        }
-
-        coleccion.insertOne(doc);
-        return doc.getObjectId("_id").toString();
     }
 
     @Override

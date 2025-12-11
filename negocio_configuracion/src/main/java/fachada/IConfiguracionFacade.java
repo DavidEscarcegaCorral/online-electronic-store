@@ -55,6 +55,15 @@ public interface IConfiguracionFacade {
     List<String> aplicarConfiguracion(EnsamblajeDTO ensamblaje);
 
     /**
+     * Guarda una configuración completa en la base de datos.
+     * Este método persiste un ensamblaje en la colección de configuraciones.
+     *
+     * @param ensamblaje El ensamblaje/configuración a guardar.
+     * @return El ID de la configuración guardada, o null si hubo error.
+     */
+    String guardarConfiguracion(EnsamblajeDTO ensamblaje);
+
+    /**
      * Verifica si hay al menos `minimo` productos disponibles (stock>0) para la categoría.
      *
      * @param categoria categoría a verificar

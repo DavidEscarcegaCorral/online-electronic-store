@@ -18,10 +18,12 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
     private static ConfiguracionFacade configInstancia;
     private final IProductoDAO productoDAO;
     private final IArmadoFacade armadoFacade;
+    private final IConfiguracionControl configuracionControl;
 
     private ConfiguracionFacade() {
         this.productoDAO = new ProductoDAO();
         this.armadoFacade = ArmadoFacade.getInstance();
+        this.configuracionControl = ConfiguracionControl.getInstance();
     }
 
     public static synchronized ConfiguracionFacade getInstance() {
@@ -118,6 +120,12 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
         if (categoria == null || marca == null) return false;
         List<ProductoEntidad> productos = productoDAO.obtenerPorCategoriaYMarca(categoria, marca);
         return !productos.isEmpty();
+    }
+
+    @Override
+    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
+        System.out.println("ConfiguracionFacade: Delegando guardado de configuración a ConfiguracionControl");
+        return configuracionControl.guardarConfiguracion(ensamblaje);
     }
 
     /**

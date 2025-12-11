@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class ArmarPcPanel extends PanelBase {
-
     private static final String[] PASOS = {
             "Tipo de PC", "Marca Procesador", "Procesador", "Tarjeta Madre",
             "RAM", "Tarjeta de video", "Almacenamiento", "Fuente de poder",
@@ -31,7 +30,7 @@ public class ArmarPcPanel extends PanelBase {
 
     private JPanel cardsPanel;
     private CardLayout cardLayout;
-    private TituloLabel subTituloLabel;
+    private TituloLabel tituloLbl;
     private Boton continuarBtn;
     private Boton retrocederBtn;
 
@@ -132,13 +131,13 @@ public class ArmarPcPanel extends PanelBase {
 
         cardsPanel.add(evaluarConfiguracionPanel, PASOS[PASO_RESUMEN]);
 
-        subTituloLabel = new TituloLabel(PASOS[0]);
-        subTituloLabel.setForeground(Color.white);
+        tituloLbl = new TituloLabel(PASOS[0]);
+        tituloLbl.setForeground(Color.white);
     }
 
     private void navegacionSup() {
         panelNorte.add(retrocederBtn);
-        panelNorte.add(subTituloLabel);
+        panelNorte.add(tituloLbl);
         panelNorte.add(continuarBtn);
 
         panelCentro.add(cardsPanel);
@@ -183,7 +182,7 @@ public class ArmarPcPanel extends PanelBase {
         if (index >= PASOS.length) index = PASOS.length - 1;
         pasoActual = index;
         cardLayout.show(cardsPanel, PASOS[pasoActual]);
-        subTituloLabel.setText(PASOS[pasoActual]);
+        tituloLbl.setText(PASOS[pasoActual]);
 
     }
 
@@ -261,8 +260,8 @@ public class ArmarPcPanel extends PanelBase {
         return PASOS;
     }
 
-    public TituloLabel getSubTituloLabel() {
-        return subTituloLabel;
+    public TituloLabel getTituloLbl() {
+        return tituloLbl;
     }
 
     public MenuComponentesPanel getMenuComponentesPanel() {

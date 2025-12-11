@@ -46,19 +46,29 @@ public class TablaPanel extends JPanel {
             IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
             List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
 
+            if (configuraciones == null || configuraciones.isEmpty()) {
+                System.out.println("No hay configuraciones en el carrito");
+                return;
+            }
+
+            // Mostrar cada configuración completa como una sola fila
             for (entidades.ConfiguracionEntidad config : configuraciones) {
                 String nombreConfig = config.getNombre() != null ? config.getNombre() : "Configuración PC";
                 Double precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : 0.0;
+                int cantidad = 1;
 
                 model.addRow(new Object[]{
                     nombreConfig,
                     String.format("$%,.2f", precio),
-                    "1",
-                    String.format("$%,.2f", precio * 1),
+                    String.valueOf(cantidad),
+                    String.format("$%,.2f", precio * cantidad),
                     "Eliminar"
                 });
             }
+
+            System.out.println("Tabla actualizada con " + configuraciones.size() + " configuración(es)");
         } catch (Exception e) {
+            System.err.println("Error al actualizar carrito: " + e.getMessage());
             e.printStackTrace();
         }
 

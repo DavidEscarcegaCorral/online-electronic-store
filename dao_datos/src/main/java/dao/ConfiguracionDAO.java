@@ -18,33 +18,68 @@ public class ConfiguracionDAO {
     }
 
     public void guardar(ConfiguracionEntidad configuracion) {
-        Document doc = new Document();
+        System.out.println("=== GUARDANDO CONFIGURACION ===");
+        System.out.println("Configuracion ID: " + configuracion.getId());
+        System.out.println("Nombre: " + configuracion.getNombre());
+        System.out.println("Precio Total: $" + configuracion.getPrecioTotal());
+        System.out.println("Componentes: " +
+            (configuracion.getComponentes() != null ? configuracion.getComponentes().size() : 0));
 
-        if (configuracion.getId() != null) {
-            doc.append("_id", configuracion.getId());
+        // Convertir LocalDateTime a Date para MongoDB
+        java.util.Date fechaCreacion = null;
+        if (configuracion.getFechaCreacion() != null) {
+            fechaCreacion = java.util.Date.from(
+                configuracion.getFechaCreacion()
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toInstant()
+            );
+        } else {
+            fechaCreacion = new java.util.Date();
         }
 
-        doc.append("nombre", configuracion.getNombre())
-           .append("precioTotal", configuracion.getPrecioTotal())
-           .append("fechaCreacion", configuracion.getFechaCreacion());
-
+        // Convertir componentes
+        List<Document> componentesDocs = null;
         if (configuracion.getComponentes() != null) {
-            List<Document> componentesDocs = new ArrayList<>();
+            componentesDocs = new ArrayList<>();
             for (Map<String, Object> componente : configuracion.getComponentes()) {
                 Document compDoc = new Document(componente);
                 componentesDocs.add(compDoc);
             }
-            doc.append("componentes", componentesDocs);
         }
 
         if (configuracion.getId() == null) {
+            // INSERT - MongoDB asignará _id automáticamente
+            Document doc = new Document();
+            doc.append("nombre", configuracion.getNombre())
+               .append("precioTotal", configuracion.getPrecioTotal())
+               .append("fechaCreacion", fechaCreacion);
+
+            if (componentesDocs != null) {
+                doc.append("componentes", componentesDocs);
+            }
+
+            System.out.println("Insertando nueva configuración...");
             coleccion.insertOne(doc);
             configuracion.setId(doc.getObjectId("_id"));
+            System.out.println("Configuración insertada con ID: " + configuracion.getId());
         } else {
-            coleccion.replaceOne(
+            // UPDATE - NO incluir _id en el documento
+            Document doc = new Document();
+            doc.append("nombre", configuracion.getNombre())
+               .append("precioTotal", configuracion.getPrecioTotal())
+               .append("fechaCreacion", fechaCreacion);
+
+            if (componentesDocs != null) {
+                doc.append("componentes", componentesDocs);
+            }
+
+            System.out.println("Actualizando configuración existente...");
+            var result = coleccion.replaceOne(
                 new Document("_id", configuracion.getId()),
                 doc
             );
+            System.out.println("Documentos modificados: " + result.getModifiedCount());
+            System.out.println("Documentos coincidentes: " + result.getMatchedCount());
         }
     }
 
@@ -77,5 +112,28 @@ public class ConfiguracionDAO {
         }
 
         return config;
+    }
+
+    public boolean eliminar(org.bson.types.ObjectId id) {
+        try {
+            var result = coleccion.deleteOne(new Document("_id", id));
+            return result.getDeletedCount() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean eliminarMultiples(List<org.bson.types.ObjectId> ids) {
+        try {
+            if (ids == null || ids.isEmpty()) {
+                return true;
+            }
+            var result = coleccion.deleteMany(new Document("_id", new Document("$in", ids)));
+            return result.getDeletedCount() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

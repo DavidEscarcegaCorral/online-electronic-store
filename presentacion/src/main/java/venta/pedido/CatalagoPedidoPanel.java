@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class CatalagoPedidoPanel extends JPanel {
     private List<ProductoPedidoCard> productoPedidoCardList;
+    private double totalGeneral;
 
     public CatalagoPedidoPanel() {
         setOpaque(false);
@@ -20,11 +21,13 @@ public class CatalagoPedidoPanel extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
 
         productoPedidoCardList = new ArrayList<>();
+        totalGeneral = 0.0;
     }
 
     public void cargarProductosDelCarrito() {
         removeAll();
         productoPedidoCardList.clear();
+        totalGeneral = 0.0;
 
         try {
             IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
@@ -42,6 +45,12 @@ public class CatalagoPedidoPanel extends JPanel {
                             ProductoPedidoCard card = crearProductoPedidoCard(componente);
                             productoPedidoCardList.add(card);
                             add(card);
+
+                            // Sumar al total
+                            Object precioObj = componente.get("precio");
+                            if (precioObj instanceof Number) {
+                                totalGeneral += ((Number) precioObj).doubleValue();
+                            }
                         }
                     }
                 }
@@ -73,6 +82,10 @@ public class CatalagoPedidoPanel extends JPanel {
         );
 
         return card;
+    }
+
+    public double getTotalGeneral() {
+        return totalGeneral;
     }
 
     @Override

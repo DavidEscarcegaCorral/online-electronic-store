@@ -8,7 +8,7 @@ import fachada.ArmadoFacade;
 
 import java.util.List;
 
-public class ControlPresentacion {
+public class ControlPresentacion implements IControlPresentacion {
 
     private final ConfiguracionFacade configuracionFacade;
     private final IArmadoFacade armadoFacade;
@@ -31,10 +31,12 @@ public class ControlPresentacion {
         return instancia;
     }
 
+    @Override
     public List<String> obtenerCategorias() {
         return configuracionFacade.obtenerCategorias();
     }
 
+    @Override
     public void seleccionarCategoria(String categoria) {
         this.categoriaActual = categoria;
         this.marcaActual = null;
@@ -47,6 +49,7 @@ public class ControlPresentacion {
         }
     }
 
+    @Override
     public List<String> obtenerMarcasParaCategoriaActual() {
         if (categoriaActual == null) {
             throw new IllegalStateException("Debe seleccionar una categoría primero");
@@ -54,11 +57,13 @@ public class ControlPresentacion {
         return configuracionFacade.obtenerMarcasPorCategoria(categoriaActual);
     }
 
+    @Override
     public void seleccionarMarca(String marca) {
         this.marcaActual = marca;
         this.componenteSeleccionado = null;
     }
 
+    @Override
     public boolean hayProductosDisponibles() {
         if (categoriaActual == null || marcaActual == null) {
             return false;
@@ -66,6 +71,7 @@ public class ControlPresentacion {
         return configuracionFacade.hayProductosDisponibles(categoriaActual, marcaActual);
     }
 
+    @Override
     public List<ComponenteDTO> obtenerProductos() {
         if (categoriaActual == null || marcaActual == null) {
             throw new IllegalStateException("Debe seleccionar categoría y marca primero");
@@ -73,14 +79,17 @@ public class ControlPresentacion {
         return configuracionFacade.obtenerProductosPorCategoriaYMarca(categoriaActual, marcaActual);
     }
 
+    @Override
     public void seleccionarProducto(ComponenteDTO producto) {
         this.componenteSeleccionado = producto;
     }
 
+    @Override
     public boolean puedeAvanzar() {
         return componenteSeleccionado != null;
     }
 
+    @Override
     public List<String> avanzarConComponenteSeleccionado() {
         if (componenteSeleccionado == null) {
             throw new IllegalStateException("No hay componente seleccionado");
@@ -97,10 +106,12 @@ public class ControlPresentacion {
         return errores;
     }
 
+    @Override
     public boolean puedeVolverAtras(String categoria) {
         return armadoFacade.puedeVolverAtras(categoria);
     }
 
+    @Override
     public void cambiarComponente(String categoria) {
         armadoFacade.removerComponente(categoria);
         this.categoriaActual = categoria;
@@ -108,14 +119,17 @@ public class ControlPresentacion {
         this.componenteSeleccionado = null;
     }
 
+    @Override
     public List<String> revalidarEnsamblaje() {
         return armadoFacade.revalidarEnsamblaje();
     }
 
+    @Override
     public EnsamblajeDTO getEnsamblajeActual() {
         return armadoFacade.getEnsamblajeActual();
     }
 
+    @Override
     public void iniciarNuevoEnsamblaje() {
         armadoFacade.iniciarNuevoEnsamblaje();
         this.categoriaActual = null;
@@ -123,14 +137,17 @@ public class ControlPresentacion {
         this.componenteSeleccionado = null;
     }
 
+    @Override
     public String getCategoriaActual() {
         return categoriaActual;
     }
 
+    @Override
     public String getMarcaActual() {
         return marcaActual;
     }
 
+    @Override
     public ComponenteDTO getComponenteSeleccionado() {
         return componenteSeleccionado;
     }

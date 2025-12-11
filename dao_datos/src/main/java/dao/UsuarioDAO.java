@@ -2,6 +2,7 @@ package dao;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import conexion.ConexionMongoDB;
 import entidades.UsuarioEntidad;
 import org.bson.Document;
@@ -43,18 +44,21 @@ public class UsuarioDAO {
     }
 
     public void guardar(UsuarioEntidad usuario) {
-        Document doc = new Document();
-        if (usuario.getId() != null) {
-            doc.append("_id", usuario.getId());
-        }
-        doc.append("nombre", usuario.getNombre())
-            .append("email", usuario.getEmail());
-
         if (usuario.getId() == null) {
+            Document doc = new Document();
+            doc.append("nombre", usuario.getNombre())
+               .append("email", usuario.getEmail());
+
             coleccion.insertOne(doc);
             usuario.setId(doc.getObjectId("_id"));
         } else {
-            coleccion.replaceOne(new Document("_id", usuario.getId()), doc);
+            coleccion.updateOne(
+                Filters.eq("_id", usuario.getId()),
+                Updates.combine(
+                    Updates.set("nombre", usuario.getNombre()),
+                    Updates.set("email", usuario.getEmail())
+                )
+            );
         }
     }
 }

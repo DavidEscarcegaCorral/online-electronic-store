@@ -11,7 +11,6 @@ import java.awt.*;
 import java.util.Map;
 
 public class EvaluarConfiguracionPanel extends JPanel {
-
     private JPanel itemsPanel;
     private ScrollPaneCustom scroll;
 

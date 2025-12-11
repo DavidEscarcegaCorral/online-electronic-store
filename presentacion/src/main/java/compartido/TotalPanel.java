@@ -20,6 +20,7 @@ public class TotalPanel extends JPanel {
         setOpaque(false);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         setPreferredSize(new Dimension(220,350));
+        setLayout(new BorderLayout());
 
         panelNorte = new JPanel();
         panelNorte.setOpaque(false);
@@ -58,8 +59,8 @@ public class TotalPanel extends JPanel {
         panelSur.add(totalLabel);
         panelSur.add(totalValueLabel);
 
-        add(panelNorte);
-        add(panelSur);
+        add(panelNorte, BorderLayout.NORTH);
+        add(panelSur, BorderLayout.SOUTH);
     }
 
     public void actualizarTotal() {
@@ -67,8 +68,15 @@ public class TotalPanel extends JPanel {
             fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
             double total = ventaFacade.calcularTotalCarrito();
             totalValueLabel.setText(String.format("$%,.2f", total));
+            System.out.println("Total actualizado: $" + total);
+            revalidate();
+            repaint();
         } catch (Exception e) {
+            System.err.println("Error al calcular total: " + e.getMessage());
+            e.printStackTrace();
             totalValueLabel.setText("$0.00");
+            revalidate();
+            repaint();
         }
     }
 

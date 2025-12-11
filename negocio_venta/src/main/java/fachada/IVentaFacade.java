@@ -85,6 +85,7 @@ public interface IVentaFacade {
      */
     boolean verificarStockCarrito();
 
+
     /**
      * Agrega una configuración completa de PC al carrito.
      * Guarda la configuración en la BD y añade su referencia al carrito.
@@ -100,6 +101,16 @@ public interface IVentaFacade {
      * @return Lista de configuraciones en el carrito.
      */
     List<ConfiguracionEntidad> obtenerConfiguracionesEnCarrito();
+
+    /**
+     * Confirma el pedido con las configuraciones del carrito.
+     * Crea un pedido con todas las configuraciones, lo guarda en BD y vacía el carrito.
+     *
+     * @param metodoPago El método de pago seleccionado.
+     * @return El ID del pedido creado, o null si hubo error.
+     */
+    String confirmarPedidoConConfiguraciones(MetodoPagoDTO metodoPago);
+
 
     /**
      * Remueve una configuración del carrito.

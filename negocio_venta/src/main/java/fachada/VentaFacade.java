@@ -2,6 +2,7 @@ package fachada;
 
 import dao.*;
 import dto.CarritoDTO;
+import dto.EnsamblajeDTO;
 import dto.ItemCarritoDTO;
 import dto.MetodoPagoDTO;
 import entidades.PedidoEntidad;
@@ -21,11 +22,13 @@ public class VentaFacade implements IVentaFacade {
     private static VentaFacade instancia;
     private final IProductoDAO productoDAO;
     private final IPedidoDAO pedidoDAO;
+    private final IVentaControl ventaControl;
     private CarritoDTO carritoActual;
 
     private VentaFacade() {
         this.productoDAO = new ProductoDAO();
         this.pedidoDAO = new PedidoDAO();
+        this.ventaControl = VentaControl.getInstance();
     }
 
     public static synchronized VentaFacade getInstance() {
@@ -134,13 +137,23 @@ public class VentaFacade implements IVentaFacade {
 
     @Override
     public double calcularTotalCarrito() {
-        if (this.carritoActual == null || this.carritoActual.getItems().isEmpty()) {
+        try {
+            List<entidades.ConfiguracionEntidad> configuraciones = obtenerConfiguracionesEnCarrito();
+            if (configuraciones == null || configuraciones.isEmpty()) {
+                return 0.0;
+            }
+
+            return configuraciones.stream()
+                    .mapToDouble(config -> {
+                        Double precioTotal = config.getPrecioTotal();
+                        return precioTotal != null ? precioTotal : 0.0;
+                    })
+                    .sum();
+        } catch (Exception e) {
+            System.err.println("Error al calcular total del carrito: " + e.getMessage());
+            e.printStackTrace();
             return 0.0;
         }
-
-        return this.carritoActual.getItems().stream()
-                .mapToDouble(item -> item.getPrecioUnitario() * item.getCantidad())
-                .sum();
     }
 
     @Override
@@ -191,29 +204,8 @@ public class VentaFacade implements IVentaFacade {
 
     @Override
     public void vaciarCarrito() {
-        try {
-            entidades.UsuarioEntidad usuario = obtenerOCrearUsuarioDefault();
-            String clienteId = usuario != null && usuario.getId() != null
-                ? usuario.getId().toString()
-                : "cliente_default";
-
-            this.carritoActual = new CarritoDTO();
-            this.carritoActual.setClienteId(clienteId);
-            this.carritoActual.setItems(new ArrayList<>());
-
-            dao.CarritoDAO carritoDAO = new dao.CarritoDAO();
-            entidades.CarritoEntidad carritoEntidad = carritoDAO.obtenerPorClienteId(clienteId);
-            if (carritoEntidad != null) {
-                carritoEntidad.setConfiguracionesIds(new java.util.ArrayList<>());
-                carritoDAO.guardar(carritoEntidad);
-            } else {
-                carritoEntidad = new entidades.CarritoEntidad();
-                carritoEntidad.setClienteId(clienteId);
-                carritoDAO.guardar(carritoEntidad);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        System.out.println("VentaFacade: Delegando vaciado del carrito a VentaControl");
+        ventaControl.vaciarCarrito();
     }
 
     @Override
@@ -286,41 +278,23 @@ public class VentaFacade implements IVentaFacade {
 
     @Override
     public String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje) {
-        if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
+        System.out.println("VentaFacade: Delegando guardado y adición al carrito a VentaControl");
+
+        IConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
+        String configuracionId = configuracionFacade.guardarConfiguracion(ensamblaje);
+
+        if (configuracionId == null) {
+            System.out.println("ERROR: No se pudo guardar la configuración");
             return null;
         }
 
-        try {
-            entidades.ConfiguracionEntidad configuracion = new entidades.ConfiguracionEntidad();
-            configuracion.setNombre("Configuración " + java.time.LocalDateTime.now());
+        return ventaControl.agregarConfiguracionAlCarrito(configuracionId);
+    }
 
-            java.util.List<java.util.Map<String, Object>> componentesList = new java.util.ArrayList<>();
-            for (dto.ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
-                java.util.Map<String, Object> compMap = new java.util.HashMap<>();
-                compMap.put("categoria", comp.getCategoria());
-                compMap.put("id", comp.getId());
-                compMap.put("nombre", comp.getNombre());
-                compMap.put("precio", comp.getPrecio());
-                compMap.put("marca", comp.getMarca());
-                componentesList.add(compMap);
-            }
-            configuracion.setComponentes(componentesList);
-            configuracion.setPrecioTotal(ensamblaje.getPrecioTotal());
-
-            dao.ConfiguracionDAO configuracionDAO = new dao.ConfiguracionDAO();
-            configuracionDAO.guardar(configuracion);
-
-            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
-            carrito.agregarConfiguracion(configuracion.getId());
-
-            dao.CarritoDAO carritoDAO = new dao.CarritoDAO();
-            carritoDAO.guardar(carrito);
-
-            return configuracion.getId().toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    @Override
+    public String confirmarPedidoConConfiguraciones(MetodoPagoDTO metodoPago) {
+        System.out.println("VentaFacade: Delegando confirmación de pedido a VentaControl");
+        return ventaControl.confirmarPedido(metodoPago);
     }
 
     @Override

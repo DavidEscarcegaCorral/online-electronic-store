@@ -4,6 +4,7 @@ import compartido.FramePrincipal;
 import armadoPC.ArmarPcPanel;
 import venta.carrito.CarritoPanel;
 import venta.pedido.ConfirmarDetallesPedidoPanel;
+import venta.producto.ProductoPanel;
 import compartido.BarraNavegacion;
 import menuprincipal.MenuPrincipalPanel;
 import javax.swing.*;
@@ -60,6 +61,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private final ArmarPcPanel armarEquipoPantalla;
     private final CarritoPanel carritoPantalla;
     private final ConfirmarDetallesPedidoPanel confirmarDetallesPedidoPanel;
+    private final ProductoPanel productoPantalla;
 
 
     private int indiceActual = 0;
@@ -74,6 +76,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         this.armarEquipoPantalla = new ArmarPcPanel();
         this.carritoPantalla = new CarritoPanel();
         this.confirmarDetallesPedidoPanel = new ConfirmarDetallesPedidoPanel();
+        this.productoPantalla = new ProductoPanel();
 
         inicializarVista();
         configurarBarraNavegacion();
@@ -86,6 +89,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     }
 
     private void inicializarVista() {
+        menuPrincipalPanel.setControlDeNavegacion(this);
         framePrincipal.setPanelContenido(menuPrincipalPanel);
         framePrincipal.setVisible(true);
         armarEquipoPantalla.mostrarMenusLaterales();
@@ -377,6 +381,15 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                 );
             }
         });
+
+        // Configurar callback para cuando se confirme el pedido
+        confirmarDetallesPedidoPanel.setOnPedidoConfirmado(() -> {
+            // Regresar al menú principal después de confirmar el pedido
+            mostrarNuevaPantalla(menuPrincipalPanel);
+
+            // Actualizar el carrito para reflejar que está vacío
+            carritoPantalla.actualizarCarrito();
+        });
     }
 
     private void mostrarNuevaPantalla(JPanel nuevoPanel) {
@@ -405,6 +418,11 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         }
     }
 
+    public void mostrarProducto(Object producto) {
+        productoPantalla.cargarProducto(producto);
+        mostrarNuevaPantalla(productoPantalla);
+    }
+
     @Override
     public void navegarAIndice(int nuevoIndice) {
         if (!esIndiceValido(nuevoIndice)) return;
@@ -431,7 +449,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             return;
         }
 
-        // Si retrocede a un paso anterior, limpiar componentes posteriores
         String[] pasos = armarEquipoPantalla.getListaPasosArmado();
         if (nuevoIndice < indiceActual && nuevoIndice >= INDICE_PROCESADOR) {
             IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
@@ -464,7 +481,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             armarEquipoPantalla.habilitarCategoriasYMarca();
             contEnabled = armarEquipoPantalla.getMarcasPanel().getSeleccionActual() != null || cfgMarca != null || seleccionMarca != null || marcaConfirmada;
         } else {
-            // Pasos de catálogo/producto
             String pasoCat = pasos[nuevoIndice];
             boolean selCatPresent = armarEquipoPantalla.getCategoriasPanel().getSeleccionActual() != null || cfgCategoria != null || seleccionCategoria != null || categoriaConfirmada;
             boolean selMarcaPresent = armarEquipoPantalla.getMarcasPanel().getSeleccionActual() != null || cfgMarca != null || seleccionMarca != null || marcaConfirmada;
@@ -508,10 +524,10 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     navegarAIndice(INDICE_MARCA_PROCESADOR);
                     return;
                 }
-                // Cargar catálogo filtrado por marca
+                // catálogo filtrado por marca
                 armarEquipoPantalla.cargarCatalogoConMarca(pasos[nuevoIndice], seleccionMarca);
             } else {
-                // Para otras categorías, cargar sin filtro de marca
+                // cargar sin filtro de marca
                 armarEquipoPantalla.cargarCatalogo(pasos[nuevoIndice]);
             }
         }
