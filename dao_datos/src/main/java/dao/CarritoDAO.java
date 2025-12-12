@@ -4,15 +4,22 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import conexion.ConexionMongoDB;
 import entidades.CarritoEntidad;
-import entidades.UsuarioEntidad;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CarritoDAO {
+
+    /** Logger para registrar operaciones del DAO */
+    private static final Logger logger = LoggerFactory.getLogger(CarritoDAO.class);
+
+    /** Colección de MongoDB donde se almacenan los carritos */
     private final MongoCollection<Document> coleccion;
-    private static CarritoEntidad carritoActual;
 
     public CarritoDAO() {
         this.coleccion = ConexionMongoDB.getInstance()
@@ -20,89 +27,68 @@ public class CarritoDAO {
                 .getCollection("carritos");
     }
 
-    public static CarritoEntidad getCarritoActual() {
-        if (carritoActual == null) {
-            System.out.println("Carrito actual null, inicializando...");
-            UsuarioDAO usuarioDAO = new UsuarioDAO();
-            UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
-            if (usuario == null) {
-                System.out.println("Usuario default no existe, creándolo...");
-                usuario = new UsuarioEntidad();
-                usuario.setNombre("Cliente Default");
-                usuario.setEmail("cliente_default@local");
-                usuarioDAO.guardar(usuario);
-            }
-            System.out.println("Usuario ID: " + usuario.getId());
+    public synchronized CarritoEntidad obtenerCarrito(String clienteId) {
+        if (clienteId == null || clienteId.trim().isEmpty()) {
+            logger.error("El clienteId no puede ser null o vacío");
+            throw new IllegalArgumentException("El clienteId es requerido");
+        }
 
-            CarritoDAO dao = new CarritoDAO();
-            String clienteId = usuario.getId() != null ? usuario.getId().toString() : "cliente_default";
-            System.out.println("Buscando carrito por clienteId: " + clienteId);
-            carritoActual = dao.obtenerPorClienteId(clienteId);
+        logger.debug("Buscando carrito para clienteId: {}", clienteId);
 
-            if (carritoActual == null) {
-                System.out.println("Carrito no encontrado con clienteId nuevo, buscando con 'cliente_default'...");
-                CarritoEntidad antiguo = dao.obtenerPorClienteId("cliente_default");
-                if (antiguo != null) {
-                    System.out.println("Carrito antiguo encontrado, actualizando clienteId...");
-                    antiguo.setClienteId(clienteId);
-                    dao.guardar(antiguo);
-                    carritoActual = antiguo;
+        CarritoEntidad carrito = obtenerPorClienteId(clienteId);
+
+        if (carrito == null) {
+            logger.info("Carrito no encontrado para clienteId: {}. Creando carrito nuevo.", clienteId);
+            carrito = new CarritoEntidad();
+            carrito.setClienteId(clienteId);
+            try {
+                guardar(carrito);
+                logger.info("Carrito creado exitosamente. ID: {}", carrito.getId());
+            } catch (com.mongodb.MongoWriteException e) {
+                if (e.getError().getCategory().equals(com.mongodb.ErrorCategory.DUPLICATE_KEY)) {
+                    logger.info("Carrito duplicado detectado (race condition prevenida). Recuperando carrito existente...");
+                    carrito = obtenerPorClienteId(clienteId);
+                    if (carrito != null) {
+                        logger.info("Carrito recuperado. ID: {}", carrito.getId());
+                    }
                 } else {
-                    System.out.println("No existe carrito, creando nuevo...");
-                    carritoActual = new CarritoEntidad();
-                    carritoActual.setClienteId(clienteId);
-                    dao.guardar(carritoActual);
+                    throw e;
                 }
             }
-            System.out.println("Carrito inicializado - ID: " + carritoActual.getId() + ", ConfigsIDs: " +
-                (carritoActual.getConfiguracionesIds() != null ? carritoActual.getConfiguracionesIds().size() : 0));
         } else {
-            System.out.println("Carrito ya existe en memoria - ID: " + carritoActual.getId() + ", ConfigsIDs: " +
-                (carritoActual.getConfiguracionesIds() != null ? carritoActual.getConfiguracionesIds().size() : 0));
+            logger.debug("Carrito encontrado. ID: {}", carrito.getId());
         }
-        return carritoActual;
-    }
 
-    /**
-     * Fuerza la recarga del carrito desde la base de datos.
-     * Útil para sincronizar después de operaciones en BD.
-     */
-    public static void recargarCarrito() {
-        System.out.println("Forzando recarga del carrito desde BD...");
-        carritoActual = null;
-        getCarritoActual();
+        return carrito;
     }
 
     public void guardar(CarritoEntidad carrito) {
-         System.out.println("Carrito creado");
-        System.out.println("Carrito ID: " + carrito.getId());
-        System.out.println("ClienteId: " + carrito.getClienteId());
-        System.out.println("Configuraciones en carrito: " +
-            (carrito.getConfiguracionesIds() != null ? carrito.getConfiguracionesIds().size() : 0));
+        logger.debug("Preparando guardar carrito. ID: {}", carrito.getId());
+        logger.debug("ClienteId: {}", carrito.getClienteId());
+        logger.debug("Configuraciones en carrito: {}",
+                (carrito.getConfiguracionesIds() != null ? carrito.getConfiguracionesIds().size() : 0));
 
         if (carrito.getConfiguracionesIds() != null && !carrito.getConfiguracionesIds().isEmpty()) {
-            System.out.println("IDs de configuraciones:");
-            for (ObjectId id : carrito.getConfiguracionesIds()) {
-                System.out.println("  - " + id.toString());
-            }
+            logger.debug("IDs de configuraciones a guardar: {}", carrito.getConfiguracionesIds().size());
         }
 
-        // Convertir fecha a Date
-        java.util.Date fechaActualizacion = null;
+        Date fechaActualizacion = null;
         if (carrito.getFechaActualizacion() != null) {
-            fechaActualizacion = java.util.Date.from(
-                carrito.getFechaActualizacion()
-                    .atZone(java.time.ZoneId.systemDefault())
-                    .toInstant()
+            fechaActualizacion = Date.from(
+                    carrito.getFechaActualizacion()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()
             );
         } else {
-            fechaActualizacion = new java.util.Date();
+            fechaActualizacion = new Date();
         }
 
+        // lista de IDs de configuraciones
         List<ObjectId> ids = carrito.getConfiguracionesIds() != null
-            ? new ArrayList<>(carrito.getConfiguracionesIds())
-            : new ArrayList<>();
+                ? new ArrayList<>(carrito.getConfiguracionesIds())
+                : new ArrayList<>();
 
+        // Convertir productos a formato Document de MongoDB
         List<Document> productos = new ArrayList<>();
         if (carrito.getProductos() != null) {
             for (java.util.Map<String, Object> prod : carrito.getProductos()) {
@@ -113,10 +99,11 @@ public class CarritoDAO {
             }
         }
 
+        // CASO 1: Inserción de nuevo carrito
         if (carrito.getId() == null) {
             Document doc = new Document();
             doc.append("clienteId", carrito.getClienteId())
-               .append("fechaActualizacion", fechaActualizacion);
+                    .append("fechaActualizacion", fechaActualizacion);
 
             if (!ids.isEmpty()) {
                 doc.append("configuracionesIds", ids);
@@ -125,85 +112,88 @@ public class CarritoDAO {
                 doc.append("productos", productos);
             }
 
-            System.out.println("Insertando nuevo carrito...");
-            System.out.println("Documento a insertar: " + doc.toJson());
+            logger.info("Insertando nuevo carrito para clienteId: {}", carrito.getClienteId());
+
+            // Insertar en MongoDB
             coleccion.insertOne(doc);
+
+            // Asignar el ID generado por MongoDB al objeto carrito
             carrito.setId(doc.getObjectId("_id"));
+            logger.info("Carrito insertado exitosamente. ID: {}", carrito.getId());
         } else {
+            // CASO 2: Actualización de carrito existente
+            // Crear documento con todos los campos a actualizar
+            // Nota: Incluimos arrays vacíos para limpiar el carrito cuando sea necesario
             Document setDoc = new Document()
-               .append("clienteId", carrito.getClienteId())
-               .append("fechaActualizacion", fechaActualizacion);
+                    .append("clienteId", carrito.getClienteId())
+                    .append("fechaActualizacion", fechaActualizacion)
+                    .append("configuracionesIds", ids)
+                    .append("productos", productos);
 
-            if (!ids.isEmpty()) {
-                setDoc.append("configuracionesIds", ids);
-            }
-            if (!productos.isEmpty()) {
-                setDoc.append("productos", productos);
-            }
-
+            // Operación $set de MongoDB para actualizar campos específicos
             Document updateDoc = new Document("$set", setDoc);
 
-            System.out.println("Actualizando carrito existente con $set...");
-            System.out.println("Filtro: _id = " + carrito.getId());
-            System.out.println("Documento a actualizar: " + updateDoc.toJson());
+            logger.info("Actualizando carrito existente. ID: {}", carrito.getId());
 
+            // Ejecutar actualización en MongoDB
             var result = coleccion.updateOne(
-                new Document("_id", carrito.getId()),
-                updateDoc
+                    new Document("_id", carrito.getId()),
+                    updateDoc
             );
-            System.out.println("Documentos modificados: " + result.getModifiedCount());
-            System.out.println("Documentos coincidentes: " + result.getMatchedCount());
-            System.out.println("Documentos upsertados: " + result.getUpsertedId());
 
+            // Logging de resultados de la operación
+            logger.debug("Documentos modificados: {}", result.getModifiedCount());
+            logger.debug("Documentos coincidentes: {}", result.getMatchedCount());
+
+            // Fallback: Si no se encontró el documento, intentar con replaceOne
             if (result.getMatchedCount() == 0) {
-                System.err.println("ADVERTENCIA: No se encontró el carrito en BD para actualizar!");
-                System.err.println("Intentando con replaceOne como fallback...");
+                logger.warn("No se encontró el carrito en BD para actualizar. ID: {}", carrito.getId());
+                logger.info("Intentando con replaceOne como fallback...");
 
+                // Crear documento completo para reemplazo
                 Document docReplace = new Document();
                 docReplace.append("clienteId", carrito.getClienteId())
-                   .append("fechaActualizacion", fechaActualizacion);
+                        .append("fechaActualizacion", fechaActualizacion)
+                        .append("configuracionesIds", ids)
+                        .append("productos", productos);
 
-                if (!ids.isEmpty()) {
-                    docReplace.append("configuracionesIds", ids);
-                }
-                if (!productos.isEmpty()) {
-                    docReplace.append("productos", productos);
-                }
-
+                // Intentar reemplazar el documento completo
                 var resultReplace = coleccion.replaceOne(
-                    new Document("_id", carrito.getId()),
-                    docReplace
+                        new Document("_id", carrito.getId()),
+                        docReplace
                 );
-                System.out.println("ReplaceOne - Documentos modificados: " + resultReplace.getModifiedCount());
+                logger.debug("ReplaceOne - Documentos modificados: {}", resultReplace.getModifiedCount());
+            } else {
+                logger.info("Carrito actualizado exitosamente. ID: {}", carrito.getId());
             }
-        }
-
-        if (carritoActual != null && carritoActual.getId() != null &&
-            carritoActual.getId().equals(carrito.getId())) {
-            carritoActual = carrito;
         }
     }
 
     public CarritoEntidad obtenerPorClienteId(String clienteId) {
+        // Buscar documento en MongoDB por clienteId
         Document doc = coleccion.find(Filters.eq("clienteId", clienteId)).first();
 
         if (doc == null) {
             return null;
         }
 
+        // Crear objeto CarritoEntidad y mapear campos básicos
         CarritoEntidad carrito = new CarritoEntidad();
         carrito.setId(doc.getObjectId("_id"));
         carrito.setClienteId(doc.getString("clienteId"));
 
+        // Mapear lista de IDs de configuraciones
         List<ObjectId> ids = (List<ObjectId>) doc.get("configuracionesIds");
         if (ids != null) {
             carrito.setConfiguracionesIds(ids);
         }
 
+        // Mapear lista de productos individuales
         List<Document> productosDoc = (List<Document>) doc.get("productos");
         if (productosDoc != null) {
             List<java.util.Map<String, Object>> productos = new ArrayList<>();
             for (Document prodDoc : productosDoc) {
+                // Convertir cada Document de producto a Map
                 java.util.Map<String, Object> prod = new java.util.HashMap<>();
                 prod.put("productoId", prodDoc.getString("productoId"));
                 prod.put("cantidad", prodDoc.getInteger("cantidad"));
@@ -211,6 +201,7 @@ public class CarritoDAO {
             }
             carrito.setProductos(productos);
         }
+
         return carrito;
     }
 }

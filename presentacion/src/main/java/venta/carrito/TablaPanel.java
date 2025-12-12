@@ -4,7 +4,10 @@ import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
 import compartido.estilos.tabla.Tabla;
 import compartido.FramePrincipal;
-import controlconfig.IVentaFacade;
+import controlpresentacion.ControlPresentacionVenta;
+import dao.CarritoDAO;
+import dao.UsuarioDAO;
+import entidades.UsuarioEntidad;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -39,13 +42,22 @@ public class TablaPanel extends JPanel {
         add(panelCentro);
     }
 
+    private String obtenerClienteIdDefecto() {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+        if (usuario != null && usuario.getId() != null) {
+            return usuario.getId().toString();
+        }
+        throw new IllegalStateException("Usuario por defecto no encontrado");
+    }
+
     public void actualizarCarrito() {
         model.setRowCount(0);
 
         try {
-            IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
+            ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
 
-            List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
+            List<entidades.ConfiguracionEntidad> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
             if (configuraciones != null && !configuraciones.isEmpty()) {
                 for (entidades.ConfiguracionEntidad config : configuraciones) {
                     String nombreConfig = config.getNombre() != null ? config.getNombre() : "Configuración PC";
@@ -60,10 +72,10 @@ public class TablaPanel extends JPanel {
                         "Eliminar"
                     });
                 }
-                System.out.println("Tabla actualizada con " + configuraciones.size() + " configuración(es)");
             }
 
-            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+            String clienteId = obtenerClienteIdDefecto();
+            entidades.CarritoEntidad carrito = new CarritoDAO().obtenerCarrito(clienteId);
             if (carrito.getProductos() != null && !carrito.getProductos().isEmpty()) {
                 dao.ProductoDAO productoDAO = new dao.ProductoDAO();
                 for (java.util.Map<String, Object> prod : carrito.getProductos()) {

@@ -2,6 +2,8 @@ package armadoPC;
 
 import compartido.estilos.FontUtil;
 import compartido.estilos.Estilos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class CategoriaCard extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(CategoriaCard.class);
+
     private JLabel imagenCategoriaLbl;
     private JLabel nombreCategoriaLbl;
 
@@ -75,37 +79,41 @@ public class CategoriaCard extends JPanel {
 
     private void cargarImagen(String path, int targetWidth, int targetHeight) {
         try {
-            java.net.URL imageURL = getClass().getResource(path);
+            ImageIcon icon = null;
+            java.net.URL location = null;
 
-            if (imageURL == null) {
-                System.err.println("Error: No se pudo encontrar la imagen en: " + path);
-                System.err.println("Intentando buscar en classpath...");
-
-                // Intentar con ClassLoader
-                imageURL = Thread.currentThread().getContextClassLoader().getResource(path.startsWith("/") ? path.substring(1) : path);
-
-                if (imageURL == null) {
-                    throw new java.io.FileNotFoundException("No se encontró la imagen: " + path);
+            // Cargar directamente desde la ruta proporcionada (las categorías siempre tienen la misma ruta)
+            if (path != null && !path.trim().isEmpty()) {
+                location = getClass().getResource(path);
+                if (location != null) {
+                    icon = new ImageIcon(location);
                 }
             }
 
-            ImageIcon originalIcon = new ImageIcon(imageURL);
-
-            // Validar que la imagen se cargó correctamente
-            if (originalIcon.getIconWidth() <= 0 || originalIcon.getIconHeight() <= 0) {
-                throw new IllegalStateException("La imagen no se cargó correctamente (dimensiones inválidas)");
+            // Si no se encuentra, usar imagen por defecto
+            if (icon == null || icon.getIconWidth() == -1) {
+                logger.debug("Imagen de categoría no encontrada en: {}. Usando imagen por defecto.", path);
+                location = getClass().getResource("/img/productos/default.png");
+                if (location != null) {
+                    icon = new ImageIcon(location);
+                }
             }
 
-            ImageIcon scaledIcon = getScaledIcon(originalIcon, targetWidth, targetHeight);
-            imagenCategoriaLbl.setIcon(scaledIcon);
+            // Si tenemos un icono válido, escalarlo y mostrarlo
+            if (icon != null && icon.getIconWidth() != -1) {
+                ImageIcon scaledIcon = getScaledIcon(icon, targetWidth, targetHeight);
+                imagenCategoriaLbl.setIcon(scaledIcon);
+                imagenCategoriaLbl.setText("");
+            } else {
+                imagenCategoriaLbl.setIcon(null);
+            }
+
         } catch (Exception e) {
-            System.err.println("Error al cargar la imagen para " + nombreCategoria + ": " + path);
-            System.err.println("Mensaje de error: " + e.getMessage());
-            imagenCategoriaLbl.setText("No Image");
+            logger.error("Error al cargar la imagen para categoría: {}", nombreCategoria, e);
             imagenCategoriaLbl.setIcon(null);
-            e.printStackTrace();
         }
     }
+
 
     private ImageIcon getScaledIcon(ImageIcon srcIcon, int targetWidth, int targetHeight) {
 

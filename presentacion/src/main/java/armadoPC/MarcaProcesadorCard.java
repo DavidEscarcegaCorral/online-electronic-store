@@ -1,17 +1,27 @@
 package armadoPC;
 
 import compartido.estilos.Estilos;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.util.function.Consumer;
 
 public class MarcaProcesadorCard extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(MarcaProcesadorCard.class);
+    private static final int ANCHO_PANEL = 260;
+    private static final int ALTO_PANEL = 220;
+    private static final int ANCHO_IMAGEN = 220;
+    private static final int RADIO_ESQUINAS = 25;
+    private static final int GROSOR_BORDE = 4;
+
     private JLabel imagenMarcaLbl;
     private String nombreMarca;
     private String imagenUrl;
-    private java.util.function.Consumer<String> onMarcaSelected;
+    private Consumer<String> onMarcaSelected;
     private boolean seleccionado = false;
 
     public MarcaProcesadorCard(String nombreMarca, String imagenUrl) {
@@ -19,12 +29,7 @@ public class MarcaProcesadorCard extends JPanel {
         this.imagenUrl = imagenUrl;
 
         initComponentes();
-        añadirComponentes();
         setupListeners();
-    }
-
-    public void setOnMarcaSelected(java.util.function.Consumer<String> callback) {
-        this.onMarcaSelected = callback;
     }
 
     public void setSeleccionado(boolean seleccionado) {
@@ -34,34 +39,58 @@ public class MarcaProcesadorCard extends JPanel {
 
     private void initComponentes() {
         setOpaque(false);
-        setPreferredSize(new Dimension(260, 220));
-        setMaximumSize(new Dimension(260, 220));
+        setPreferredSize(new Dimension(ANCHO_PANEL, ALTO_PANEL));
+        setMaximumSize(new Dimension(ANCHO_PANEL, ALTO_PANEL));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        GridBagLayout gbl = new GridBagLayout();
+        setLayout(gbl);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.CENTER;
 
         imagenMarcaLbl = new JLabel();
         imagenMarcaLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         cargarImagen(this.imagenUrl);
-    }
 
-    private void añadirComponentes() {
-        add(Box.createVerticalStrut(10));
-        add(imagenMarcaLbl);
-        add(Box.createVerticalStrut(20));
-        add(imagenMarcaLbl);
+        add(imagenMarcaLbl, gbc);
     }
 
     private void cargarImagen(String path) {
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource(path));
-            Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(220, -1, Image.SCALE_SMOOTH);
-            imagenMarcaLbl.setIcon(new ImageIcon(scaledImage));
+            ImageIcon icon = null;
+            URL location = null;
+
+            if (path != null && !path.trim().isEmpty()) {
+                location = getClass().getResource(path);
+                if (location != null) {
+                    icon = new ImageIcon(location);
+                }
+            }
+
+            if (icon == null || icon.getIconWidth() == -1) {
+                logger.debug("Imagen de marca no encontrada en: {}. Usando imagen por defecto.", path);
+                location = getClass().getResource("/img/productos/default.png");
+                if (location != null) {
+                    icon = new ImageIcon(location);
+                }
+            }
+
+            if (icon != null && icon.getIconWidth() != -1) {
+                Image originalImage = icon.getImage();
+                Image scaledImage = originalImage.getScaledInstance(ANCHO_IMAGEN, -1, Image.SCALE_SMOOTH);
+                imagenMarcaLbl.setIcon(new ImageIcon(scaledImage));
+                imagenMarcaLbl.setText("");
+            } else {
+                imagenMarcaLbl.setIcon(null);
+            }
+
         } catch (Exception e) {
-            System.err.println("Error al cargar la imagen para " + nombreMarca + ": " + path);
-            imagenMarcaLbl.setText("No Image");
+            logger.error("Error al cargar la imagen para marca: {}", nombreMarca, e);
             imagenMarcaLbl.setIcon(null);
-            e.printStackTrace();
         }
     }
 
@@ -82,11 +111,11 @@ public class MarcaProcesadorCard extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.WHITE);
-        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), RADIO_ESQUINAS, RADIO_ESQUINAS);
         if (seleccionado) {
             g2d.setColor(Estilos.COLOR_ENFASIS);
-            g2d.setStroke(new BasicStroke(4));
-            g2d.drawRoundRect(2, 2, getWidth()-5, getHeight()-5, 25, 25);
+            g2d.setStroke(new BasicStroke(GROSOR_BORDE));
+            g2d.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, RADIO_ESQUINAS, RADIO_ESQUINAS);
         }
         g2d.dispose();
     }

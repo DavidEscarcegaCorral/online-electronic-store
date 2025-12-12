@@ -32,7 +32,6 @@ public class ProductoCard extends JPanel {
         initComponents();
         añadirComponentes();
         setupListeners();
-
     }
 
     public void setOnSelect(Consumer<String> onSelect) {

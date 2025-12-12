@@ -27,7 +27,6 @@ public class PedidoDAO implements IPedidoDAO {
 
     @Override
     public String crearPedido(PedidoEntidad pedido) {
-        System.out.println("=== CREANDO PEDIDO EN BD ===");
         System.out.println("ClienteId: " + pedido.getClienteId());
         System.out.println("Total: $" + pedido.getTotal());
         System.out.println("Estado: " + pedido.getEstado());
@@ -63,7 +62,6 @@ public class PedidoDAO implements IPedidoDAO {
 
             ObjectId pedidoId = doc.getObjectId("_id");
             System.out.println("Pedido insertado con ID: " + pedidoId);
-            System.out.println("=== PEDIDO CREADO EXITOSAMENTE ===\n");
 
             return pedidoId.toString();
         } catch (Exception e) {

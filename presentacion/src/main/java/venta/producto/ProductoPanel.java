@@ -1,6 +1,7 @@
 package venta.producto;
 
 import compartido.PanelBase;
+import compartido.cards.ProductoFotosCard;
 import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
 import compartido.estilos.FontUtil;
@@ -18,6 +19,7 @@ import java.awt.*;
 public class ProductoPanel extends PanelBase {
     private DetallesProductoPanel detallesProductoPanel;
     private TituloLabel tituloLabel;
+    private ProductoFotosCard productoFotosCard;
 
     private JPanel p1;
     private JPanel p2;
@@ -26,7 +28,6 @@ public class ProductoPanel extends PanelBase {
 
     private JScrollPane scroll;
 
-    private JLabel fotoPorductoLbl;
     private JLabel nombreProductoLbl;
     private JLabel precioProductoLbl;
     private JSpinner spinnerCantidad;
@@ -53,22 +54,8 @@ public class ProductoPanel extends PanelBase {
 
         panelNorte.add(tituloLabel);
         inicializarPanelCentro();
-        inicializarPanelEste();
+        inicializarPanelOeste();
 
-    }
-
-    private void inicializarPanelEste() {
-        JPanel panelFoto = new JPanel(new BorderLayout());
-        panelFoto.setBackground(new Color(70, 70, 70));
-        panelFoto.setPreferredSize(new Dimension(350, 450));
-        panelFoto.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        fotoPorductoLbl = new JLabel();
-        fotoPorductoLbl.setHorizontalAlignment(JLabel.CENTER);
-        fotoPorductoLbl.setVerticalAlignment(JLabel.CENTER);
-        panelFoto.add(fotoPorductoLbl, BorderLayout.CENTER);
-
-        panelEste = panelFoto;
     }
 
     private void inicializarPanelCentro() {
@@ -114,7 +101,6 @@ public class ProductoPanel extends PanelBase {
         p4.add(detallesProductoPanel);
 
         panelCentro.add(p1);
-        panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(p2);
         panelCentro.add(Box.createVerticalStrut(10));
         panelCentro.add(p3);
@@ -123,25 +109,21 @@ public class ProductoPanel extends PanelBase {
 
     }
 
-    private void cargarFoto(String imagenUrl) {
-        try {
-            if (imagenUrl != null && !imagenUrl.isEmpty()) {
-                java.net.URL url = getClass().getResource(imagenUrl);
-                if (url != null) {
-                    ImageIcon icon = new ImageIcon(url);
-                    Image img = icon.getImage();
-                    Image imgEscalada = img.getScaledInstance(330, 330, Image.SCALE_SMOOTH);
-                    fotoPorductoLbl.setIcon(new ImageIcon(imgEscalada));
-                } else {
-                    fotoPorductoLbl.setText("Imagen no disponible");
-                    fotoPorductoLbl.setForeground(Color.GRAY);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error al cargar la imagen: " + e.getMessage());
-            fotoPorductoLbl.setText("Error al cargar imagen");
-            fotoPorductoLbl.setForeground(Color.RED);
+    private void inicializarPanelOeste() {
+        panelOeste.setPreferredSize(new Dimension(800, 800));
+        panelOeste.setBackground(new Color(70, 70, 70));
+        panelOeste.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+
+    private void cargarFoto(String productoId) {
+        if (productoFotosCard != null) {
+            panelOeste.remove(productoFotosCard);
         }
+
+        productoFotosCard = new ProductoFotosCard(productoId);
+        panelOeste.add(productoFotosCard, BorderLayout.CENTER);
+        panelOeste.revalidate();
+        panelOeste.repaint();
     }
 
     public void cargarProducto(Object producto) {
@@ -157,18 +139,20 @@ public class ProductoPanel extends PanelBase {
             String marca = (String) obtenerValorProducto(producto, "getMarca");
             String nombre = (String) obtenerValorProducto(producto, "getNombre");
             Double precio = (Double) obtenerValorProducto(producto, "getPrecio");
-            String imagenUrl = (String) obtenerValorProducto(producto, "getImagenUrl");
+            String productoId = obtenerValorProducto(producto, "getId").toString();
 
             String titulo = categoria + " - " + marca;
             tituloLabel.setText(titulo);
 
-            cargarFoto(imagenUrl);
+            cargarFoto(productoId);
 
             nombreProductoLbl.setText(nombre);
 
             precioProductoLbl.setText("$" + String.format("%.2f", precio));
 
             spinnerCantidad.setValue(1);
+
+            productoActual = producto;
 
         } catch (Exception e) {
             System.err.println("Error al cargar producto: " + e.getMessage());
@@ -182,12 +166,16 @@ public class ProductoPanel extends PanelBase {
 
     private void limpiarUI() {
         tituloLabel.setText("Categoría - Componente");
-        fotoPorductoLbl.setIcon(null);
-        fotoPorductoLbl.setText("");
+        if (productoFotosCard != null) {
+            panelOeste.remove(productoFotosCard);
+            productoFotosCard = null;
+        }
         nombreProductoLbl.setText("Nombre del Producto");
         precioProductoLbl.setText("$0.00");
         spinnerCantidad.setValue(1);
         productoActual = null;
+        panelOeste.revalidate();
+        panelOeste.repaint();
     }
 
     public Object getProductoActual() {

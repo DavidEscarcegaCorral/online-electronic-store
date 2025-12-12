@@ -1,12 +1,14 @@
 package entidades;
 
 import org.bson.types.ObjectId;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 public class ConfiguracionEntidad {
     private ObjectId id;
+    private String usuarioId;
     private String nombre;
     private List<Map<String, Object>> componentes;
     private Double precioTotal;
@@ -22,6 +24,14 @@ public class ConfiguracionEntidad {
 
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    public String getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(String usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public String getNombre() {

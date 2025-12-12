@@ -1,11 +1,15 @@
 package compartido.cards;
 
 import compartido.estilos.FontUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ProductoPedidoCard extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(ProductoPedidoCard.class);
+
     private JLabel imagenProductoLbl;
     private JLabel nombreProductoLbl;
     private JLabel precioProductoLbl;
@@ -69,22 +73,74 @@ public class ProductoPedidoCard extends JPanel {
 
     private void cargarImagen(String path) {
         try {
-            java.net.URL location = getClass().getResource(path);
-            if (location == null) {
-                imagenProductoLbl.setText("No Image");
-                imagenProductoLbl.setIcon(null);
-                return;
+            ImageIcon icon = null;
+            java.net.URL location = null;
+
+            // Primero intentar cargar desde la ruta proporcionada
+            if (path != null && !path.trim().isEmpty()) {
+                location = getClass().getResource(path);
+                if (location != null) {
+                    icon = new ImageIcon(location);
+                }
             }
-            ImageIcon originalIcon = new ImageIcon(location);
-            Image originalImage = originalIcon.getImage();
-            Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
-            imagenProductoLbl.setIcon(new ImageIcon(scaledImage));
+
+            // Si no se encontró en la ruta proporcionada, buscar por nombre del producto
+            if (icon == null || icon.getIconWidth() == -1) {
+                String rutaPorNombre = obtenerRutaImagenPorNombre(nombreProducto);
+                location = getClass().getResource(rutaPorNombre);
+                if (location != null) {
+                    icon = new ImageIcon(location);
+                }
+            }
+
+            // Si aún no se encontró, usar imagen por defecto
+            if (icon == null || icon.getIconWidth() == -1) {
+                location = getClass().getResource("/img/productos/default.png");
+                if (location != null) {
+                    icon = new ImageIcon(location);
+                }
+            }
+
+            // Si tenemos un icono, escalarlo y mostrarlo
+            if (icon != null && icon.getIconWidth() != -1) {
+                Image originalImage = icon.getImage();
+                Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
+                imagenProductoLbl.setIcon(new ImageIcon(scaledImage));
+                imagenProductoLbl.setText("");
+            } else {
+                imagenProductoLbl.setIcon(null);
+            }
+
         } catch (Exception e) {
-            System.err.println("Error al cargar la imagen para " + nombreProducto + ": " + path);
-            imagenProductoLbl.setText("No Image");
+            logger.error("Error al cargar la imagen para producto: {}", nombreProducto, e);
             imagenProductoLbl.setIcon(null);
-            e.printStackTrace();
         }
+    }
+
+    private String obtenerRutaImagenPorNombre(String nombreProducto) {
+        if (nombreProducto == null || nombreProducto.trim().isEmpty()) {
+            return "/img/productos/default.png";
+        }
+
+        String nombreNormalizado = nombreProducto.toLowerCase()
+            .replaceAll("\\s+", "-")
+            .replaceAll("[^a-z0-9-]", "");
+
+        String[] variaciones = {
+            "/img/productos/" + nombreNormalizado + ".png",
+            "/img/productos/" + nombreNormalizado + ".jpg",
+            "/img/productos/" + nombreNormalizado.substring(0, Math.min(20, nombreNormalizado.length())) + ".png",
+            "/img/productos/procesadores/" + nombreNormalizado + ".png"
+        };
+
+        for (String ruta : variaciones) {
+            java.net.URL location = getClass().getResource(ruta);
+            if (location != null) {
+                return ruta;
+            }
+        }
+
+        return "/img/productos/default.png";
     }
 
     @Override

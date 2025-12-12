@@ -6,13 +6,14 @@ import java.io.InputStream;
 public class FontUtil {
     public static Font loadFont(float tamaño, String fuente) {
         try {
-            InputStream is = FontUtil.class.getClassLoader().getResourceAsStream("fonts/" + fuente + ".ttf");
-            if (is == null) {
-                throw new RuntimeException("No se pudo encontrar la fuente.");
-            }
+            String rutaFuente = "fonts/" + fuente + ".ttf";
+            InputStream is = FontUtil.class.getResourceAsStream("/" + rutaFuente);
+
             Font font = Font.createFont(Font.TRUETYPE_FONT, is);
+            is.close();
             return font.deriveFont(tamaño);
         } catch (Exception e) {
+            System.err.println("ERROR al cargar fuente: " + fuente);
             e.printStackTrace();
             return new Font("SansSerif", Font.PLAIN, (int) tamaño);
         }

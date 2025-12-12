@@ -5,12 +5,24 @@ import compartido.estilos.Boton;
 import compartido.estilos.FontUtil;
 import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
+import dao.ConfiguracionDAO;
+import dao.UsuarioDAO;
+import entidades.ConfiguracionEntidad;
+import entidades.UsuarioEntidad;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class MenuOpcionesPanel extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(MenuOpcionesPanel.class);
+
     private JLabel tituloLbl;
     private TotalCard totalCard;
     private JPanel panelNorte;
@@ -84,9 +96,7 @@ public class MenuOpcionesPanel extends JPanel {
                 return;
             }
 
-            if (onGuardarConfiguracion != null) {
-                onGuardarConfiguracion.accept(null);
-            }
+            abrirDialogoGuardarConfiguracion();
         });
 
         agregarAlCarritoBtn.addActionListener(e -> {
@@ -174,6 +184,100 @@ public class MenuOpcionesPanel extends JPanel {
 
     public dto.EnsamblajeDTO getEnsamblajActual() {
         return ensamblajActual;
+    }
+
+    private void abrirDialogoGuardarConfiguracion() {
+        if (ensamblajActual == null) {
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(this),
+                "No hay configuración para guardar.",
+                "Configuración vacía",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+        NombrearConfiguracionDialog dialog = new NombrearConfiguracionDialog(parentFrame);
+        dialog.setEnsamblaje(ensamblajActual);
+        dialog.setOnGuardarConfiguracion(nombre -> guardarConfiguracionEnBD(nombre));
+        dialog.setVisible(true);
+    }
+
+    private void guardarConfiguracionEnBD(String nombre) {
+        try {
+            String clienteId = obtenerClienteIdDefecto();
+            ConfiguracionDAO configuracionDAO = new ConfiguracionDAO();
+
+            List<ConfiguracionEntidad> configsExistentes = configuracionDAO.obtenerPorUsuarioId(clienteId);
+
+            boolean existeConEsteNombre = configsExistentes.stream()
+                .anyMatch(c -> c.getNombre() != null && c.getNombre().equalsIgnoreCase(nombre));
+
+            if (existeConEsteNombre) {
+                JOptionPane.showMessageDialog(
+                    SwingUtilities.getWindowAncestor(this),
+                    "Ya existe una configuración con el nombre: " + nombre,
+                    "Nombre duplicado",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            ConfiguracionEntidad nuevaConfig = new ConfiguracionEntidad();
+            nuevaConfig.setNombre(nombre);
+            nuevaConfig.setUsuarioId(clienteId);
+            nuevaConfig.setPrecioTotal(ensamblajActual.getPrecioTotal());
+            nuevaConfig.setComponentes(convertirComponentesAMapas());
+
+            configuracionDAO.guardar(nuevaConfig);
+
+            logger.info("Configuración guardada exitosamente: {}", nombre);
+
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(this),
+                "Configuración guardada exitosamente con el nombre: " + nombre,
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+            if (onGuardarConfiguracion != null) {
+                onGuardarConfiguracion.accept(null);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error al guardar configuración", e);
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(this),
+                "Error al guardar la configuración: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private List<Map<String, Object>> convertirComponentesAMapas() {
+        List<Map<String, Object>> componentes = new ArrayList<>();
+        if (ensamblajActual != null && ensamblajActual.getComponentes() != null) {
+            ensamblajActual.getComponentes().forEach((key, comp) -> {
+                Map<String, Object> mapa = new HashMap<>();
+                mapa.put("id", comp.getId());
+                mapa.put("nombre", comp.getNombre());
+                mapa.put("precio", comp.getPrecio());
+                mapa.put("categoria", comp.getCategoria());
+                componentes.add(mapa);
+            });
+        }
+        return componentes;
+    }
+
+    private String obtenerClienteIdDefecto() {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+        if (usuario != null && usuario.getId() != null) {
+            return usuario.getId().toString();
+        }
+        throw new IllegalStateException("Usuario por defecto no encontrado");
     }
 
     @Override

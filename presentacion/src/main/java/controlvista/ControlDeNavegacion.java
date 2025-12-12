@@ -2,13 +2,19 @@ package controlvista;
 
 import compartido.FramePrincipal;
 import armadoPC.ArmarPcPanel;
+import entidades.ConfiguracionEntidad;
 import venta.carrito.CarritoPanel;
 import venta.pedido.ConfirmarDetallesPedidoPanel;
 import venta.producto.ProductoPanel;
 import compartido.BarraNavegacion;
 import menuprincipal.MenuPrincipalPanel;
+import dao.CarritoDAO;
+import dao.UsuarioDAO;
+import entidades.UsuarioEntidad;
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -315,8 +321,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     return;
                 }
 
-                controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
-                String configuracionId = ventaFacade.agregarConfiguracionAlCarrito(ensamblaje);
+                controlpresentacion.ControlPresentacionVenta controlVenta = controlpresentacion.ControlPresentacionVenta.getInstance();
+                String configuracionId = controlVenta.agregarConfiguracionAlCarrito(ensamblaje);
 
                 if (configuracionId != null) {
                     mostrarMensaje("Configuración guardada exitosamente", TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
@@ -343,8 +349,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     return;
                 }
 
-                controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
-                String configuracionId = ventaFacade.agregarConfiguracionAlCarrito(ensamblaje);
+                controlpresentacion.ControlPresentacionVenta controlVenta = controlpresentacion.ControlPresentacionVenta.getInstance();
+                String configuracionId = controlVenta.agregarConfiguracionAlCarrito(ensamblaje);
 
                 if (configuracionId != null) {
                     limpiarConfiguracionActual();
@@ -361,13 +367,30 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         armarEquipoPantalla.getMenuOpcionesPanel().setOnAgregarAlCarrito(agregarCarritoHandler);
     }
 
+    private String obtenerClienteIdDefecto() {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+        if (usuario != null && usuario.getId() != null) {
+            return usuario.getId().toString();
+        }
+        throw new IllegalStateException("Usuario por defecto no encontrado");
+    }
+
     private void configurarCallbacksCarrito() {
         carritoPantalla.setOnRealizarPedido(() -> {
             try {
-                controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
-                java.util.List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
+                controlpresentacion.ControlPresentacionVenta controlVenta = controlpresentacion.ControlPresentacionVenta.getInstance();
+                List<ConfiguracionEntidad> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
 
-                if (configuraciones == null || configuraciones.isEmpty()) {
+                String clienteId = obtenerClienteIdDefecto();
+                entidades.CarritoEntidad carrito = new CarritoDAO().obtenerCarrito(clienteId);
+                List<Map<String, Object>> productosIndividuales =
+                    carrito.getProductos() != null ? carrito.getProductos() : new ArrayList<>();
+
+                boolean tieneConfiguraciones = configuraciones != null && !configuraciones.isEmpty();
+                boolean tieneProductos = !productosIndividuales.isEmpty();
+
+                if (!tieneConfiguraciones && !tieneProductos) {
                     JOptionPane.showMessageDialog(
                         framePrincipal,
                         "No hay productos en el carrito para realizar el pedido.",
@@ -390,12 +413,9 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             }
         });
 
-        // Configurar callback para cuando se confirme el pedido
         confirmarDetallesPedidoPanel.setOnPedidoConfirmado(() -> {
-            // Regresar al menú principal después de confirmar el pedido
             mostrarNuevaPantalla(menuPrincipalPanel);
 
-            // Actualizar el carrito para reflejar que está vacío
             carritoPantalla.actualizarCarrito();
         });
     }
@@ -445,8 +465,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     String productoId = idObj.toString();
                     String nombreProducto = (String) productoActual.getClass().getMethod("getNombre").invoke(productoActual);
 
-                    controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
-                    boolean agregado = ventaFacade.agregarProductoAlCarrito(productoId, cantidad);
+                    controlpresentacion.ControlPresentacionVenta controlVenta = controlpresentacion.ControlPresentacionVenta.getInstance();
+                    boolean agregado = controlVenta.agregarProductoAlCarrito(productoId, cantidad);
 
                     if (agregado) {
                         JOptionPane.showMessageDialog(

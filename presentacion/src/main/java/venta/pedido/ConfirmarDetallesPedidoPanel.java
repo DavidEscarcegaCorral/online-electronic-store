@@ -6,7 +6,10 @@ import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
 import compartido.estilos.TituloLabel;
 import dto.MetodoPagoDTO;
-import controlconfig.IVentaFacade;
+import controlpresentacion.ControlPresentacionVenta;
+import dao.CarritoDAO;
+import dao.UsuarioDAO;
+import entidades.UsuarioEntidad;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,16 +27,15 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
 
         catalagoPedidoPanel = new CatalagoPedidoPanel();
         metodoPagoPanel = new MetodoPagoPanel();
-        tituloLabel = new TituloLabel("Confirmar detalles");
+        tituloLabel = new TituloLabel("Confirmar y pagar");
         totalPanel = new TotalPanel();
 
-        // Crear botón de confirmar pedido
         confirmarPedidoBtn = new Boton(
             "Confirmar Pedido",
-            200,
-            45,
-            16,
-            15,
+            180,
+            30,
+            14,
+            8,
             Color.WHITE,
             Estilos.COLOR_BOTON_MORADO,
             Estilos.COLOR_BOTON_MORADO_HOVER
@@ -42,38 +44,52 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
         inicializarPanelCentral();
         configurarEventos();
 
-        // Panel Norte
         panelNorte.add(tituloLabel);
 
-        // Panel Centro
         panelCentro.setLayout(new FlowLayout());
         panelCentro.add(catalagoPedidoPanel);
 
-        // Panel Oeste
         panelOeste.setLayout(new BoxLayout(panelOeste, BoxLayout.Y_AXIS));
         panelOeste.add(metodoPagoPanel);
         panelOeste.add(Box.createVerticalStrut(20));
 
-        // Centrar el botón
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnPanel.setOpaque(false);
         btnPanel.add(confirmarPedidoBtn);
-        btnPanel.setMaximumSize(new Dimension(300, 60));
-        panelOeste.add(btnPanel);
 
-        // Panel Este
-        panelEste.setLayout(new FlowLayout(FlowLayout.CENTER));
+        panelEste.setLayout(new BoxLayout(panelEste, BoxLayout.Y_AXIS));
+        panelEste.add(Box.createVerticalGlue());
         panelEste.add(totalPanel);
+        panelEste.add(Box.createVerticalStrut(20));
+        panelEste.add(btnPanel);
+        panelEste.add(Box.createVerticalGlue());
+    }
+
+    private String obtenerClienteIdDefecto() {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
+        if (usuario != null && usuario.getId() != null) {
+            return usuario.getId().toString();
+        }
+        throw new IllegalStateException("Usuario por defecto no encontrado");
     }
 
     private void configurarEventos() {
         confirmarPedidoBtn.addActionListener(e -> {
             try {
                 // Validar que hay productos en el carrito
-                IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
-                var configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
+                ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
+                var configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
 
-                if (configuraciones == null || configuraciones.isEmpty()) {
+                String clienteId = obtenerClienteIdDefecto();
+                entidades.CarritoEntidad carrito = new CarritoDAO().obtenerCarrito(clienteId);
+                java.util.List<java.util.Map<String, Object>> productosIndividuales =
+                    carrito.getProductos() != null ? carrito.getProductos() : new java.util.ArrayList<>();
+
+                boolean tieneConfiguraciones = configuraciones != null && !configuraciones.isEmpty();
+                boolean tieneProductos = !productosIndividuales.isEmpty();
+
+                if (!tieneConfiguraciones && !tieneProductos) {
                     JOptionPane.showMessageDialog(
                         this,
                         "No hay productos en el carrito para realizar el pedido.",
@@ -93,12 +109,12 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
                 );
 
                 if (confirmacion == JOptionPane.YES_OPTION) {
-                    // Crear método de pago (mock - por ahora tarjeta por defecto)
+                    // Crear metodo de pago (mock)
                     MetodoPagoDTO metodoPago = new MetodoPagoDTO();
                     metodoPago.setTipo(MetodoPagoDTO.Tipo.TARJETA);
 
                     // Confirmar el pedido
-                    String pedidoId = ventaFacade.confirmarPedidoConConfiguraciones(metodoPago);
+                    String pedidoId = controlVenta.confirmarPedido(metodoPago);
 
                     if (pedidoId != null) {
                         JOptionPane.showMessageDialog(

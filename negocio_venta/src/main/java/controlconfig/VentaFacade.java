@@ -261,6 +261,14 @@ public class VentaFacade implements IVentaFacade {
         }
     }
 
+    private String obtenerClienteIdDefecto() {
+        UsuarioEntidad usuario = obtenerOCrearUsuarioDefault();
+        if (usuario != null && usuario.getId() != null) {
+            return usuario.getId().toString();
+        }
+        throw new IllegalStateException("No se pudo obtener el cliente por defecto");
+    }
+
     /**
      * Busca un item en el carrito por ID de producto.
      */
@@ -306,7 +314,8 @@ public class VentaFacade implements IVentaFacade {
         List<entidades.ConfiguracionEntidad> configuraciones = new ArrayList<>();
 
         try {
-            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+            String clienteId = obtenerClienteIdDefecto();
+            entidades.CarritoEntidad carrito = new dao.CarritoDAO().obtenerCarrito(clienteId);
             dao.ConfiguracionDAO configuracionDAO = new dao.ConfiguracionDAO();
 
             if (carrito.getConfiguracionesIds() != null) {
@@ -327,7 +336,8 @@ public class VentaFacade implements IVentaFacade {
     @Override
     public boolean removerConfiguracionDelCarrito(String configuracionId) {
         try {
-            entidades.CarritoEntidad carrito = dao.CarritoDAO.getCarritoActual();
+            String clienteId = obtenerClienteIdDefecto();
+            entidades.CarritoEntidad carrito = new dao.CarritoDAO().obtenerCarrito(clienteId);
 
             if (carrito.getConfiguracionesIds() == null) {
                 return false;

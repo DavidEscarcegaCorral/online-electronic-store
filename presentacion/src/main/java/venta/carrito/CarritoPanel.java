@@ -3,7 +3,7 @@ package venta.carrito;
 import compartido.TotalPanel;
 import compartido.estilos.FontUtil;
 import compartido.PanelBase;
-import controlconfig.IVentaFacade;
+import controlpresentacion.ControlPresentacionVenta;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,8 +52,8 @@ public class CarritoPanel extends PanelBase {
             if (vaciarBtn != null) {
                 vaciarBtn.addActionListener(e -> {
                     try {
-                        IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
-                        ventaFacade.vaciarCarrito();
+                        ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
+                        controlVenta.vaciarCarrito();
 
                         tablaPanel.limpiar();
                         if (totalPanel != null) totalPanel.actualizarTotal();
