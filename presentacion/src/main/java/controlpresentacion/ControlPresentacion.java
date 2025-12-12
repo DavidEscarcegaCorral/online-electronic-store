@@ -2,16 +2,13 @@ package controlpresentacion;
 
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
-import fachada.ConfiguracionFacade;
-import fachada.IArmadoFacade;
-import fachada.ArmadoFacade;
+import controlconfig.FachadaControl;
 
 import java.util.List;
 
 public class ControlPresentacion implements IControlPresentacion {
 
-    private final ConfiguracionFacade configuracionFacade;
-    private final IArmadoFacade armadoFacade;
+    private final FachadaControl fachada;
 
     private String categoriaActual;
     private String marcaActual;
@@ -20,8 +17,7 @@ public class ControlPresentacion implements IControlPresentacion {
     private static ControlPresentacion instancia;
 
     private ControlPresentacion() {
-        this.configuracionFacade = ConfiguracionFacade.getInstance();
-        this.armadoFacade = ArmadoFacade.getInstance();
+        this.fachada = FachadaControl.getInstance();
     }
 
     public static synchronized ControlPresentacion getInstance() {
@@ -33,7 +29,7 @@ public class ControlPresentacion implements IControlPresentacion {
 
     @Override
     public List<String> obtenerCategorias() {
-        return configuracionFacade.obtenerCategorias();
+        return fachada.obtenerCategorias();
     }
 
     @Override
@@ -42,7 +38,7 @@ public class ControlPresentacion implements IControlPresentacion {
         this.marcaActual = null;
         this.componenteSeleccionado = null;
 
-        dto.ComponenteDTO seleccionado = armadoFacade.getComponenteSeleccionado(categoria);
+        dto.ComponenteDTO seleccionado = fachada.getComponenteSeleccionado(categoria);
         if (seleccionado != null) {
             this.marcaActual = seleccionado.getMarca();
             this.componenteSeleccionado = seleccionado;
@@ -54,7 +50,7 @@ public class ControlPresentacion implements IControlPresentacion {
         if (categoriaActual == null) {
             throw new IllegalStateException("Debe seleccionar una categoría primero");
         }
-        return configuracionFacade.obtenerMarcasPorCategoria(categoriaActual);
+        return fachada.obtenerMarcasPorCategoria(categoriaActual);
     }
 
     @Override
@@ -68,7 +64,7 @@ public class ControlPresentacion implements IControlPresentacion {
         if (categoriaActual == null || marcaActual == null) {
             return false;
         }
-        return configuracionFacade.hayProductosDisponibles(categoriaActual, marcaActual);
+        return fachada.hayProductosDisponibles(categoriaActual, marcaActual);
     }
 
     @Override
@@ -76,7 +72,7 @@ public class ControlPresentacion implements IControlPresentacion {
         if (categoriaActual == null || marcaActual == null) {
             throw new IllegalStateException("Debe seleccionar categoría y marca primero");
         }
-        return configuracionFacade.obtenerProductosPorCategoriaYMarca(categoriaActual, marcaActual);
+        return fachada.obtenerProductosPorCategoriaYMarca(categoriaActual, marcaActual);
     }
 
     @Override
@@ -95,7 +91,7 @@ public class ControlPresentacion implements IControlPresentacion {
             throw new IllegalStateException("No hay componente seleccionado");
         }
 
-        List<String> errores = armadoFacade.agregarComponente(componenteSeleccionado);
+        List<String> errores = fachada.agregarComponente(componenteSeleccionado);
 
         if (errores.isEmpty()) {
             this.categoriaActual = null;
@@ -108,12 +104,12 @@ public class ControlPresentacion implements IControlPresentacion {
 
     @Override
     public boolean puedeVolverAtras(String categoria) {
-        return armadoFacade.puedeVolverAtras(categoria);
+        return fachada.puedeVolverAtras(categoria);
     }
 
     @Override
     public void cambiarComponente(String categoria) {
-        armadoFacade.removerComponente(categoria);
+        fachada.removerComponente(categoria);
         this.categoriaActual = categoria;
         this.marcaActual = null;
         this.componenteSeleccionado = null;
@@ -121,17 +117,17 @@ public class ControlPresentacion implements IControlPresentacion {
 
     @Override
     public List<String> revalidarEnsamblaje() {
-        return armadoFacade.revalidarEnsamblaje();
+        return fachada.revalidarEnsamblaje();
     }
 
     @Override
     public EnsamblajeDTO getEnsamblajeActual() {
-        return armadoFacade.getEnsamblajeActual();
+        return fachada.getEnsamblajeActual();
     }
 
     @Override
     public void iniciarNuevoEnsamblaje() {
-        armadoFacade.iniciarNuevoEnsamblaje();
+        fachada.iniciarNuevoEnsamblaje();
         this.categoriaActual = null;
         this.marcaActual = null;
         this.componenteSeleccionado = null;

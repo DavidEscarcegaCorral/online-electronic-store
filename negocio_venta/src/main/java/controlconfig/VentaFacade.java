@@ -1,8 +1,7 @@
-package fachada;
+package controlconfig;
 
 import dao.*;
 import dto.CarritoDTO;
-import dto.EnsamblajeDTO;
 import dto.ItemCarritoDTO;
 import dto.MetodoPagoDTO;
 import entidades.PedidoEntidad;
@@ -280,8 +279,8 @@ public class VentaFacade implements IVentaFacade {
     public String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje) {
         System.out.println("VentaFacade: Delegando guardado y adición al carrito a VentaControl");
 
-        IConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
-        String configuracionId = configuracionFacade.guardarConfiguracion(ensamblaje);
+        controlconfig.IFachadaControl fachadaControl = controlconfig.FachadaControl.getInstance();
+        String configuracionId = fachadaControl.guardarConfiguracion(ensamblaje);
 
         if (configuracionId == null) {
             System.out.println("ERROR: No se pudo guardar la configuración");

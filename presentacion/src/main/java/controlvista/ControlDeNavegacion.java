@@ -13,8 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import dao.ProductoDAO;
-import fachada.ArmadoFacade;
-import fachada.IArmadoFacade;
+import controlconfig.FachadaControl;
 
 /**
  * Controlador principal de navegación entre pantallas y gestión del flujo de armado de PC.
@@ -198,8 +197,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                 return;
             }
 
-            IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-            List<String> errores = armadoFacade.agregarComponente(componente);
+            FachadaControl fachada = FachadaControl.getInstance();
+            List<String> errores = fachada.agregarComponente(componente);
 
             // Los errores no deberían ocurrir ya que el catálogo muestra solo productos compatibles
             // Pero los manejamos por si acaso
@@ -208,7 +207,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                 // No mostramos mensaje al usuario, ya que el catálogo debería prevenir esto
             }
 
-            armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
+            armarEquipoPantalla.updateResumen(fachada.getEnsamblajeActual());
             var btn = armarEquipoPantalla.getContinuarBtn();
             if (btn != null) btn.setEnabled(true);
         } catch (Exception ex) {
@@ -228,8 +227,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         }
 
         // Validar que hay suficientes productos para configuración básica
-        fachada.ConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
-        if (!configuracionFacade.tieneMinimoPorCategoria("Procesador", MINIMO_POR_CATEGORIA)) {
+        FachadaControl fachada = FachadaControl.getInstance();
+        if (!fachada.tieneMinimoPorCategoria("Procesador", MINIMO_POR_CATEGORIA)) {
             mostrarMensaje(
                 "No hay suficientes procesadores disponibles para la categoría seleccionada.",
                 "Inventario Insuficiente",
@@ -243,7 +242,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         // Validar componentes mínimos necesarios
         String[] componentesObligatorios = {"Procesador", "Tarjeta Madre", "RAM", "Gabinete", "Tarjeta de video", "Fuente de poder", "Disipador"};
         for (String componente : componentesObligatorios) {
-            if (!configuracionFacade.tieneMinimoPorCategoria(componente, MINIMO_POR_CATEGORIA)) {
+            if (!fachada.tieneMinimoPorCategoria(componente, MINIMO_POR_CATEGORIA)) {
                 mostrarMensaje(
                     "No hay suficientes productos de '" + componente + "' disponibles para armar una configuración básica.",
                     "Inventario Insuficiente",
@@ -286,8 +285,8 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         }
 
         // Validar que hay procesadores de esa marca en inventario para la categoría seleccionada
-        fachada.ConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
-        if (!configuracionFacade.tieneMarcaEnCategoria("Procesador", marca)) {
+        FachadaControl fachada = FachadaControl.getInstance();
+        if (!fachada.tieneMarcaEnCategoria("Procesador", marca)) {
             mostrarMensaje(
                 "No hay procesadores de la marca '" + marca + "' disponibles en inventario.",
                 "Marca no disponible",
@@ -308,15 +307,15 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private void configurarCallbacksGuardarConfiguracion() {
         Consumer<Void> guardarConfigHandler = v -> {
             try {
-                IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-                dto.EnsamblajeDTO ensamblaje = armadoFacade.getEnsamblajeActual();
+                FachadaControl fachada = FachadaControl.getInstance();
+                dto.EnsamblajeDTO ensamblaje = fachada.getEnsamblajeActual();
 
                 if (!validarEnsamblaje(ensamblaje)) {
                     mostrarMensaje(MENSAJE_CONFIG_VACIA + "guardar", "Configuración vacía", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
-                fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
                 String configuracionId = ventaFacade.agregarConfiguracionAlCarrito(ensamblaje);
 
                 if (configuracionId != null) {
@@ -336,15 +335,15 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private void configurarCallbacksAgregarAlCarrito() {
         Consumer<Void> agregarCarritoHandler = v -> {
             try {
-                IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-                dto.EnsamblajeDTO ensamblaje = armadoFacade.getEnsamblajeActual();
+                FachadaControl fachada = FachadaControl.getInstance();
+                dto.EnsamblajeDTO ensamblaje = fachada.getEnsamblajeActual();
 
                 if (!validarEnsamblaje(ensamblaje)) {
                     mostrarMensaje(MENSAJE_CONFIG_VACIA + "añadir al carrito", "Configuración vacía", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
-                fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
                 String configuracionId = ventaFacade.agregarConfiguracionAlCarrito(ensamblaje);
 
                 if (configuracionId != null) {
@@ -365,7 +364,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private void configurarCallbacksCarrito() {
         carritoPantalla.setOnRealizarPedido(() -> {
             try {
-                fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
                 java.util.List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
 
                 if (configuraciones == null || configuraciones.isEmpty()) {
@@ -446,7 +445,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     String productoId = idObj.toString();
                     String nombreProducto = (String) productoActual.getClass().getMethod("getNombre").invoke(productoActual);
 
-                    fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                    controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
                     boolean agregado = ventaFacade.agregarProductoAlCarrito(productoId, cantidad);
 
                     if (agregado) {
@@ -505,14 +504,14 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
         String[] pasos = armarEquipoPantalla.getListaPasosArmado();
         if (nuevoIndice < indiceActual && nuevoIndice >= INDICE_PROCESADOR) {
-            IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
+            FachadaControl fachada = FachadaControl.getInstance();
             String categoriaActual = pasos[nuevoIndice];
 
             // Remover componentes posteriores para evitar incompatibilidades
-            armadoFacade.removerComponentesPosteriores(categoriaActual);
+            fachada.removerComponentesPosteriores(categoriaActual);
 
             // Actualizar resumen después de limpiar
-            armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
+            armarEquipoPantalla.updateResumen(fachada.getEnsamblajeActual());
         }
 
         armarEquipoPantalla.mostrarMenusLaterales();
@@ -526,7 +525,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         controlpresentacion.ControlPresentacion cfg = controlpresentacion.ControlPresentacion.getInstance();
         String cfgCategoria = cfg.getCategoriaActual();
         String cfgMarca = cfg.getMarcaActual();
-        IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
+        FachadaControl fachada = FachadaControl.getInstance();
 
         if (nuevoIndice == 0) {
             armarEquipoPantalla.habilitarSoloCategorias();
@@ -546,7 +545,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             }
 
             if (PASOS_OBLIGATORIOS.contains(nuevoIndice)) {
-                contEnabled = (armadoFacade.getComponenteSeleccionado(pasoCat) != null) || armarEquipoPantalla.haySeleccionEnCatalogo(pasoCat);
+                contEnabled = (fachada.getComponenteSeleccionado(pasoCat) != null) || armarEquipoPantalla.haySeleccionEnCatalogo(pasoCat);
             } else {
                 contEnabled = true;
             }
@@ -555,8 +554,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         if (contBtn != null) contBtn.setEnabled(contEnabled);
 
         if (nuevoIndice >= 2 && nuevoIndice < pasos.length - 1) {
-            fachada.ConfiguracionFacade configuracionFacade = fachada.ConfiguracionFacade.getInstance();
-            boolean ok = configuracionFacade.tieneMinimoPorCategoria(pasos[nuevoIndice], MINIMO_POR_CATEGORIA);
+            boolean ok = fachada.tieneMinimoPorCategoria(pasos[nuevoIndice], MINIMO_POR_CATEGORIA);
             if (!ok) {
                 JOptionPane.showMessageDialog(framePrincipal,
                         "No hay suficientes productos disponibles en la categoría '" + pasos[nuevoIndice] + "' para continuar.",
@@ -569,7 +567,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
             // Validación especial para procesadores: verificar que haya productos de la marca seleccionada
             if (nuevoIndice == INDICE_PROCESADOR && marcaConfirmada && seleccionMarca != null) {
-                if (!configuracionFacade.tieneMarcaEnCategoria("Procesador", seleccionMarca)) {
+                if (!fachada.tieneMarcaEnCategoria("Procesador", seleccionMarca)) {
                     mostrarMensaje(
                         "No hay procesadores de la marca '" + seleccionMarca + "' disponibles en inventario.",
                         "Marca no disponible",
@@ -588,7 +586,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
         if (nuevoIndice == INDICE_RESUMEN) {
             try {
-                dto.EnsamblajeDTO ensamblaje = armadoFacade.getEnsamblajeActual();
+                dto.EnsamblajeDTO ensamblaje = fachada.getEnsamblajeActual();
                 armarEquipoPantalla.updateResumen(ensamblaje);
                 armarEquipoPantalla.mostrarMenuOpcionesEnLateral();
             } catch (Exception ex) {
@@ -670,9 +668,9 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     }
 
     private void limpiarConfiguracionActual() {
-        IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
-        armadoFacade.limpiarEnsamblaje();
-        armarEquipoPantalla.updateResumen(armadoFacade.getEnsamblajeActual());
+        FachadaControl fachada = FachadaControl.getInstance();
+        fachada.limpiarEnsamblaje();
+        armarEquipoPantalla.updateResumen(fachada.getEnsamblajeActual());
 
         controlpresentacion.ControlPresentacion.getInstance().seleccionarCategoria(null);
         controlpresentacion.ControlPresentacion.getInstance().seleccionarMarca(null);

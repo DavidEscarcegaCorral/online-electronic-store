@@ -16,7 +16,7 @@ import java.awt.*;
  * - Centro: BoxLayout con 4 paneles (nombre, precio, cantidad/botón, detalles)
  */
 public class ProductoPanel extends PanelBase {
-    private DetallesPanel detallesPanel;
+    private DetallesProductoPanel detallesProductoPanel;
     private TituloLabel tituloLabel;
 
     private JPanel p1;
@@ -104,14 +104,14 @@ public class ProductoPanel extends PanelBase {
         );
 
         // contenido p4
-        detallesPanel = new DetallesPanel();
+        detallesProductoPanel = new DetallesProductoPanel();
 
         p1.add(nombreProductoLbl);
         p2.add(precioProductoLbl);
         p3.add(lblCantidad);
         p3.add(spinnerCantidad);
         p3.add(btnAgregarCarrito);
-        p4.add(detallesPanel);
+        p4.add(detallesProductoPanel);
 
         panelCentro.add(p1);
         panelCentro.add(Box.createVerticalStrut(10));

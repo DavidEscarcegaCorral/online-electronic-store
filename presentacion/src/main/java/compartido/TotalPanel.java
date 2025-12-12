@@ -65,7 +65,7 @@ public class TotalPanel extends JPanel {
 
     public void actualizarTotal() {
         try {
-            fachada.IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+            controlconfig.IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
             double total = ventaFacade.calcularTotalCarrito();
             totalValueLabel.setText(String.format("$%,.2f", total));
             System.out.println("Total actualizado: $" + total);

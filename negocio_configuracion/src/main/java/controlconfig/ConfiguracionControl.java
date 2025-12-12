@@ -1,36 +1,51 @@
-package fachada;
+package controlconfig;
 
+import dao.ConfiguracionDAO;
 import dao.IProductoDAO;
 import dao.ProductoDAO;
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
+import entidades.ConfiguracionEntidad;
 import entidades.ProductoEntidad;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Implementación de la fachada para el subsistema de Configuración.
- * Gestiona el flujo secuencial de selección de componentes.
- */
-public class ConfiguracionFacade implements IConfiguracionFacade {
-    private static ConfiguracionFacade configInstancia;
+public class ConfiguracionControl implements IConfiguracionControl {
+    private static ConfiguracionControl instancia;
+    private final ConfiguracionDAO configuracionDAO;
     private final IProductoDAO productoDAO;
-    private final IArmadoFacade armadoFacade;
-    private final IConfiguracionControl configuracionControl;
 
-    private ConfiguracionFacade() {
+    private ConfiguracionControl() {
+        this.configuracionDAO = new ConfiguracionDAO();
         this.productoDAO = new ProductoDAO();
-        this.armadoFacade = ArmadoFacade.getInstance();
-        this.configuracionControl = ConfiguracionControl.getInstance();
     }
 
-    public static synchronized ConfiguracionFacade getInstance() {
-        if (configInstancia == null) {
-            configInstancia = new ConfiguracionFacade();
+    public static synchronized ConfiguracionControl getInstance() {
+        if (instancia == null) {
+            instancia = new ConfiguracionControl();
         }
-        return configInstancia;
+        return instancia;
+    }
+
+    @Override
+    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
+        if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
+            return null;
+        }
+
+        ConfiguracionEntidad cfg = convertirAEntidad(ensamblaje);
+        try {
+            configuracionDAO.guardar(cfg);
+            return cfg.getId().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -68,46 +83,6 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
         return !productoDAO.obtenerPorCategoriaYMarca(categoria, marca).isEmpty();
     }
 
-    /**
-     * Aplica una configuración completa: crea un nuevo ensamblaje en el ArmadoFacade
-     * y agrega cada componente presente en el EnsamblajeDTO. Se devuelven todos los
-     * errores encontrados durante la inserción (compatibilidad, etc.).
-     *
-     * @param ensamblaje Ensamblaje con componentes por categoría.
-     * @return Lista de errores encontrados; lista vacía si la configuración fue aplicada correctamente.
-     */
-    @Override
-    public List<String> aplicarConfiguracion(EnsamblajeDTO ensamblaje) {
-        List<String> errores = new ArrayList<>();
-
-        if (ensamblaje == null) {
-            errores.add("Ensamblaje nulo");
-            return errores;
-        }
-
-        // Reiniciamos el ensamblaje
-        armadoFacade.iniciarNuevoEnsamblaje();
-
-        // Agregamos cada componente del ensamblaje
-        for (ComponenteDTO componente : ensamblaje.obtenerTodosComponentes()) {
-            if (componente == null || componente.getCategoria() == null) {
-                errores.add("Componente o categoría nula en la configuración");
-                continue;
-            }
-
-            List<String> erroresComponente = armadoFacade.agregarComponente(componente);
-            for (String e : erroresComponente) {
-                errores.add(componente.getCategoria() + ": " + e);
-            }
-        }
-
-        // Revalidamos ensamblaje
-        List<String> revalidacion = armadoFacade.revalidarEnsamblaje();
-        errores.addAll(revalidacion);
-
-        return errores;
-    }
-
     @Override
     public boolean tieneMinimoPorCategoria(String categoria, int minimo) {
         if (categoria == null || minimo <= 0) return false;
@@ -122,15 +97,27 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
         return !productos.isEmpty();
     }
 
-    @Override
-    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
-        System.out.println("ConfiguracionFacade: Delegando guardado de configuración a ConfiguracionControl");
-        return configuracionControl.guardarConfiguracion(ensamblaje);
+    private ConfiguracionEntidad convertirAEntidad(EnsamblajeDTO ensamblajeDTO) {
+        ConfiguracionEntidad entidad = new ConfiguracionEntidad();
+        entidad.setNombre("Configuración " + LocalDateTime.now());
+
+        List<Map<String, Object>> componentesList = new ArrayList<>();
+        for (ComponenteDTO comp : ensamblajeDTO.obtenerTodosComponentes()) {
+            Map<String, Object> compMap = new HashMap<>();
+            compMap.put("categoria", comp.getCategoria());
+            compMap.put("id", comp.getId());
+            compMap.put("nombre", comp.getNombre());
+            compMap.put("precio", comp.getPrecio());
+            compMap.put("marca", comp.getMarca());
+            componentesList.add(compMap);
+        }
+
+        entidad.setComponentes(componentesList);
+        entidad.setPrecioTotal(ensamblajeDTO.getPrecioTotal());
+
+        return entidad;
     }
 
-    /**
-     * Convierte una entidad de producto a DTO.
-     */
     private ComponenteDTO convertirADTO(ProductoEntidad entidad) {
         ComponenteDTO dto = new ComponenteDTO();
         dto.setId(entidad.getId().toString());
@@ -158,3 +145,4 @@ public class ConfiguracionFacade implements IConfiguracionFacade {
         return dto;
     }
 }
+

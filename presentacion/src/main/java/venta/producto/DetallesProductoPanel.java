@@ -5,10 +5,10 @@ import compartido.estilos.Estilos;
 import javax.swing.*;
 import java.awt.*;
 
-public class DetallesPanel extends JPanel {
+public class DetallesProductoPanel extends JPanel {
     private JLabel detallesLabel;
 
-    public DetallesPanel() {
+    public DetallesProductoPanel() {
         setOpaque(false);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

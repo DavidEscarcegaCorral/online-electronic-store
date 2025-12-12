@@ -3,7 +3,7 @@ package venta.pedido;
 import compartido.cards.ProductoPedidoCard;
 import compartido.estilos.Estilos;
 import entidades.ConfiguracionEntidad;
-import fachada.IVentaFacade;
+import controlconfig.IVentaFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +30,7 @@ public class CatalagoPedidoPanel extends JPanel {
         totalGeneral = 0.0;
 
         try {
-            IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+            IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
             List<ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
 
             if (configuraciones == null || configuraciones.isEmpty()) {

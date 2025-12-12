@@ -1,4 +1,4 @@
-package fachada;
+package controlconfig;
 
 import dto.CarritoDTO;
 import dto.ItemCarritoDTO;

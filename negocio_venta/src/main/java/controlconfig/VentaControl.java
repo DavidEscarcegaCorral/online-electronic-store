@@ -1,4 +1,4 @@
-package fachada;
+package controlconfig;
 
 import dao.CarritoDAO;
 import dao.ConfiguracionDAO;

@@ -17,8 +17,8 @@ La aplicación utiliza una arquitectura en capas modular con los siguientes subs
 ### Módulos de Negocio
 - `dto_negocios` — DTOs (ComponenteDTO, EnsamblajeDTO, CarritoDTO, ItemCarritoDTO, ClienteDTO, etc.).
 - `objetos_negocio` — Lógica de negocio central.
-- `negocio_configuracion` — Subsistema que gestiona el flujo de configuración paso a paso y expone una fachada (`ConfiguracionFacade`).
-- `negocio_venta` — Subsistema de ventas y venta, con su fachada (`VentaFacade` o similar).
+- `negocio_configuracion` — Subsistema que gestiona el flujo de configuración paso a paso y expone una controlconfig (`ConfiguracionFacade`).
+- `negocio_venta` — Subsistema de ventas y venta, con su controlconfig (`VentaFacade` o similar).
 - `negocio_armarPC` — Validación de compatibilidad entre componentes y revalidación de ensamblaje (`ArmadoFacade`).
 
 ### Módulo de Presentación

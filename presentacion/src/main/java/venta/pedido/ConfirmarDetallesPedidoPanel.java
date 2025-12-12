@@ -6,7 +6,7 @@ import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
 import compartido.estilos.TituloLabel;
 import dto.MetodoPagoDTO;
-import fachada.IVentaFacade;
+import controlconfig.IVentaFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +70,7 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
         confirmarPedidoBtn.addActionListener(e -> {
             try {
                 // Validar que hay productos en el carrito
-                IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+                IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
                 var configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
 
                 if (configuraciones == null || configuraciones.isEmpty()) {

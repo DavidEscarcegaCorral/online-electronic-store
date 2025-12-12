@@ -119,9 +119,8 @@ public class DatabaseInitializer {
         MongoCollection<Document> carritosCol = database.getCollection("carritos");
 
         Document carrito = new Document();
-        carrito.append("clienteId", usuarioDefaultId.toString());
-        carrito.append("configuracionesIds", new ArrayList<>());
-        carrito.append("fechaActualizacion", new Date());
+        carrito.append("clienteId", usuarioDefaultId.toString())
+               .append("fechaActualizacion", new Date());
 
         carritosCol.insertOne(carrito);
         carritoDefaultId = carrito.getObjectId("_id");

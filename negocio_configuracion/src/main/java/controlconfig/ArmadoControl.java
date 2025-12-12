@@ -1,29 +1,67 @@
-package fachada;
+package controlconfig;
 
+import dao.ConfiguracionDAO;
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
+import entidades.ConfiguracionEntidad;
 import objetosNegocio.componenteON.ComponenteON;
 import objetosNegocio.componenteON.IComponenteON;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ArmadoFacade implements IArmadoFacade {
-    private static ArmadoFacade instancia;
+public class ArmadoControl implements IArmadoControl {
+    private static ArmadoControl instancia;
+    private final ConfiguracionDAO configuracionDAO;
+    private final IComponenteON componenteON;
+    private EnsamblajeDTO ensamblajeActual;
 
-    public static synchronized ArmadoFacade getInstance() {
+    private ArmadoControl() {
+        this.configuracionDAO = new ConfiguracionDAO();
+        this.componenteON = ComponenteON.getInstance();
+        this.ensamblajeActual = new EnsamblajeDTO();
+    }
+
+    public static synchronized ArmadoControl getInstance() {
         if (instancia == null) {
-            instancia = new ArmadoFacade();
+            instancia = new ArmadoControl();
         }
         return instancia;
     }
 
-    private final IComponenteON componenteON;
-    private EnsamblajeDTO ensamblajeActual;
+    @Override
+    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
+        if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
+            return null;
+        }
 
-    private ArmadoFacade() {
-        this.componenteON = ComponenteON.getInstance();
-        this.ensamblajeActual = new EnsamblajeDTO();
+        try {
+            ConfiguracionEntidad configuracion = new ConfiguracionEntidad();
+            configuracion.setNombre("Configuración " + LocalDateTime.now());
+
+            List<Map<String, Object>> componentesList = new ArrayList<>();
+            for (ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
+                Map<String, Object> compMap = new HashMap<>();
+                compMap.put("categoria", comp.getCategoria());
+                compMap.put("id", comp.getId());
+                compMap.put("nombre", comp.getNombre());
+                compMap.put("precio", comp.getPrecio());
+                compMap.put("marca", comp.getMarca());
+                componentesList.add(compMap);
+            }
+            configuracion.setComponentes(componentesList);
+            configuracion.setPrecioTotal(ensamblaje.getPrecioTotal());
+
+            configuracionDAO.guardar(configuracion);
+
+            return configuracion.getId().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -109,26 +147,15 @@ public class ArmadoFacade implements IArmadoFacade {
 
     @Override
     public boolean verificarStockSuficiente(String tipoUso) {
-        // Todas las categorías que conforman una configuración completa
         String[] categoriasCriticas = {
-            "Procesador",
-            "Tarjeta Madre",
-            "RAM",
-            "Tarjeta de video",
-            "Almacenamiento",
-            "Fuente de poder",
-            "Gabinete",
-            "Disipador",
-            "Ventilador",
-            "Monitor",
-            "Kit de teclado/raton",
-            "Redes e internet"
+            "Procesador", "Tarjeta Madre", "RAM", "Tarjeta de video",
+            "Almacenamiento", "Fuente de poder", "Gabinete", "Disipador",
+            "Ventilador", "Monitor", "Kit de teclado/raton", "Redes e internet"
         };
 
         for (String cat : categoriasCriticas) {
             List<ComponenteDTO> disponibles = obtenerComponentesCompatibles(cat, tipoUso);
             if (disponibles.isEmpty()) {
-                // La tarjeta de video es opcional para configuraciones de oficina
                 if (tipoUso.equalsIgnoreCase("OFFICE") && cat.equals("Tarjeta de video")) {
                     continue;
                 }
@@ -224,23 +251,12 @@ public class ArmadoFacade implements IArmadoFacade {
     public void removerComponentesPosteriores(String categoria) {
         if (this.ensamblajeActual == null) return;
 
-        // Orden de construcción de componentes
         String[] ordenConstruccion = {
-            "Procesador",
-            "Tarjeta Madre",
-            "RAM",
-            "Tarjeta de video",
-            "Almacenamiento",
-            "Fuente de poder",
-            "Gabinete",
-            "Disipador",
-            "Ventilador",
-            "Monitor",
-            "Kit de teclado/raton",
-            "Redes e internet"
+            "Procesador", "Tarjeta Madre", "RAM", "Tarjeta de video",
+            "Almacenamiento", "Fuente de poder", "Gabinete", "Disipador",
+            "Ventilador", "Monitor", "Kit de teclado/raton", "Redes e internet"
         };
 
-        // Encontrar el índice de la categoría actual
         int indiceCategoria = -1;
         for (int i = 0; i < ordenConstruccion.length; i++) {
             if (ordenConstruccion[i].equals(categoria)) {
@@ -249,12 +265,11 @@ public class ArmadoFacade implements IArmadoFacade {
             }
         }
 
-        // Si se encontró la categoría, remover todos los componentes posteriores
         if (indiceCategoria >= 0) {
             for (int i = indiceCategoria + 1; i < ordenConstruccion.length; i++) {
                 this.ensamblajeActual.removerComponente(ordenConstruccion[i]);
             }
         }
     }
-
 }
+

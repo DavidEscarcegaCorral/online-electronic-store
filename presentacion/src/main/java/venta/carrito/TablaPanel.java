@@ -4,7 +4,7 @@ import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
 import compartido.estilos.tabla.Tabla;
 import compartido.FramePrincipal;
-import fachada.IVentaFacade;
+import controlconfig.IVentaFacade;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -43,7 +43,7 @@ public class TablaPanel extends JPanel {
         model.setRowCount(0);
 
         try {
-            IVentaFacade ventaFacade = fachada.VentaFacade.getInstance();
+            IVentaFacade ventaFacade = controlconfig.VentaFacade.getInstance();
 
             List<entidades.ConfiguracionEntidad> configuraciones = ventaFacade.obtenerConfiguracionesEnCarrito();
             if (configuraciones != null && !configuraciones.isEmpty()) {

@@ -3,8 +3,7 @@ package armadoPC;
 import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
-import fachada.ArmadoFacade;
-import fachada.IArmadoFacade;
+import controlconfig.FachadaControl;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,10 +56,10 @@ public class CatalagoPanel extends JPanel {
         productoSeleccionado = null;
 
         try {
-            IArmadoFacade armadoFacade = ArmadoFacade.getInstance();
+            FachadaControl fachada = FachadaControl.getInstance();
 
             // Obtener productos compatibles con el ensamblaje actual
-            List<dto.ComponenteDTO> productosCompatibles = armadoFacade.obtenerComponentesCompatibles(nombreProducto, null);
+            List<dto.ComponenteDTO> productosCompatibles = fachada.obtenerComponentesCompatibles(nombreProducto, null);
 
             // Filtrar por marca si se especifica
             if (marca != null && !marca.isEmpty()) {
@@ -87,7 +86,7 @@ public class CatalagoPanel extends JPanel {
                 return;
             }
 
-            dto.ComponenteDTO seleccionadoDTO = armadoFacade.getComponenteSeleccionado(nombreProducto);
+            dto.ComponenteDTO seleccionadoDTO = fachada.getComponenteSeleccionado(nombreProducto);
             String seleccionadoId = seleccionadoDTO != null ? seleccionadoDTO.getId() : null;
 
             for (dto.ComponenteDTO componente : productosCompatibles) {

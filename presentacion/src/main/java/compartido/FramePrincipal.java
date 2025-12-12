@@ -69,7 +69,7 @@ public class FramePrincipal extends JFrame {
 
     public void actualizarUsuario() {
         try {
-            fachada.IVentaFacade venta = fachada.VentaFacade.getInstance();
+            controlconfig.IVentaFacade venta = controlconfig.VentaFacade.getInstance();
             entidades.UsuarioEntidad u = venta.getUsuarioActual();
             if (u != null) {
                 usuarioNombre = u.getNombre() != null ? u.getNombre() : "Usuario";

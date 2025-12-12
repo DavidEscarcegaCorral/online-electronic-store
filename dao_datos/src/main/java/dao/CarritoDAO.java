@@ -21,9 +21,8 @@ public class CarritoDAO {
     }
 
     public static CarritoEntidad getCarritoActual() {
-        System.out.println("=== GET CARRITO ACTUAL ===");
         if (carritoActual == null) {
-            System.out.println("Carrito actual es null, inicializando...");
+            System.out.println("Carrito actual null, inicializando...");
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
             if (usuario == null) {
@@ -61,7 +60,6 @@ public class CarritoDAO {
             System.out.println("Carrito ya existe en memoria - ID: " + carritoActual.getId() + ", ConfigsIDs: " +
                 (carritoActual.getConfiguracionesIds() != null ? carritoActual.getConfiguracionesIds().size() : 0));
         }
-        System.out.println("=== FIN GET CARRITO ACTUAL ===\n");
         return carritoActual;
     }
 
@@ -118,21 +116,32 @@ public class CarritoDAO {
         if (carrito.getId() == null) {
             Document doc = new Document();
             doc.append("clienteId", carrito.getClienteId())
-               .append("fechaActualizacion", fechaActualizacion)
-               .append("configuracionesIds", ids)
-               .append("productos", productos);
+               .append("fechaActualizacion", fechaActualizacion);
+
+            if (!ids.isEmpty()) {
+                doc.append("configuracionesIds", ids);
+            }
+            if (!productos.isEmpty()) {
+                doc.append("productos", productos);
+            }
 
             System.out.println("Insertando nuevo carrito...");
             System.out.println("Documento a insertar: " + doc.toJson());
             coleccion.insertOne(doc);
             carrito.setId(doc.getObjectId("_id"));
-            System.out.println("Carrito insertado con ID: " + carrito.getId());
         } else {
-            Document updateDoc = new Document("$set", new Document()
+            Document setDoc = new Document()
                .append("clienteId", carrito.getClienteId())
-               .append("fechaActualizacion", fechaActualizacion)
-               .append("configuracionesIds", ids)
-               .append("productos", productos));
+               .append("fechaActualizacion", fechaActualizacion);
+
+            if (!ids.isEmpty()) {
+                setDoc.append("configuracionesIds", ids);
+            }
+            if (!productos.isEmpty()) {
+                setDoc.append("productos", productos);
+            }
+
+            Document updateDoc = new Document("$set", setDoc);
 
             System.out.println("Actualizando carrito existente con $set...");
             System.out.println("Filtro: _id = " + carrito.getId());
@@ -152,9 +161,14 @@ public class CarritoDAO {
 
                 Document docReplace = new Document();
                 docReplace.append("clienteId", carrito.getClienteId())
-                   .append("fechaActualizacion", fechaActualizacion)
-                   .append("configuracionesIds", ids)
-                   .append("productos", productos);
+                   .append("fechaActualizacion", fechaActualizacion);
+
+                if (!ids.isEmpty()) {
+                    docReplace.append("configuracionesIds", ids);
+                }
+                if (!productos.isEmpty()) {
+                    docReplace.append("productos", productos);
+                }
 
                 var resultReplace = coleccion.replaceOne(
                     new Document("_id", carrito.getId()),
@@ -167,22 +181,15 @@ public class CarritoDAO {
         if (carritoActual != null && carritoActual.getId() != null &&
             carritoActual.getId().equals(carrito.getId())) {
             carritoActual = carrito;
-            System.out.println("Variable estática actualizada con el carrito guardado");
         }
-
-        System.out.println("Carrito guardado\n");
     }
 
     public CarritoEntidad obtenerPorClienteId(String clienteId) {
-        System.out.println("Buscando carrito en BD por clienteId: " + clienteId);
         Document doc = coleccion.find(Filters.eq("clienteId", clienteId)).first();
 
         if (doc == null) {
-            System.out.println("No se encontró carrito en BD para clienteId: " + clienteId);
             return null;
         }
-
-        System.out.println("Carrito encontrado en BD: " + doc.toJson());
 
         CarritoEntidad carrito = new CarritoEntidad();
         carrito.setId(doc.getObjectId("_id"));
@@ -191,9 +198,6 @@ public class CarritoDAO {
         List<ObjectId> ids = (List<ObjectId>) doc.get("configuracionesIds");
         if (ids != null) {
             carrito.setConfiguracionesIds(ids);
-            System.out.println("ConfiguracionesIds cargados: " + ids.size() + " configuraciones");
-        } else {
-            System.out.println("ConfiguracionesIds es null en BD");
         }
 
         List<Document> productosDoc = (List<Document>) doc.get("productos");
@@ -206,11 +210,7 @@ public class CarritoDAO {
                 productos.add(prod);
             }
             carrito.setProductos(productos);
-            System.out.println("Productos cargados: " + productos.size() + " productos");
-        } else {
-            System.out.println("Productos es null en BD");
         }
-
         return carrito;
     }
 }
