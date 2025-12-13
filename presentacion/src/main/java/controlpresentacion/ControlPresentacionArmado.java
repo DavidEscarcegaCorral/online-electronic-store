@@ -1,30 +1,29 @@
 package controlpresentacion;
 
+import ensamblajecontrol.ConfiguracionFacade;
+import ensamblajecontrol.IEnsamblajeControl;
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
-import controlconfig.FachadaControl;
 
 import java.util.List;
 
-public class ControlPresentacion implements IControlPresentacion {
+/**
+ * Implementación del control de presentación para el flujo de armado de PC.
+ *
+ * IMPORTANTE: Esta clase NO debe ser Singleton.
+ * Cada instancia de la vista debe tener su propia instancia del controlador
+ * para evitar conflictos de estado entre múltiples usuarios/sesiones.
+ */
+public class ControlPresentacionArmado implements IControlPresentacionArmado {
 
-    private final FachadaControl fachada;
+    private final IEnsamblajeControl fachada;
 
     private String categoriaActual;
     private String marcaActual;
     private ComponenteDTO componenteSeleccionado;
 
-    private static ControlPresentacion instancia;
-
-    private ControlPresentacion() {
-        this.fachada = FachadaControl.getInstance();
-    }
-
-    public static synchronized ControlPresentacion getInstance() {
-        if (instancia == null) {
-            instancia = new ControlPresentacion();
-        }
-        return instancia;
+    public ControlPresentacionArmado() {
+        this.fachada = new ConfiguracionFacade();
     }
 
     @Override
@@ -38,7 +37,7 @@ public class ControlPresentacion implements IControlPresentacion {
         this.marcaActual = null;
         this.componenteSeleccionado = null;
 
-        dto.ComponenteDTO seleccionado = fachada.getComponenteSeleccionado(categoria);
+        ComponenteDTO seleccionado = fachada.getComponenteSeleccionado(categoria);
         if (seleccionado != null) {
             this.marcaActual = seleccionado.getMarca();
             this.componenteSeleccionado = seleccionado;
@@ -147,5 +146,40 @@ public class ControlPresentacion implements IControlPresentacion {
     public ComponenteDTO getComponenteSeleccionado() {
         return componenteSeleccionado;
     }
-}
 
+    @Override
+    public boolean tieneMinimoPorCategoria(String categoria, int minimo) {
+        return fachada.tieneMinimoPorCategoria(categoria, minimo);
+    }
+
+    @Override
+    public boolean tieneMarcaEnCategoria(String categoria, String marca) {
+        return fachada.tieneMarcaEnCategoria(categoria, marca);
+    }
+
+    @Override
+    public void removerComponentesPosteriores(String categoria) {
+        fachada.removerComponentesPosteriores(categoria);
+        this.categoriaActual = null;
+        this.marcaActual = null;
+        this.componenteSeleccionado = null;
+    }
+
+    @Override
+    public void limpiarEnsamblaje() {
+        fachada.limpiarEnsamblaje();
+        this.categoriaActual = null;
+        this.marcaActual = null;
+        this.componenteSeleccionado = null;
+    }
+
+    @Override
+    public ComponenteDTO getComponenteSeleccionado(String categoria) {
+        return fachada.getComponenteSeleccionado(categoria);
+    }
+
+    @Override
+    public ComponenteDTO convertirProductoADTO(String productoId) {
+        return fachada.convertirProductoADTO(productoId);
+    }
+}

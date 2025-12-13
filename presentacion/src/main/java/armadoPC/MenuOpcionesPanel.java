@@ -241,9 +241,6 @@ public class MenuOpcionesPanel extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE
             );
 
-            if (onGuardarConfiguracion != null) {
-                onGuardarConfiguracion.accept(null);
-            }
 
         } catch (Exception e) {
             logger.error("Error al guardar configuración", e);

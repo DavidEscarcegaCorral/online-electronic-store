@@ -113,6 +113,13 @@ public class ArmarPcPanel extends PanelBase {
                 Estilos.COLOR_BACKGROUND, Estilos.COLOR_ATRAS_BOTON_HOOVER);
 
         inicializarCards();
+        inicializarPanalesLaterales();
+    }
+
+    private void inicializarPanalesLaterales() {
+        panelOeste.add(menuComponentesPanel);
+        panelEste.add(sideMenuResumenPanel);
+        menuOpcionesPanel.setVisible(false);
     }
 
     private void inicializarCards() {
@@ -209,31 +216,42 @@ public class ArmarPcPanel extends PanelBase {
         };
     }
 
+    /**
+     * Muestra los menús laterales por defecto durante el proceso de armado.
+     * Panel Oeste: Menú de componentes (siempre visible)
+     * Panel Este: Resumen de la configuración
+     */
     public void mostrarMenusLaterales() {
-        mostrarEnPanelLateral(menuComponentesPanel, sideMenuResumenPanel);
+        menuComponentesPanel.setVisible(true);
+        sideMenuResumenPanel.setVisible(true);
+        menuOpcionesPanel.setVisible(false);
     }
 
+    /**
+     * Muestra las opciones finales (Guardar/Agregar al carrito) en el panel este.
+     * Panel Oeste: Menú de componentes (permanece visible)
+     * Panel Este: Opciones de acción
+     */
     public void mostrarMenuOpcionesEnLateral() {
-        mostrarEnPanelLateral(null, menuOpcionesPanel);
+        sideMenuResumenPanel.setVisible(false);
+
+        if (menuOpcionesPanel.getParent() != panelEste) {
+            panelEste.add(menuOpcionesPanel);
+        }
+        menuOpcionesPanel.setVisible(true);
+
+        panelEste.revalidate();
+        panelEste.repaint();
     }
 
+    /**
+     * Muestra solo el resumen en el panel este.
+     * Panel Oeste: Menú de componentes (permanece visible)
+     * Panel Este: Resumen de la configuración
+     */
     public void mostrarResumenEnLateral() {
-        mostrarEnPanelLateral(null, sideMenuResumenPanel);
-    }
-
-    private void mostrarEnPanelLateral(JComponent oeste, JComponent este) {
-        if (oeste != null) {
-            panelOeste.removeAll();
-            panelOeste.add(oeste);
-            panelOeste.revalidate();
-            panelOeste.repaint();
-        }
-        if (este != null) {
-            panelEste.removeAll();
-            panelEste.add(este);
-            panelEste.revalidate();
-            panelEste.repaint();
-        }
+        sideMenuResumenPanel.setVisible(true);
+        menuOpcionesPanel.setVisible(false);
     }
 
     public int getPasoActual() {

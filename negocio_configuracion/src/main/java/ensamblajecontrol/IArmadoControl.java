@@ -1,11 +1,11 @@
-package controlconfig;
+package ensamblajecontrol;
 
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
 import java.util.List;
 
 public interface IArmadoControl {
-    String guardarConfiguracion(EnsamblajeDTO ensamblaje);
+    String guardarConfiguracion(EnsamblajeDTO ensamblaje, String usuarioId);
 
     EnsamblajeDTO iniciarNuevoEnsamblaje();
 

@@ -1,29 +1,25 @@
-package controlconfig;
+package ensamblajecontrol;
 
 import dto.EnsamblajeDTO;
 import dto.ComponenteDTO;
 import java.util.List;
 
-public class FachadaControl implements IFachadaControl {
-    private static FachadaControl instancia;
+public class ConfiguracionFacade implements IEnsamblajeControl {
     private final IArmadoControl armadoControl;
     private final IConfiguracionControl configuracionControl;
 
-    private FachadaControl() {
-        this.armadoControl = ArmadoControl.getInstance();
-        this.configuracionControl = ConfiguracionControl.getInstance();
+    public ConfiguracionFacade() {
+        this.armadoControl = new ArmadoControl();
+        this.configuracionControl = new ConfiguracionControl();
     }
 
-    public static synchronized FachadaControl getInstance() {
-        if (instancia == null) {
-            instancia = new FachadaControl();
-        }
-        return instancia;
+    public static ConfiguracionFacade getInstance() {
+        return new ConfiguracionFacade();
     }
 
     @Override
-    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
-        return armadoControl.guardarConfiguracion(ensamblaje);
+    public String guardarConfiguracion(EnsamblajeDTO ensamblaje, String usuarioId) {
+        return armadoControl.guardarConfiguracion(ensamblaje, usuarioId);
     }
 
     @Override
@@ -114,6 +110,11 @@ public class FachadaControl implements IFachadaControl {
     @Override
     public boolean hayProductosDisponibles(String categoria, String marca) {
         return configuracionControl.hayProductosDisponibles(categoria, marca);
+    }
+
+    @Override
+    public ComponenteDTO convertirProductoADTO(String productoId) {
+        return configuracionControl.convertirProductoADTO(productoId);
     }
 }
 

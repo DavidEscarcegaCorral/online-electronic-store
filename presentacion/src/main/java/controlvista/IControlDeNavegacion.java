@@ -1,6 +1,5 @@
 package controlvista;
 
-import javax.swing.JPanel;
 
 /**
  * Interfaz para el controlador principal de navegación entre pantallas.
@@ -10,24 +9,31 @@ import javax.swing.JPanel;
 public interface IControlDeNavegacion {
 
     /**
-     * Obtiene el panel actual de la pantalla activa.
-     * @return El JPanel que representa la pantalla actual.
+     * Navega a la pantalla del Menú Principal (Home).
      */
-    JPanel getPanelActual();
+    void mostrarMenuPrincipal();
 
     /**
-     * Navega a un índice de paso específico en el flujo de armado.
-     * @param indice El índice del paso al que navegar.
+     * Inicia el flujo de Armado de PC (Wizard).
+     * Debe resetear el estado del ensamblaje si es necesario.
      */
-    void navegarAIndice(int indice);
+    void mostrarArmarPc();
 
     /**
-     * Avanza al siguiente paso en el flujo de armado.
+     * Navega a la pantalla del Carrito de Compras.
+     * Debe forzar la actualización de datos del carrito.
      */
-    void avanzarPaso();
+    void mostrarCarrito();
 
     /**
-     * Retrocede al paso anterior en el flujo de armado.
+     * Muestra el detalle de un producto específico.
+     * @param productoId El ID del producto a mostrar.
      */
-    void retrocederPaso();
+    void mostrarProducto(String productoId);
+
+    /**
+     * Muestra el detalle de un producto usando su objeto de transferencia.
+     * @param productoDTO El objeto DTO del producto.
+     */
+    void mostrarProducto(Object productoDTO);
 }

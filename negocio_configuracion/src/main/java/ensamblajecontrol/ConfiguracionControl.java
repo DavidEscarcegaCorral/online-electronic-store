@@ -1,4 +1,4 @@
-package controlconfig;
+package ensamblajecontrol;
 
 import dao.ConfiguracionDAO;
 import dao.IProductoDAO;
@@ -16,29 +16,26 @@ import java.util.List;
 import java.util.Map;
 
 public class ConfiguracionControl implements IConfiguracionControl {
-    private static ConfiguracionControl instancia;
     private final ConfiguracionDAO configuracionDAO;
     private final IProductoDAO productoDAO;
 
-    private ConfiguracionControl() {
+    public ConfiguracionControl() {
         this.configuracionDAO = new ConfiguracionDAO();
         this.productoDAO = new ProductoDAO();
     }
 
-    public static synchronized ConfiguracionControl getInstance() {
-        if (instancia == null) {
-            instancia = new ConfiguracionControl();
-        }
-        return instancia;
-    }
 
     @Override
-    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
+    public String guardarConfiguracion(EnsamblajeDTO ensamblaje, String usuarioId) {
         if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
             return null;
         }
 
-        ConfiguracionEntidad cfg = convertirAEntidad(ensamblaje);
+        if (usuarioId == null || usuarioId.trim().isEmpty()) {
+            return null;
+        }
+
+        ConfiguracionEntidad cfg = convertirAEntidad(ensamblaje, usuarioId);
         try {
             configuracionDAO.guardar(cfg);
             return cfg.getId().toString();
@@ -97,9 +94,10 @@ public class ConfiguracionControl implements IConfiguracionControl {
         return !productos.isEmpty();
     }
 
-    private ConfiguracionEntidad convertirAEntidad(EnsamblajeDTO ensamblajeDTO) {
+    private ConfiguracionEntidad convertirAEntidad(EnsamblajeDTO ensamblajeDTO, String usuarioId) {
         ConfiguracionEntidad entidad = new ConfiguracionEntidad();
         entidad.setNombre("Configuración " + LocalDateTime.now());
+        entidad.setUsuarioId(usuarioId);
 
         List<Map<String, Object>> componentesList = new ArrayList<>();
         for (ComponenteDTO comp : ensamblajeDTO.obtenerTodosComponentes()) {
@@ -116,6 +114,24 @@ public class ConfiguracionControl implements IConfiguracionControl {
         entidad.setPrecioTotal(ensamblajeDTO.getPrecioTotal());
 
         return entidad;
+    }
+
+    @Override
+    public ComponenteDTO convertirProductoADTO(String productoId) {
+        if (productoId == null || productoId.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
+            if (producto == null) {
+                return null;
+            }
+            return convertirADTO(producto);
+        } catch (Exception e) {
+            System.err.println("Error al convertir producto a DTO: " + e.getMessage());
+            return null;
+        }
     }
 
     private ComponenteDTO convertirADTO(ProductoEntidad entidad) {

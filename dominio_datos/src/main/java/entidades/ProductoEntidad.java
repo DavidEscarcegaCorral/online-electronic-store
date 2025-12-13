@@ -2,17 +2,20 @@ package entidades;
 
 import org.bson.types.ObjectId;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
  * Entidad que representa un producto en MongoDB.
+ *
+ * NOTA: Usa BigDecimal para el precio (evita problemas de precisión de Double).
  */
 public class ProductoEntidad {
     private ObjectId id;
     private String nombre;
     private String categoria;
     private String marca;
-    private Double precio;
+    private BigDecimal precio;
     private Integer stock;
     private Map<String, String> especificaciones;
     private String descripcion;
@@ -53,11 +56,11 @@ public class ProductoEntidad {
         this.marca = marca;
     }
 
-    public Double getPrecio() {
+    public BigDecimal getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
 

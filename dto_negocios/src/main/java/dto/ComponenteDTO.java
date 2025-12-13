@@ -16,6 +16,8 @@ public class ComponenteDTO {
     private int stock;
     private String descripcion;
     private String imagenUrl;
+    private String usoRecomendado;
+    private String gama;
 
     public ComponenteDTO() {
     }
@@ -114,5 +116,21 @@ public class ComponenteDTO {
 
     public void setImagenUrl(String imagenUrl) {
         this.imagenUrl = imagenUrl;
+    }
+
+    public String getUsoRecomendado() {
+        return usoRecomendado;
+    }
+
+    public void setUsoRecomendado(String usoRecomendado) {
+        this.usoRecomendado = usoRecomendado;
+    }
+
+    public String getGama() {
+        return gama;
+    }
+
+    public void setGama(String gama) {
+        this.gama = gama;
     }
 }

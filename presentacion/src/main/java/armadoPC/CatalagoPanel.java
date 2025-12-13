@@ -3,7 +3,7 @@ package armadoPC;
 import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
-import controlconfig.FachadaControl;
+import ensamblajecontrol.ConfiguracionFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class CatalagoPanel extends JPanel {
         productoSeleccionado = null;
 
         try {
-            FachadaControl fachada = FachadaControl.getInstance();
+            ConfiguracionFacade fachada = ConfiguracionFacade.getInstance();
 
             // Obtener productos compatibles con el ensamblaje actual
             List<dto.ComponenteDTO> productosCompatibles = fachada.obtenerComponentesCompatibles(nombreProducto, null);

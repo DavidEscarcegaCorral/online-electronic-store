@@ -2,21 +2,37 @@ package entidades;
 
 import org.bson.types.ObjectId;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * Entidad que representa un pedido en MongoDB.
+ *
+ * NOTA: Usa BigDecimal para el total (evita problemas de precisión de Double).
+ * NOTA: Usa LocalDateTime para fechaCreacion (API moderna de Java 8+).
+ * NOTA: Usa EstadoPedido enum para el estado (evita errores de tipeo).
  */
 public class PedidoEntidad {
     private ObjectId id;
     private String clienteId;
     private List<ItemPedido> items;
-    private Double total;
-    private String estado;
-    private Date fechaCreacion;
+    private BigDecimal total;
+    private EstadoPedido estado;
+    private LocalDateTime fechaCreacion;
     private MetodoPagoInfo metodoPago;
     private DireccionEntrega direccionEntrega;
+
+    /**
+     * Estados posibles de un pedido.
+     */
+    public enum EstadoPedido {
+        PENDIENTE,      // Pedido creado pero no procesado
+        PROCESANDO,     // Pedido en proceso de preparación
+        ENVIADO,        // Pedido enviado al cliente
+        ENTREGADO,      // Pedido entregado exitosamente
+        CANCELADO       // Pedido cancelado por el cliente o sistema
+    }
 
     public PedidoEntidad() {
     }
@@ -45,27 +61,27 @@ public class PedidoEntidad {
         this.items = items;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
-    public String getEstado() {
+    public EstadoPedido getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoPedido estado) {
         this.estado = estado;
     }
 
-    public Date getFechaCreacion() {
+    public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(Date fechaCreacion) {
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
@@ -85,11 +101,14 @@ public class PedidoEntidad {
         this.direccionEntrega = direccionEntrega;
     }
 
+    /**
+     * Representa un item individual dentro del pedido.
+     */
     public static class ItemPedido {
         private String productoId;
         private String nombre;
         private Integer cantidad;
-        private Double precioUnitario;
+        private BigDecimal precioUnitario;
 
         public String getProductoId() {
             return productoId;
@@ -115,15 +134,18 @@ public class PedidoEntidad {
             this.cantidad = cantidad;
         }
 
-        public Double getPrecioUnitario() {
+        public BigDecimal getPrecioUnitario() {
             return precioUnitario;
         }
 
-        public void setPrecioUnitario(Double precioUnitario) {
+        public void setPrecioUnitario(BigDecimal precioUnitario) {
             this.precioUnitario = precioUnitario;
         }
     }
 
+    /**
+     * Información del método de pago utilizado en el pedido.
+     */
     public static class MetodoPagoInfo {
         private String tipo;
         private String detalles;
@@ -145,6 +167,9 @@ public class PedidoEntidad {
         }
     }
 
+    /**
+     * Dirección de entrega del pedido.
+     */
     public static class DireccionEntrega {
         private String calle;
         private String ciudad;

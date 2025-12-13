@@ -8,8 +8,6 @@ import javax.swing.*;
 public class MainPresentacion {
     public static void main(String[] args) {
         System.out.println("     ONLINE ELECTRONIC STORE HIGHSPECS - INICIANDO    ");
-
-        // Inicializar la base de datos PRIMERO, antes de cualquier cosa de Swing
         System.out.println("Inicializando base de datos...");
         boolean bdInicializada = DatabaseInitializer.ejecutarInicializacion();
 
@@ -23,7 +21,6 @@ public class MainPresentacion {
         System.out.println("Base de datos lista");
         System.out.println("\nIniciando aplicacion...\n");
 
-        // Ahora sí, iniciar la interfaz gráfica
         try {
             FramePrincipal framePrincipal = new FramePrincipal();
             ControlDeNavegacion controlDeNavegacion = new ControlDeNavegacion(framePrincipal);

@@ -2,7 +2,7 @@ package venta.pedido;
 
 import compartido.cards.ProductoPedidoCard;
 import compartido.estilos.Estilos;
-import entidades.ConfiguracionEntidad;
+import dto.ConfiguracionDTO;
 import controlpresentacion.ControlPresentacionVenta;
 import dao.CarritoDAO;
 import dao.UsuarioDAO;
@@ -43,7 +43,7 @@ public class CatalagoPedidoPanel extends JPanel {
 
         try {
             ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
-            List<ConfiguracionEntidad> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
+            List<ConfiguracionDTO> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
 
             String clienteId = obtenerClienteIdDefecto();
             entidades.CarritoEntidad carrito = new CarritoDAO().obtenerCarrito(clienteId);
@@ -61,7 +61,7 @@ public class CatalagoPedidoPanel extends JPanel {
             } else {
                 // Cargar configuraciones (componentes individuales de cada configuración)
                 if (tieneConfiguraciones) {
-                    for (ConfiguracionEntidad config : configuraciones) {
+                    for (ConfiguracionDTO config : configuraciones) {
                         if (config.getComponentes() != null && !config.getComponentes().isEmpty()) {
                             for (Map<String, Object> componente : config.getComponentes()) {
                                 ProductoPedidoCard card = crearProductoPedidoCard(componente);

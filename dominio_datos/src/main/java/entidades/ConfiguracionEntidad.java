@@ -2,16 +2,23 @@ package entidades;
 
 import org.bson.types.ObjectId;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Entidad que representa una configuración guardada en MongoDB.
+ *
+ * NOTA: Usa BigDecimal para precioTotal (evita problemas de precisión de Double).
+ * NOTA: Usa LocalDateTime para fechaCreacion (API moderna de Java 8+).
+ */
 public class ConfiguracionEntidad {
     private ObjectId id;
     private String usuarioId;
     private String nombre;
     private List<Map<String, Object>> componentes;
-    private Double precioTotal;
+    private BigDecimal precioTotal;
     private LocalDateTime fechaCreacion;
 
     public ConfiguracionEntidad() {
@@ -50,11 +57,11 @@ public class ConfiguracionEntidad {
         this.componentes = componentes;
     }
 
-    public Double getPrecioTotal() {
+    public BigDecimal getPrecioTotal() {
         return precioTotal;
     }
 
-    public void setPrecioTotal(Double precioTotal) {
+    public void setPrecioTotal(BigDecimal precioTotal) {
         this.precioTotal = precioTotal;
     }
 

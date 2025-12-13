@@ -1,4 +1,4 @@
-package controlconfig;
+package ensamblajecontrol;
 
 import dao.ConfiguracionDAO;
 import dto.ComponenteDTO;
@@ -14,33 +14,31 @@ import java.util.List;
 import java.util.Map;
 
 public class ArmadoControl implements IArmadoControl {
-    private static ArmadoControl instancia;
     private final ConfiguracionDAO configuracionDAO;
     private final IComponenteON componenteON;
     private EnsamblajeDTO ensamblajeActual;
 
-    private ArmadoControl() {
+    public ArmadoControl() {
         this.configuracionDAO = new ConfiguracionDAO();
         this.componenteON = ComponenteON.getInstance();
         this.ensamblajeActual = new EnsamblajeDTO();
     }
 
-    public static synchronized ArmadoControl getInstance() {
-        if (instancia == null) {
-            instancia = new ArmadoControl();
-        }
-        return instancia;
-    }
 
     @Override
-    public String guardarConfiguracion(EnsamblajeDTO ensamblaje) {
+    public String guardarConfiguracion(EnsamblajeDTO ensamblaje, String usuarioId) {
         if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
+            return null;
+        }
+
+        if (usuarioId == null || usuarioId.trim().isEmpty()) {
             return null;
         }
 
         try {
             ConfiguracionEntidad configuracion = new ConfiguracionEntidad();
             configuracion.setNombre("Configuración " + LocalDateTime.now());
+            configuracion.setUsuarioId(usuarioId);
 
             List<Map<String, Object>> componentesList = new ArrayList<>();
             for (ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
@@ -56,6 +54,8 @@ public class ArmadoControl implements IArmadoControl {
             configuracion.setPrecioTotal(ensamblaje.getPrecioTotal());
 
             configuracionDAO.guardar(configuracion);
+
+            limpiarEnsamblaje();
 
             return configuracion.getId().toString();
         } catch (Exception e) {
@@ -147,22 +147,43 @@ public class ArmadoControl implements IArmadoControl {
 
     @Override
     public boolean verificarStockSuficiente(String tipoUso) {
-        String[] categoriasCriticas = {
-            "Procesador", "Tarjeta Madre", "RAM", "Tarjeta de video",
-            "Almacenamiento", "Fuente de poder", "Gabinete", "Disipador",
-            "Ventilador", "Monitor", "Kit de teclado/raton", "Redes e internet"
-        };
+        List<String> categoriasCriticas = obtenerCategoriasCriticas(tipoUso);
 
         for (String cat : categoriasCriticas) {
             List<ComponenteDTO> disponibles = obtenerComponentesCompatibles(cat, tipoUso);
             if (disponibles.isEmpty()) {
-                if (tipoUso.equalsIgnoreCase("OFFICE") && cat.equals("Tarjeta de video")) {
-                    continue;
-                }
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Obtiene las categorías críticas según el tipo de uso.
+     *
+     * Categorías críticas (obligatorias):
+     * - Gaming/Diseño/Custom: Procesador, Tarjeta Madre, RAM, Tarjeta de video, Almacenamiento, Fuente de poder, Gabinete, Disipador
+     * - Office: Procesador, Tarjeta Madre, RAM, Almacenamiento, Fuente de poder, Gabinete, Disipador (SIN Tarjeta de video)
+     *
+     * Categorías opcionales (para todos): Ventilador, Monitor, Kit de teclado/ratón, Redes e internet
+     */
+    private List<String> obtenerCategoriasCriticas(String tipoUso) {
+        List<String> categoriasCriticas = new ArrayList<>();
+
+        categoriasCriticas.add("Procesador");
+        categoriasCriticas.add("Tarjeta Madre");
+        categoriasCriticas.add("RAM");
+
+        if (!tipoUso.equalsIgnoreCase("OFFICE")) {
+            categoriasCriticas.add("Tarjeta de video");
+        }
+
+        categoriasCriticas.add("Almacenamiento");
+        categoriasCriticas.add("Fuente de poder");
+        categoriasCriticas.add("Gabinete");
+        categoriasCriticas.add("Disipador");
+
+        return categoriasCriticas;
     }
 
     @Override
@@ -176,31 +197,43 @@ public class ArmadoControl implements IArmadoControl {
             }
         }
 
-        if (tipoUso != null) {
-            compatibles = filtrarPorUso(compatibles, tipoUso);
+        if (tipoUso != null && !tipoUso.isEmpty()) {
+            compatibles = filtrarPorUsoDesdeComponente(compatibles, tipoUso);
         }
 
         return compatibles;
     }
 
-    private List<ComponenteDTO> filtrarPorUso(List<ComponenteDTO> componentes, String tipoUso) {
+    private List<ComponenteDTO> filtrarPorUsoDesdeComponente(List<ComponenteDTO> componentes, String tipoUso) {
         List<ComponenteDTO> filtrados = new ArrayList<>();
         for (ComponenteDTO c : componentes) {
-            boolean apto = true;
-            if (tipoUso.equalsIgnoreCase("OFFICE")) {
-                if (c.getNombre().toUpperCase().contains("RTX 3090") || c.getNombre().toUpperCase().contains("I9")) {
-                    apto = false;
-                }
-            } else if (tipoUso.equalsIgnoreCase("GAMER")) {
-                if (c.getNombre().toUpperCase().contains("CELERON") || c.getNombre().toUpperCase().contains("GT 710")) {
-                    apto = false;
-                }
-            }
-            if (apto) {
+            if (esAptoPara(c, tipoUso)) {
                 filtrados.add(c);
             }
         }
         return filtrados;
+    }
+
+    private boolean esAptoPara(ComponenteDTO componente, String tipoUso) {
+        String usoRecomendado = componente.getUsoRecomendado();
+        String gama = componente.getGama();
+
+        if (usoRecomendado == null || gama == null) {
+            return true;
+        }
+
+        if (tipoUso.equalsIgnoreCase("OFFICE")) {
+            return usoRecomendado.equalsIgnoreCase("OFFICE") ||
+                   usoRecomendado.equalsIgnoreCase("MULTIFUNCION") ||
+                   gama.equalsIgnoreCase("BAJA") ||
+                   gama.equalsIgnoreCase("MEDIA");
+        } else if (tipoUso.equalsIgnoreCase("GAMER")) {
+            return usoRecomendado.equalsIgnoreCase("GAMING") ||
+                   usoRecomendado.equalsIgnoreCase("MULTIFUNCION") ||
+                   gama.equalsIgnoreCase("ALTA");
+        }
+
+        return true;
     }
 
     @Override

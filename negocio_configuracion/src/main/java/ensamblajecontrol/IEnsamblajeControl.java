@@ -1,12 +1,12 @@
-package controlconfig;
+package ensamblajecontrol;
 
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
 import java.util.List;
 
-public interface IFachadaControl {
+public interface IEnsamblajeControl {
     // Métodos de ArmadoControl
-    String guardarConfiguracion(EnsamblajeDTO ensamblaje);
+    String guardarConfiguracion(EnsamblajeDTO ensamblaje, String usuarioId);
     EnsamblajeDTO iniciarNuevoEnsamblaje();
     EnsamblajeDTO getEnsamblajeActual();
     List<ComponenteDTO> obtenerComponentesPorCategoria(String categoria);
@@ -27,5 +27,6 @@ public interface IFachadaControl {
     boolean hayProductosDisponibles(String categoria, String marca);
     boolean tieneMinimoPorCategoria(String categoria, int minimo);
     boolean tieneMarcaEnCategoria(String categoria, String marca);
+    ComponenteDTO convertirProductoADTO(String productoId);
 }
 

@@ -57,9 +57,9 @@ public class TablaPanel extends JPanel {
         try {
             ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
 
-            List<entidades.ConfiguracionEntidad> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
+            List<dto.ConfiguracionDTO> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
             if (configuraciones != null && !configuraciones.isEmpty()) {
-                for (entidades.ConfiguracionEntidad config : configuraciones) {
+                for (dto.ConfiguracionDTO config : configuraciones) {
                     String nombreConfig = config.getNombre() != null ? config.getNombre() : "Configuración PC";
                     Double precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : 0.0;
                     int cantidad = 1;

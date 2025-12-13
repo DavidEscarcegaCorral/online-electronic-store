@@ -60,34 +60,51 @@ public class FramePrincipal extends JFrame {
         panelContenedor.add(headerPanel, BorderLayout.NORTH);
 
         add(scrollCustom, BorderLayout.CENTER);
-        actualizarUsuario();
     }
 
     public BarraNavegacion getBarraNavegacion() {
         return barraNavegacion;
     }
 
-    public void actualizarUsuario() {
-        try {
-            controlpresentacion.ControlPresentacionVenta controlVenta = controlpresentacion.ControlPresentacionVenta.getInstance();
-            entidades.UsuarioEntidad u = controlVenta.getUsuarioActual();
-            if (u != null) {
-                usuarioNombre = u.getNombre() != null ? u.getNombre() : "Usuario";
-                usuarioEmail = u.getEmail() != null ? u.getEmail() : "";
-                headerPanel.repaint();
-            } else {
-                usuarioNombre = "Invitado";
-                usuarioEmail = "";
-                headerPanel.repaint();
-            }
-        } catch (Exception e) {
-            usuarioNombre = "Invitado";
-            usuarioEmail = "";
-            if (headerPanel != null) headerPanel.repaint();
+    /**
+     * Establece la barra de navegación con los listeners ya configurados.
+     * Permite que el controlador inyecte la barra personalizada.
+     *
+     * @param barraNavegacion La barra de navegación configurada
+     */
+    public void setBarraDeNavegacion(BarraNavegacion barraNavegacion) {
+        if (this.barraNavegacion != null && headerPanel != null) {
+            headerPanel.remove(this.barraNavegacion);
+        }
+        this.barraNavegacion = barraNavegacion;
+        if (headerPanel != null && barraNavegacion != null) {
+            headerPanel.add(this.barraNavegacion, BorderLayout.CENTER);
+            headerPanel.revalidate();
+            headerPanel.repaint();
         }
     }
 
-    public void setPanelContenido(JPanel panelContenido) {
+    /**
+     * Actualiza los datos del usuario mostrados en el header.
+     * El controlador es responsable de proporcionar estos datos.
+     *
+     * @param nombre Nombre del usuario a mostrar
+     * @param email  Email del usuario a mostrar
+     */
+    public void actualizarUsuario(String nombre, String email) {
+        this.usuarioNombre = nombre != null && !nombre.trim().isEmpty() ? nombre : "Invitado";
+        this.usuarioEmail = email != null ? email : "";
+        if (headerPanel != null) {
+            headerPanel.repaint();
+        }
+    }
+
+    /**
+     * Cambia el panel de contenido principal mostrado en el frame.
+     *
+     * @param panelContenido El nuevo panel a mostrar
+     */
+    public void cambiarPanel(JPanel panelContenido) {
         if (this.panelContenido != null) {
             panelContenedor.remove(this.panelContenido);
         }
