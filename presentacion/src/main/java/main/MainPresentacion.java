@@ -1,6 +1,7 @@
-package controlvista;
+package main;
 
 import compartido.FramePrincipal;
+import controlvista.ControlDeNavegacion;
 import dao.DatabaseInitializer;
 
 import javax.swing.*;

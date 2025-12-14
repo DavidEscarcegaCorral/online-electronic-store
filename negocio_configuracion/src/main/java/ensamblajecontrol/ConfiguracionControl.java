@@ -6,14 +6,14 @@ import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
 import entidades.ConfiguracionEntidad;
 import entidades.ProductoEntidad;
+import objetosNegocio.ConfiguracionBO;
 import objetosNegocio.ProductoBO;
+import objetosNegocio.mappers.ConfiguracionMapper;
 import objetosNegocio.mappers.ProductoMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ConfiguracionControl implements IConfiguracionControl {
     private final ConfiguracionDAO configuracionDAO;
@@ -35,10 +35,15 @@ public class ConfiguracionControl implements IConfiguracionControl {
             return null;
         }
 
-        ConfiguracionEntidad cfg = convertirAEntidad(ensamblaje, usuarioId);
         try {
-            configuracionDAO.guardar(cfg);
-            return cfg.getId().toString();
+            String nombreConfig = "Configuración " + LocalDateTime.now();
+            ConfiguracionBO configuracionBO = ConfiguracionMapper.ensamblajeABO(ensamblaje, usuarioId, nombreConfig);
+
+            ConfiguracionEntidad entidad = ConfiguracionMapper.boAEntidad(configuracionBO);
+
+            configuracionDAO.guardar(entidad);
+
+            return entidad.getId().toString();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -164,27 +169,6 @@ public class ConfiguracionControl implements IConfiguracionControl {
         return !productos.isEmpty();
     }
 
-    private ConfiguracionEntidad convertirAEntidad(EnsamblajeDTO ensamblajeDTO, String usuarioId) {
-        ConfiguracionEntidad entidad = new ConfiguracionEntidad();
-        entidad.setNombre("Configuración " + LocalDateTime.now());
-        entidad.setUsuarioId(usuarioId);
-
-        List<Map<String, Object>> componentesList = new ArrayList<>();
-        for (ComponenteDTO comp : ensamblajeDTO.obtenerTodosComponentes()) {
-            Map<String, Object> compMap = new HashMap<>();
-            compMap.put("categoria", comp.getCategoria());
-            compMap.put("id", comp.getId());
-            compMap.put("nombre", comp.getNombre());
-            compMap.put("precio", comp.getPrecio());
-            compMap.put("marca", comp.getMarca());
-            componentesList.add(compMap);
-        }
-
-        entidad.setComponentes(componentesList);
-        entidad.setPrecioTotal(java.math.BigDecimal.valueOf(ensamblajeDTO.getPrecioTotal()));
-
-        return entidad;
-    }
 
     @Override
     public ComponenteDTO convertirProductoADTO(String productoId) {
