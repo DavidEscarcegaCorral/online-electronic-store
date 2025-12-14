@@ -1,25 +1,29 @@
-package objetosNegocio.componenteON;
+package objetosNegocio;
 
 import dao.ProductoDAO;
 import dto.ComponenteDTO;
 import entidades.ProductoEntidad;
+import objetosNegocio.mappers.ProductoMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ComponenteON implements IComponenteON {
+/**
+ * Business Object para gestión de componentes.
+ */
+public class ComponenteBO implements IComponenteBO {
 
-    private static ComponenteON componenteON;
+    private static ComponenteBO componenteON;
     private final ProductoDAO productoDAO;
 
-    public static synchronized IComponenteON getInstance() {
+    public static synchronized IComponenteBO getInstance() {
         if (componenteON == null) {
-            componenteON = new ComponenteON();
+            componenteON = new ComponenteBO();
         }
         return componenteON;
     }
 
-    private ComponenteON() {
+    private ComponenteBO() {
         this.productoDAO = new ProductoDAO();
     }
 
@@ -57,23 +61,16 @@ public class ComponenteON implements IComponenteON {
         }
     }
 
-    private ComponenteDTO convertirADTO(ProductoEntidad producto) {
-        ComponenteDTO dto = new ComponenteDTO();
-        dto.setId(producto.getId().toString());
-        dto.setNombre(producto.getNombre());
-        dto.setPrecio(producto.getPrecio());
-        dto.setCategoria(producto.getCategoria());
-        dto.setMarca(producto.getMarca());
-        dto.setDescripcion(producto.getDescripcion());
-        dto.setStock(producto.getStock());
-        dto.setImagenUrl(producto.getImagenUrl());
-
-        if (producto.getEspecificaciones() != null) {
-            dto.setSocket(producto.getEspecificaciones().get("socket"));
-            dto.setTipoRam(producto.getEspecificaciones().get("tipoRam"));
-            dto.setFormFactor(producto.getEspecificaciones().get("formFactor"));
+    /**
+     * Convierte ProductoEntidad a ComponenteDTO usando ProductoMapper.
+     */
+    private ComponenteDTO convertirADTO(ProductoEntidad entidad) {
+        if (entidad == null) {
+            return null;
         }
 
-        return dto;
+        // Usar ProductoMapper para hacer la conversión
+        ProductoBO productoBO = ProductoMapper.entidadABO(entidad);
+        return ProductoMapper.boADTO(productoBO);
     }
 }

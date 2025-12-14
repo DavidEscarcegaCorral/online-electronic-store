@@ -1,20 +1,15 @@
 package ventacontrol;
 
 import ensamblajecontrol.ConfiguracionFacade;
-import ensamblajecontrol.IEnsamblajeControl;
+import ensamblajecontrol.IEnsamblajeFacade;
 import dao.UsuarioDAO;
-import dto.CarritoDTO;
 import dto.MetodoPagoDTO;
-import entidades.CarritoEntidad;
 import entidades.ConfiguracionEntidad;
 import entidades.UsuarioEntidad;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Implementación de la fachada para el subsistema de Venta.
- *
  * PATRÓN: Facade
  */
 public class VentaFacade implements IVentaFacade {
@@ -36,19 +31,11 @@ public class VentaFacade implements IVentaFacade {
             if (usuario != null && usuario.getId() != null) {
                 return usuario.getId().toString();
             }
-            throw new IllegalStateException("Usuario por defecto no encontrado. Debe ser creado en la inicialización de la BD.");
+            throw new IllegalStateException("Usuario por defecto no encontrado.");
         } catch (Exception e) {
             throw new IllegalStateException("No se pudo obtener el cliente por defecto", e);
         }
     }
-
-    @Override
-    public CarritoDTO getCarritoActual() {
-        String clienteId = obtenerClienteIdDefecto();
-        CarritoEntidad carrito = ventaControl.obtenerCarrito(clienteId);
-        return convertirCarritoADTO(carrito);
-    }
-
 
     @Override
     public void removerItemDelCarrito(String productoId) {
@@ -90,7 +77,7 @@ public class VentaFacade implements IVentaFacade {
     public String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje) {
         String clienteId = obtenerClienteIdDefecto();
 
-        IEnsamblajeControl fachadaControl = ConfiguracionFacade.getInstance();
+        IEnsamblajeFacade fachadaControl = ConfiguracionFacade.getInstance();
         String configuracionId = fachadaControl.guardarConfiguracion(ensamblaje, clienteId);
 
         if (configuracionId == null) {
@@ -108,6 +95,12 @@ public class VentaFacade implements IVentaFacade {
 
 
     @Override
+    public objetosNegocio.CarritoBO obtenerCarrito() {
+        String clienteId = obtenerClienteIdDefecto();
+        return ventaControl.obtenerCarrito(clienteId);
+    }
+
+    @Override
     public List<ConfiguracionEntidad> obtenerConfiguracionesEnCarrito() {
         String clienteId = obtenerClienteIdDefecto();
         return ventaControl.obtenerConfiguracionesEnCarrito(clienteId);
@@ -119,13 +112,4 @@ public class VentaFacade implements IVentaFacade {
         return ventaControl.removerConfiguracionDelCarrito(clienteId, configuracionId);
     }
 
-    private CarritoDTO convertirCarritoADTO(CarritoEntidad entidad) {
-        if (entidad == null) return null;
-
-        CarritoDTO dto = new CarritoDTO();
-        dto.setClienteId(entidad.getClienteId());
-        dto.setItems(new ArrayList<>());
-
-        return dto;
-    }
 }

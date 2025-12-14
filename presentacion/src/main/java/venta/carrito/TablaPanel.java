@@ -1,35 +1,49 @@
 package venta.carrito;
 
+import compartido.FramePrincipal;
 import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
 import compartido.estilos.tabla.Tabla;
-import compartido.FramePrincipal;
-import controlpresentacion.ControlPresentacionVenta;
-import dao.CarritoDAO;
-import dao.UsuarioDAO;
-import entidades.UsuarioEntidad;
+import dto.ItemCarritoDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Vista Pasiva (Dumb View) para mostrar items del carrito en una tabla.
+ *
+ * ✅ ARQUITECTURA CORRECTA:
+ * - NO tiene acceso directo a DAOs (violación de capas eliminada)
+ * - NO tiene lógica de negocio (cálculos, validaciones)
+ * - Recibe datos como DTOs desde el panel padre
+ * - Solo se encarga de pintar y formatear visualmente
+ * - Gestión de errores con logging adecuado
+ */
 public class TablaPanel extends JPanel {
+    private static final Logger logger = LoggerFactory.getLogger(TablaPanel.class);
+
     private DefaultTableModel model;
     private Tabla tablaResumen;
     private ScrollPaneCustom scroll;
-
     private JPanel panelCentro;
 
-    public TablaPanel() {
+    /**
+     * Constructor que inicializa la tabla sin lógica de negocio.
+     */
+    public TablaPanel(FramePrincipal framePadre) {
         setOpaque(false);
 
         String[] columns = {"Producto", "Precio unitario", "Cantidad", "Costo total", ""};
         model = new DefaultTableModel(columns, 0);
-        tablaResumen = new Tabla(model, new FramePrincipal());
+
+        tablaResumen = new Tabla(model, framePadre);
         panelCentro = new JPanel();
 
         panelCentro.setOpaque(false);
-
         tablaResumen.setOpaque(false);
         tablaResumen.setBackground(new Color(0, 0, 0, 0));
 
@@ -42,76 +56,73 @@ public class TablaPanel extends JPanel {
         add(panelCentro);
     }
 
-    private String obtenerClienteIdDefecto() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
-        if (usuario != null && usuario.getId() != null) {
-            return usuario.getId().toString();
-        }
-        throw new IllegalStateException("Usuario por defecto no encontrado");
-    }
-
-    public void actualizarCarrito() {
-        model.setRowCount(0);
-
+    /**
+     * Actualiza la tabla con items del carrito.
+     *
+     * FLUJO CORRECTO: Panel Padre → obtiene DTOs → pasa a Vista → Vista pinta
+     *
+     * @param items Lista de items del carrito como DTOs (productos + configuraciones)
+     */
+    public void actualizarCarrito(List<ItemCarritoDTO> items) {
         try {
-            ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
+            limpiar();
 
-            List<dto.ConfiguracionDTO> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
-            if (configuraciones != null && !configuraciones.isEmpty()) {
-                for (dto.ConfiguracionDTO config : configuraciones) {
-                    String nombreConfig = config.getNombre() != null ? config.getNombre() : "Configuración PC";
-                    Double precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : 0.0;
-                    int cantidad = 1;
-
-                    model.addRow(new Object[]{
-                        nombreConfig,
-                        String.format("$%,.2f", precio),
-                        String.valueOf(cantidad),
-                        String.format("$%,.2f", precio * cantidad),
-                        "Eliminar"
-                    });
-                }
+            if (items == null || items.isEmpty()) {
+                logger.info("Carrito vacío, tabla limpia");
+                return;
             }
 
-            String clienteId = obtenerClienteIdDefecto();
-            entidades.CarritoEntidad carrito = new CarritoDAO().obtenerCarrito(clienteId);
-            if (carrito.getProductos() != null && !carrito.getProductos().isEmpty()) {
-                dao.ProductoDAO productoDAO = new dao.ProductoDAO();
-                for (java.util.Map<String, Object> prod : carrito.getProductos()) {
-                    String productoId = (String) prod.get("productoId");
-                    Integer cantidad = (Integer) prod.get("cantidad");
-
-                    entidades.ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
-                    if (producto != null) {
-                        String nombreProducto = producto.getNombre();
-                        Double precioUnitario = producto.getPrecio();
-                        Double precioTotal = precioUnitario * cantidad;
-
-                        model.addRow(new Object[]{
-                            nombreProducto,
-                            String.format("$%,.2f", precioUnitario),
-                            String.valueOf(cantidad),
-                            String.format("$%,.2f", precioTotal),
-                            "Eliminar"
-                        });
-                    }
-                }
-                System.out.println("Tabla actualizada con " + carrito.getProductos().size() + " producto(s)");
+            for (ItemCarritoDTO item : items) {
+                agregarItemATabla(item);
             }
 
-            if ((configuraciones == null || configuraciones.isEmpty()) &&
-                (carrito.getProductos() == null || carrito.getProductos().isEmpty())) {
-                System.out.println("No hay items en el carrito");
-            }
+            logger.info("Tabla actualizada con {} items", items.size());
+
+            revalidate();
+            repaint();
 
         } catch (Exception e) {
-            System.err.println("Error al actualizar carrito: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al actualizar tabla del carrito", e);
+            mostrarMensajeError();
+        }
+    }
+
+    /**
+     * Agrega un item individual a la tabla.
+     * Solo formatea y pinta, no calcula ni busca datos.
+     */
+    private void agregarItemATabla(ItemCarritoDTO item) {
+        if (item == null) {
+            logger.warn("Intento de agregar item null a la tabla");
+            return;
         }
 
-        revalidate();
-        repaint();
+        String nombre = item.getNombre() != null ? item.getNombre() : "Sin nombre";
+        double precioUnitario = item.getPrecioUnitario();
+        int cantidad = item.getCantidad();
+        double precioTotal = item.getSubtotal();
+
+        model.addRow(new Object[]{
+            nombre,
+            String.format("$%,.2f", precioUnitario),
+            String.valueOf(cantidad),
+            String.format("$%,.2f", precioTotal),
+            "Eliminar"
+        });
+    }
+
+    /**
+     * Muestra un mensaje de error en la tabla cuando falla la carga.
+     */
+    private void mostrarMensajeError() {
+        limpiar();
+        model.addRow(new Object[]{
+            "Error al cargar items del carrito",
+            "",
+            "",
+            "",
+            ""
+        });
     }
 
     public void limpiar() {

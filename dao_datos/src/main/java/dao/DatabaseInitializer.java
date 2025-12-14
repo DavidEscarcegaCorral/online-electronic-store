@@ -340,6 +340,7 @@ public class DatabaseInitializer {
     private List<Document> crearTarjetasMadre() {
         List<Document> tarjetas = new ArrayList<>();
 
+        // Tarjetas Madre Intel LGA1700
         tarjetas.add(crearProducto("ASUS ROG Strix B660-A", "Tarjeta Madre", "ASUS", 189.99, 15,
                 "Placa madre ATX para Intel Gen 12/13, DDR5, PCIe 5.0",
                 Map.of("socket", "LGA1700", "formFactor", "ATX", "tipoRam", "DDR5", "chipset", "B660")));
@@ -348,9 +349,31 @@ public class DatabaseInitializer {
                 "Placa madre ATX para Intel Gen 12/13/14, DDR5, PCIe 5.0, WiFi 6E",
                 Map.of("socket", "LGA1700", "formFactor", "ATX", "tipoRam", "DDR5", "chipset", "Z790")));
 
+        // Tarjetas Madre AMD AM4
         tarjetas.add(crearProducto("Gigabyte B550 AORUS ELITE", "Tarjeta Madre", "Gigabyte", 149.99, 20,
                 "Placa madre ATX para AMD Ryzen, DDR4, PCIe 4.0",
                 Map.of("socket", "AM4", "formFactor", "ATX", "tipoRam", "DDR4", "chipset", "B550")));
+
+        // Tarjetas Madre AMD AM5 - Compatibles con Ryzen 7000
+        tarjetas.add(crearProducto("ASUS TUF Gaming B650-PLUS WIFI", "Tarjeta Madre", "ASUS", 209.99, 18,
+                "Placa madre ATX para AMD Ryzen 7000, DDR5, PCIe 5.0, WiFi 6",
+                Map.of("socket", "AM5", "formFactor", "ATX", "tipoRam", "DDR5", "chipset", "B650")));
+
+        tarjetas.add(crearProducto("MSI MAG B650 TOMAHAWK WIFI", "Tarjeta Madre", "MSI", 229.99, 16,
+                "Placa madre ATX para AMD Ryzen 7000, DDR5, PCIe 5.0, WiFi 6E",
+                Map.of("socket", "AM5", "formFactor", "ATX", "tipoRam", "DDR5", "chipset", "B650")));
+
+        tarjetas.add(crearProducto("Gigabyte X670 AORUS ELITE AX", "Tarjeta Madre", "Gigabyte", 279.99, 14,
+                "Placa madre ATX para AMD Ryzen 7000, DDR5, PCIe 5.0, WiFi 6E",
+                Map.of("socket", "AM5", "formFactor", "ATX", "tipoRam", "DDR5", "chipset", "X670")));
+
+        tarjetas.add(crearProducto("ASRock B650M Pro RS", "Tarjeta Madre", "ASRock", 179.99, 22,
+                "Placa madre Micro-ATX para AMD Ryzen 7000, DDR5, PCIe 4.0",
+                Map.of("socket", "AM5", "formFactor", "Micro-ATX", "tipoRam", "DDR5", "chipset", "B650")));
+
+        tarjetas.add(crearProducto("ASUS ROG Strix X670E-E Gaming WIFI", "Tarjeta Madre", "ASUS", 449.99, 10,
+                "Placa madre ATX premium para AMD Ryzen 7000, DDR5, PCIe 5.0, WiFi 6E",
+                Map.of("socket", "AM5", "formFactor", "ATX", "tipoRam", "DDR5", "chipset", "X670E")));
 
         return tarjetas;
     }

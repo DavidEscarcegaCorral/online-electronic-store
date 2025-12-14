@@ -2,40 +2,76 @@ package compartido.cards;
 
 import compartido.estilos.Boton;
 import compartido.estilos.Estilos;
-
 import javax.swing.*;
 import java.awt.*;
+import java.net.URL;
 import java.util.function.Consumer;
 
+/**
+ * Tarjeta visual de producto con dos modos de operación:
+ * - ARMADO: Usado en el catálogo de armado de PC (botón selecciona componente)
+ * - CATALOGO: Usado en otras secciones (botón abre página de producto)
+ */
 public class ProductoCard extends JPanel {
+
+    public enum Modo {
+        ARMADO,
+        CATALOGO
+    }
+
     private JLabel imagenProductoLbl;
     private JLabel nombreProductoLbl;
     private JLabel precioProductoLbl;
     private JLabel productoLinkLbl;
     private Boton productoLinkBtn;
-
     private String id;
     private String imagenUrl;
     private String nombreProducto;
     private double precioProducto;
 
-    // callback para notificar selección
     private Consumer<String> onSelect;
+    private Consumer<String> onVerProducto;
     private boolean seleccionado = false;
+    private Modo modo;
 
+    /**
+     * Constructor con modo por defecto.
+     */
     public ProductoCard(String id, String nombreProducto, double productoPrecio, String imagenUrl){
+        this(id, nombreProducto, productoPrecio, imagenUrl, Modo.CATALOGO);
+    }
+
+    /**
+     * Constructor con modo específico.
+     *
+     * @param modo ARMADO para catálogo de armado PC, CATALOGO para otras secciones
+     */
+    public ProductoCard(String id, String nombreProducto, double productoPrecio, String imagenUrl, Modo modo){
         this.id = id;
         this.nombreProducto = nombreProducto;
         this.precioProducto = productoPrecio;
         this.imagenUrl = imagenUrl;
+        this.modo = modo;
 
         initComponents();
         añadirComponentes();
         setupListeners();
     }
 
+    /**
+     * Configura el callback cuando se selecciona el producto.
+     * Se usa para agregar el componente al resumen del armado.
+     */
     public void setOnSelect(Consumer<String> onSelect) {
         this.onSelect = onSelect;
+    }
+
+    /**
+     * Configura el callback cuando se quiere ver el producto.
+     * Se usa para navegar a la página de detalles del producto.
+     */
+    public void setOnVerProducto(Consumer<String> onVerProducto) {
+        this.onVerProducto = onVerProducto;
     }
 
     public void setSeleccionado(boolean seleccionado) {
@@ -54,14 +90,12 @@ public class ProductoCard extends JPanel {
         imagenProductoLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         cargarImagen(this.imagenUrl);
 
-        // Label del nombre
         nombreProductoLbl = new JLabel("<html><div style='text-align: center;'>" + nombreProducto + "</div></html>");
         nombreProductoLbl.setFont(new Font("Arial", Font.PLAIN, 14));
         nombreProductoLbl.setForeground(Color.BLACK);
         nombreProductoLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         nombreProductoLbl.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Label del precio
         precioProductoLbl = new JLabel(String.format("$%,.2f", precioProducto));
         precioProductoLbl.setFont(new Font("Arial", Font.BOLD, 18));
         precioProductoLbl.setForeground(Color.BLACK);
@@ -73,31 +107,54 @@ public class ProductoCard extends JPanel {
         productoLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         productoLinkLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        productoLinkBtn = new Boton("Seleccionar", 85, 30, 14, 10, Color.white, Estilos.COLOR_ENFASIS,  Estilos.COLOR_ENFASIS_HOOVER);
+        String textoBoton = (modo == Modo.ARMADO) ? "Seleccionar" : "Ver Producto";
+        int anchoBoton = (modo == Modo.ARMADO) ? 100 : 120;
+
+        productoLinkBtn = new Boton(textoBoton, anchoBoton, 30, 14, 10, Color.white, Estilos.COLOR_ENFASIS, Estilos.COLOR_ENFASIS_HOOVER);
         productoLinkBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
     private void añadirComponentes() {
         add(Box.createVerticalStrut(10));
         add(imagenProductoLbl);
-        add(Box.createVerticalStrut(20));
+        add(Box.createVerticalStrut(10));
         add(nombreProductoLbl);
-        add(Box.createVerticalStrut(15));
+        add(Box.createVerticalStrut(5));
         add(precioProductoLbl);
-        add(Box.createVerticalStrut(15));
-        add(productoLinkBtn);
+
         add(Box.createVerticalGlue());
+
+        add(productoLinkBtn);
+
+        add(Box.createVerticalStrut(15));
     }
 
     private void setupListeners() {
         productoLinkBtn.addActionListener(e -> {
-            if (onSelect != null) onSelect.accept(id);
+            if (modo == Modo.ARMADO) {
+                if (onSelect != null) {
+                    onSelect.accept(id);
+                }
+            } else {
+                if (onVerProducto != null) {
+                    onVerProducto.accept(id);
+                }
+            }
+        });
+
+        productoLinkLbl.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (onVerProducto != null) {
+                    onVerProducto.accept(id);
+                }
+            }
         });
     }
 
     private void cargarImagen(String path){
         try {
-            java.net.URL location = getClass().getResource(path);
+            URL location = getClass().getResource(path);
             if (location == null) {
                 imagenProductoLbl.setText("No Image");
                 imagenProductoLbl.setIcon(null);

@@ -1,12 +1,17 @@
 package venta.carrito;
 
+import compartido.FramePrincipal;
 import compartido.TotalPanel;
 import compartido.estilos.FontUtil;
 import compartido.PanelBase;
 import controlpresentacion.ControlPresentacionVenta;
+import dto.ConfiguracionDTO;
+import dto.ItemCarritoDTO;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class CarritoPanel extends PanelBase {
     private static String titulo = "Carrito";
@@ -15,11 +20,14 @@ public class CarritoPanel extends PanelBase {
     private TotalPanel totalPanel;
     private OpcionPagoPanel opcionPagoPanel;
     private TablaPanel tablaPanel;
+    private ControlPresentacionVenta controlVenta;
 
     private Runnable onRealizarPedido;
 
-    public CarritoPanel() {
+    public CarritoPanel(FramePrincipal framePadre) {
         super();
+        this.controlVenta = ControlPresentacionVenta.getInstance();
+
         tituloLbl = new JLabel(titulo);
         tituloLbl.setFont(FontUtil.loadFont(28, "Inter_SemiBold"));
         tituloLbl.setForeground(Color.white);
@@ -27,7 +35,8 @@ public class CarritoPanel extends PanelBase {
         opcionEntregaPanel = new OpcionEntregaPanel();
         totalPanel = new TotalPanel();
         opcionPagoPanel = new OpcionPagoPanel();
-        tablaPanel = new TablaPanel();
+
+        tablaPanel = new TablaPanel(framePadre);
 
         // Panel Norte
         panelNorte.add(tituloLbl);
@@ -52,15 +61,8 @@ public class CarritoPanel extends PanelBase {
             if (vaciarBtn != null) {
                 vaciarBtn.addActionListener(e -> {
                     try {
-                        ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
                         controlVenta.vaciarCarrito();
-
-                        tablaPanel.limpiar();
-                        if (totalPanel != null) totalPanel.actualizarTotal();
-
-                        revalidate();
-                        repaint();
-
+                        actualizarCarrito();
                         JOptionPane.showMessageDialog(this, "Carrito vaciado correctamente.", "Listo", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -86,16 +88,48 @@ public class CarritoPanel extends PanelBase {
         this.onRealizarPedido = onRealizarPedido;
     }
 
+    /**
+     * Actualiza el carrito obteniendo datos del controlador.
+     */
     public void actualizarCarrito() {
-        tablaPanel.actualizarCarrito();
-
         try {
-            if (totalPanel != null) {
-                totalPanel.actualizarTotal();
-            }
-        } catch (Exception ignored) {}
+            List<ItemCarritoDTO> items = new ArrayList<>();
 
-        revalidate();
-        repaint();
+            // Obtener productos individuales del carrito
+            List<ItemCarritoDTO> productos = controlVenta.obtenerProductosDelCarrito();
+            if (productos != null && !productos.isEmpty()) {
+                items.addAll(productos);
+            }
+
+            // Obtener configuraciones del carrito
+            List<ConfiguracionDTO> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
+            if (configuraciones != null) {
+                for (ConfiguracionDTO config : configuraciones) {
+                    ItemCarritoDTO item = new ItemCarritoDTO();
+                    item.setNombre(config.getNombre() != null ? config.getNombre() : "Configuración PC");
+                    item.setPrecioUnitario(config.getPrecioTotal());
+                    item.setCantidad(1);
+                    items.add(item);
+                }
+            }
+
+            tablaPanel.actualizarCarrito(items);
+
+            if (totalPanel != null) {
+                double total = controlVenta.calcularTotalCarrito();
+                totalPanel.actualizarTotal(total);
+            }
+
+            revalidate();
+            repaint();
+
+        } catch (Exception e) {
+            System.err.println("Error al actualizar carrito: " + e.getMessage());
+            e.printStackTrace();
+            tablaPanel.actualizarCarrito(new ArrayList<>());
+            if (totalPanel != null) {
+                totalPanel.limpiar();
+            }
+        }
     }
 }

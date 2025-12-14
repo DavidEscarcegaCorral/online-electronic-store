@@ -1,23 +1,33 @@
 package objetosNegocio.mappers;
 
 import entidades.UsuarioEntidad;
-import objetosNegocio.usuarioON.UsuarioON;
+import objetosNegocio.UsuarioBO;
 
+/**
+ * Mapper para convertir entre UsuarioEntidad y UsuarioBO.
+ */
 public class UsuarioMapper {
-    public static UsuarioON toON(UsuarioEntidad entidad) {
+
+    /**
+     * Convierte una UsuarioEntidad a UsuarioBO.
+     */
+    public static UsuarioBO entidadABO(UsuarioEntidad entidad) {
         if (entidad == null) return null;
-        return new UsuarioON(
+        return new UsuarioBO(
             entidad.getId() != null ? entidad.getId().toString() : null,
             entidad.getNombre(),
             entidad.getEmail()
         );
     }
 
-    public static UsuarioEntidad toEntidad(UsuarioON on) {
-        if (on == null) return null;
+    /**
+     * Convierte un UsuarioBO a UsuarioEntidad.
+     */
+    public static UsuarioEntidad boAEntidad(UsuarioBO bo) {
+        if (bo == null) return null;
         UsuarioEntidad entidad = new UsuarioEntidad();
-        entidad.setNombre(on.getNombre());
-        entidad.setEmail(on.getEmail());
+        entidad.setNombre(bo.getNombre());
+        entidad.setEmail(bo.getEmail());
         return entidad;
     }
 }

@@ -91,13 +91,16 @@ public class CatalagoPedidoPanel extends JPanel {
                                 // Crear un Map compatible con crearProductoPedidoCard
                                 Map<String, Object> productoMap = new java.util.HashMap<>();
                                 productoMap.put("nombre", producto.getNombre() + " (x" + cantidad + ")");
-                                productoMap.put("precio", producto.getPrecio() * cantidad);
+
+                                double precioUnitario = producto.getPrecio() != null ? producto.getPrecio().doubleValue() : 0.0;
+                                double precioTotal = precioUnitario * cantidad;
+                                productoMap.put("precio", precioTotal);
 
                                 ProductoPedidoCard card = crearProductoPedidoCard(productoMap);
                                 productoPedidoCardList.add(card);
                                 add(card);
 
-                                totalGeneral += producto.getPrecio() * cantidad;
+                                totalGeneral += precioTotal;
                             }
                         }
                     }

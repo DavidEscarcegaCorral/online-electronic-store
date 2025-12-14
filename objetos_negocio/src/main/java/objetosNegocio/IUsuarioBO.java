@@ -1,8 +1,10 @@
-package objetosNegocio.usuarioON;
+package objetosNegocio;
 
-public interface IUsuarioON {
+public interface IUsuarioBO {
     String getId();
+
     String getNombre();
+
     String getEmail();
 }
 

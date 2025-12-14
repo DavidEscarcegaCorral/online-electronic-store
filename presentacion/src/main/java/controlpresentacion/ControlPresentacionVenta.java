@@ -1,41 +1,34 @@
 package controlpresentacion;
 
+import dto.ItemCarritoDTO;
+import objetosNegocio.CarritoBO;
 import ventacontrol.IVentaFacade;
 import ventacontrol.VentaFacade;
 import dto.ConfiguracionDTO;
 import dto.EnsamblajeDTO;
 import dto.MetodoPagoDTO;
 import entidades.ConfiguracionEntidad;
+import objetosNegocio.ConfiguracionBO;
+import objetosNegocio.mappers.ConfiguracionMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Implementación del control de presentación para gestionar ventas y carritos.
- *
- * RESPONSABILIDADES:
- * - Convierte Entidades (de BD) a DTOs (para la vista).
- * - La vista NUNCA debe recibir objetos de entidad directamente.
- * - Orquesta llamadas a la fachada de ventas.
- *
- * NOTA: Puede ser Singleton ya que no mantiene estado mutable de sesión.
  */
 public class ControlPresentacionVenta implements IControlPresentacionVenta {
     private static ControlPresentacionVenta instancia;
     private final IVentaFacade ventaFacade;
 
     /**
-     * Constructor para inyección de dependencias (usado en pruebas).
-     * @param ventaFacade La fachada a utilizar (puede ser un mock).
+     * Constructor para inyección de dependencias.
+     * @param ventaFacade La fachada a utilizar.
      */
     public ControlPresentacionVenta(IVentaFacade ventaFacade) {
         this.ventaFacade = ventaFacade;
     }
 
-    /**
-     * Constructor privado para uso en producción (Singleton).
-     * Llama al constructor público con la implementación real.
-     */
     private ControlPresentacionVenta() {
         this(VentaFacade.getInstance());
     }
@@ -85,22 +78,52 @@ public class ControlPresentacionVenta implements IControlPresentacionVenta {
         return ventaFacade.agregarConfiguracionAlCarrito(ensamblaje);
     }
 
+    @Override
+    public List<ItemCarritoDTO> obtenerProductosDelCarrito() {
+        try {
+            CarritoBO carritoBO = ventaFacade.obtenerCarrito();
+
+            if (carritoBO == null || carritoBO.getProductos() == null || carritoBO.getProductos().isEmpty()) {
+                System.out.println("DEBUG: Carrito vacío o nulo");
+                return new ArrayList<>();
+            }
+
+            System.out.println("DEBUG: Carrito tiene " + carritoBO.getProductos().size() + " productos");
+
+            // Convertir ItemCarritoBO a ItemCarritoDTO
+            List<ItemCarritoDTO> items = new ArrayList<>();
+            for (CarritoBO.ItemCarritoBO itemBO : carritoBO.getProductos()) {
+                System.out.println("DEBUG: Item - ID: " + itemBO.getProductoId() +
+                    ", Nombre: " + itemBO.getNombre() +
+                    ", Precio: " + itemBO.getPrecio() +
+                    ", Cantidad: " + itemBO.getCantidad());
+
+                ItemCarritoDTO itemDTO = new ItemCarritoDTO();
+                itemDTO.setProductoId(itemBO.getProductoId());
+                itemDTO.setNombre(itemBO.getNombre());
+                itemDTO.setCantidad(itemBO.getCantidad());
+                itemDTO.setPrecioUnitario(itemBO.getPrecio() != null ? itemBO.getPrecio().doubleValue() : 0.0);
+                items.add(itemDTO);
+            }
+
+            return items;
+        } catch (Exception e) {
+            System.err.println("Error al obtener productos del carrito: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     /**
-     * Convierte una ConfiguracionEntidad (BD) a ConfiguracionDTO (Vista).
-     * Evita la fuga de entidades a la capa de presentación.
+     * Convierte una ConfiguracionEntidad a ConfiguracionDTO.
+     * Usa ConfiguracionMapper para hacer la conversión.
      */
     private ConfiguracionDTO convertirADTO(ConfiguracionEntidad entidad) {
-        ConfiguracionDTO dto = new ConfiguracionDTO();
-
-        if (entidad.getId() != null) {
-            dto.setId(entidad.getId().toString());
+        if (entidad == null) {
+            return null;
         }
 
-        dto.setNombre(entidad.getNombre());
-        dto.setUsuarioId(entidad.getUsuarioId());
-        dto.setPrecioTotal(entidad.getPrecioTotal());
-        dto.setComponentes(entidad.getComponentes());
-
-        return dto;
+        ConfiguracionBO bo = ConfiguracionMapper.entidadABO(entidad);
+        return ConfiguracionMapper.boADTO(bo);
     }
 }

@@ -9,22 +9,23 @@ import entidades.CarritoEntidad;
 import entidades.ConfiguracionEntidad;
 import entidades.PedidoEntidad;
 import entidades.ProductoEntidad;
+import objetosNegocio.CarritoBO;
+import objetosNegocio.PedidoBO;
+import objetosNegocio.mappers.CarritoMapper;
+import objetosNegocio.mappers.PedidoMapper;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Control de negocio para gestión de ventas y carritos.
  *
- * PATRÓN: Stateless (Sin Estado)
- * - NO mantiene carritoActual como variable de instancia.
- * - Cada método recibe clienteId y recupera el carrito de la BD.
- * - Seguro para concurrencia y multi-usuario.
+ * PATRÓN: Stateless
  */
 public class VentaControl {
     private static final Logger logger = LoggerFactory.getLogger(VentaControl.class);
@@ -45,32 +46,49 @@ public class VentaControl {
         return new VentaControl();
     }
 
-    public CarritoEntidad crearCarrito(String clienteId) {
+    /**
+     * Crea un carrito nuevo para un cliente.
+     */
+    public CarritoBO crearCarrito(String clienteId) {
         try {
-            CarritoEntidad carrito = new CarritoEntidad();
-            carrito.setClienteId(clienteId);
-            carrito.setFechaActualizacion(LocalDateTime.now());
-            carritoDAO.guardar(carrito);
+            CarritoBO carritoBO = new CarritoBO();
+            carritoBO.setClienteId(clienteId);
+
+            CarritoEntidad entidad = CarritoMapper.boAEntidad(carritoBO);
+            entidad.setFechaActualizacion(LocalDateTime.now());
+
+            carritoDAO.guardar(entidad);
+
+            CarritoBO resultado = CarritoMapper.entidadABO(entidad);
 
             logger.info("Carrito creado para cliente {}", clienteId);
-            return carrito;
+            return resultado;
         } catch (Exception e) {
             logger.error("Error al crear carrito para cliente {}", clienteId, e);
             throw new RuntimeException("No se pudo crear el carrito", e);
         }
     }
 
-    public CarritoEntidad obtenerCarrito(String clienteId) {
+    /**
+     * Obtiene el carrito de un cliente.
+     */
+    public CarritoBO obtenerCarrito(String clienteId) {
         try {
-            CarritoEntidad carrito = carritoDAO.obtenerCarrito(clienteId);
+            CarritoEntidad entidad = carritoDAO.obtenerCarrito(clienteId);
+
+            CarritoBO carritoBO = CarritoMapper.entidadABO(entidad);
+
             logger.debug("Carrito obtenido para cliente {}", clienteId);
-            return carrito;
+            return carritoBO;
         } catch (Exception e) {
             logger.error("Error al obtener carrito para cliente {}", clienteId, e);
             throw new RuntimeException("No se pudo obtener el carrito", e);
         }
     }
 
+    /**
+     * Agrega una configuración al carrito.
+     */
     public String agregarConfiguracionAlCarrito(String clienteId, String configuracionId) {
         if (configuracionId == null) {
             logger.warn("Intento de agregar configuración nula al carrito");
@@ -78,10 +96,15 @@ public class VentaControl {
         }
 
         try {
-            CarritoEntidad carrito = carritoDAO.obtenerCarrito(clienteId);
-            carrito.agregarConfiguracion(new ObjectId(configuracionId));
-            carrito.setFechaActualizacion(LocalDateTime.now());
-            carritoDAO.guardar(carrito);
+            CarritoEntidad entidad = carritoDAO.obtenerCarrito(clienteId);
+            CarritoBO carritoBO = CarritoMapper.entidadABO(entidad);
+
+            carritoBO.agregarConfiguracion(configuracionId);
+
+            CarritoEntidad entidadActualizada = CarritoMapper.boAEntidad(carritoBO);
+            entidadActualizada.setFechaActualizacion(LocalDateTime.now());
+
+            carritoDAO.guardar(entidadActualizada);
 
             logger.info("Configuración {} agregada al carrito del cliente {}", configuracionId, clienteId);
             return configuracionId;
@@ -91,6 +114,9 @@ public class VentaControl {
         }
     }
 
+    /**
+     * Agrega un producto al carrito con validaciones de stock.
+     */
     public boolean agregarProductoAlCarrito(String clienteId, String productoId, int cantidad) {
         if (productoId == null || cantidad <= 0) {
             logger.warn("Intento de agregar producto inválido: productoId={}, cantidad={}", productoId, cantidad);
@@ -110,10 +136,15 @@ public class VentaControl {
                 return false;
             }
 
-            CarritoEntidad carrito = carritoDAO.obtenerCarrito(clienteId);
-            carrito.agregarProducto(productoId, cantidad);
-            carrito.setFechaActualizacion(LocalDateTime.now());
-            carritoDAO.guardar(carrito);
+            CarritoEntidad entidad = carritoDAO.obtenerCarrito(clienteId);
+            CarritoBO carritoBO = CarritoMapper.entidadABO(entidad);
+
+            carritoBO.agregarProducto(productoId, producto.getNombre(), producto.getPrecio(), cantidad);
+
+            CarritoEntidad entidadActualizada = CarritoMapper.boAEntidad(carritoBO);
+            entidadActualizada.setFechaActualizacion(LocalDateTime.now());
+
+            carritoDAO.guardar(entidadActualizada);
 
             logger.info("Producto {} (cantidad: {}) agregado al carrito del cliente {}",
                 productoId, cantidad, clienteId);
@@ -124,20 +155,27 @@ public class VentaControl {
         }
     }
 
+    /**
+     * Vacía el carrito de un cliente.
+     */
     public void vaciarCarrito(String clienteId) {
         try {
-            CarritoEntidad carrito = carritoDAO.obtenerCarrito(clienteId);
+            CarritoEntidad entidad = carritoDAO.obtenerCarrito(clienteId);
+            CarritoBO carritoBO = CarritoMapper.entidadABO(entidad);
 
-            if (carrito.getConfiguracionesIds() != null && !carrito.getConfiguracionesIds().isEmpty()) {
-                List<ObjectId> idsAEliminar = new ArrayList<>(carrito.getConfiguracionesIds());
+            carritoBO.vaciar();
+
+            CarritoEntidad entidadActualizada = CarritoMapper.boAEntidad(carritoBO);
+
+            if (entidad.getConfiguracionesIds() != null && !entidad.getConfiguracionesIds().isEmpty()) {
+                List<ObjectId> idsAEliminar = new ArrayList<>(entidad.getConfiguracionesIds());
                 configuracionDAO.eliminarMultiples(idsAEliminar);
                 logger.debug("Eliminadas {} configuraciones del carrito", idsAEliminar.size());
             }
 
-            carrito.setConfiguracionesIds(new ArrayList<>());
-            carrito.setProductos(new ArrayList<>());
-            carrito.setFechaActualizacion(LocalDateTime.now());
-            carritoDAO.guardar(carrito);
+            entidadActualizada.setFechaActualizacion(LocalDateTime.now());
+
+            carritoDAO.guardar(entidadActualizada);
 
             logger.info("Carrito vaciado para cliente {}", clienteId);
         } catch (Exception e) {
@@ -146,24 +184,57 @@ public class VentaControl {
         }
     }
 
+    /**
+     * Calcula el total del carrito usando la lógica de negocio del BO.
+     */
     public double calcularTotalCarrito(String clienteId) {
         try {
-            CarritoEntidad carrito = carritoDAO.obtenerCarrito(clienteId);
-            return calcularTotalCarritoInterno(carrito);
+            CarritoEntidad entidad = carritoDAO.obtenerCarrito(clienteId);
+            CarritoBO carritoBO = CarritoMapper.entidadABO(entidad);
+
+            BigDecimal subtotalProductos = carritoBO.calcularSubtotal();
+
+            BigDecimal totalConfiguraciones = calcularTotalConfiguraciones(carritoBO.getConfiguracionesIds());
+
+            BigDecimal total = subtotalProductos.add(totalConfiguraciones);
+
+            return total.doubleValue();
         } catch (Exception e) {
             logger.error("Error al calcular total del carrito para cliente {}", clienteId, e);
             return 0.0;
         }
     }
 
+    /**
+     * Calcula el total de las configuraciones en el carrito.
+     */
+    private BigDecimal calcularTotalConfiguraciones(List<String> configuracionesIds) {
+        if (configuracionesIds == null || configuracionesIds.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (String configId : configuracionesIds) {
+            try {
+                ConfiguracionEntidad config = configuracionDAO.obtenerPorId(new ObjectId(configId));
+                if (config != null && config.getPrecioTotal() != null) {
+                    total = total.add(config.getPrecioTotal());
+                }
+            } catch (Exception e) {
+                logger.warn("Error al obtener configuración {}: {}", configId, e.getMessage());
+            }
+        }
+        return total;
+    }
+
     private double calcularTotalCarritoInterno(CarritoEntidad carrito) {
-        double total = 0.0;
+        BigDecimal total = BigDecimal.ZERO;
 
         if (carrito.getConfiguracionesIds() != null) {
             for (ObjectId configId : carrito.getConfiguracionesIds()) {
                 ConfiguracionEntidad config = configuracionDAO.obtenerPorId(configId);
                 if (config != null && config.getPrecioTotal() != null) {
-                    total += config.getPrecioTotal();
+                    total = total.add(config.getPrecioTotal());
                 }
             }
         }
@@ -175,14 +246,15 @@ public class VentaControl {
 
                 if (productoId != null && cantidad != null && cantidad > 0) {
                     ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
-                    if (producto != null) {
-                        total += producto.getPrecio() * cantidad;
+                    if (producto != null && producto.getPrecio() != null) {
+                        BigDecimal subtotal = producto.getPrecio().multiply(BigDecimal.valueOf(cantidad));
+                        total = total.add(subtotal);
                     }
                 }
             }
         }
 
-        return total;
+        return total.doubleValue();
     }
 
     public List<ConfiguracionEntidad> obtenerConfiguracionesEnCarrito(String clienteId) {
@@ -223,26 +295,28 @@ public class VentaControl {
                 return null;
             }
 
-            PedidoEntidad pedido = new PedidoEntidad();
-            pedido.setClienteId(clienteId);
-            pedido.setEstado("PROCESANDO");
-            pedido.setFechaCreacion(new Date());
+            PedidoBO pedidoBO = new PedidoBO();
+            pedidoBO.setClienteId(clienteId);
+            pedidoBO.setEstado(PedidoBO.EstadoPedido.PROCESANDO);
+            pedidoBO.setFechaCreacion(LocalDateTime.now());
 
             if (metodoPago != null) {
-                PedidoEntidad.MetodoPagoInfo metodoPagoInfo = new PedidoEntidad.MetodoPagoInfo();
+                PedidoBO.MetodoPagoInfo metodoPagoInfo = new PedidoBO.MetodoPagoInfo();
                 metodoPagoInfo.setTipo(metodoPago.getTipo() != null ? metodoPago.getTipo().toString() : "TARJETA");
                 metodoPagoInfo.setDetalles("Pago procesado exitosamente");
-                pedido.setMetodoPago(metodoPagoInfo);
+                pedidoBO.setMetodoPago(metodoPagoInfo);
             }
 
-            List<PedidoEntidad.ItemPedido> itemsPedido = construirItemsPedido(configuraciones, productosIndividuales);
-            pedido.setItems(itemsPedido);
-            pedido.setTotal(calcularTotalCarritoInterno(carrito));
+            List<PedidoBO.ItemPedido> itemsPedidoBO = construirItemsPedidoBO(configuraciones, productosIndividuales);
+            pedidoBO.setItems(itemsPedidoBO);
+            pedidoBO.setTotal(BigDecimal.valueOf(calcularTotalCarritoInterno(carrito)));
 
-            String pedidoId = pedidoDAO.crearPedido(pedido);
+            PedidoEntidad pedidoEntidad = PedidoMapper.boAEntidad(pedidoBO);
+
+            String pedidoId = pedidoDAO.crearPedido(pedidoEntidad);
 
             if (pedidoId != null) {
-                pedidoDAO.actualizarEstado(pedidoId, "COMPLETADO");
+                pedidoDAO.actualizarEstado(pedidoId, PedidoEntidad.EstadoPedido.ENTREGADO);
                 vaciarCarrito(clienteId);
                 logger.info("Pedido {} confirmado exitosamente para cliente {}", pedidoId, clienteId);
                 return pedidoId;
@@ -257,19 +331,22 @@ public class VentaControl {
         }
     }
 
-    private List<PedidoEntidad.ItemPedido> construirItemsPedido(
+    /**
+     * Construye los items del pedido usando PedidoBO.
+     */
+    private List<PedidoBO.ItemPedido> construirItemsPedidoBO(
             List<ConfiguracionEntidad> configuraciones,
             List<Map<String, Object>> productosIndividuales) {
 
-        List<PedidoEntidad.ItemPedido> itemsPedido = new ArrayList<>();
+        List<PedidoBO.ItemPedido> itemsPedido = new ArrayList<>();
 
         if (configuraciones != null) {
             for (ConfiguracionEntidad config : configuraciones) {
-                PedidoEntidad.ItemPedido itemPedido = new PedidoEntidad.ItemPedido();
+                PedidoBO.ItemPedido itemPedido = new PedidoBO.ItemPedido();
                 itemPedido.setProductoId(config.getId() != null ? config.getId().toString() : "");
                 itemPedido.setNombre(config.getNombre() != null ? config.getNombre() : "Configuración PC");
                 itemPedido.setCantidad(1);
-                double precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : 0.0;
+                BigDecimal precio = config.getPrecioTotal() != null ? config.getPrecioTotal() : BigDecimal.ZERO;
                 itemPedido.setPrecioUnitario(precio);
                 itemsPedido.add(itemPedido);
             }
@@ -283,7 +360,7 @@ public class VentaControl {
                 if (productoId != null && cantidad != null && cantidad > 0) {
                     ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
                     if (producto != null) {
-                        PedidoEntidad.ItemPedido itemPedido = new PedidoEntidad.ItemPedido();
+                        PedidoBO.ItemPedido itemPedido = new PedidoBO.ItemPedido();
                         itemPedido.setProductoId(productoId);
                         itemPedido.setNombre(producto.getNombre());
                         itemPedido.setCantidad(cantidad);

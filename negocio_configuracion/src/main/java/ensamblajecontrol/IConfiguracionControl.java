@@ -11,7 +11,7 @@ public interface IConfiguracionControl {
 
     List<String> obtenerMarcasPorCategoria(String categoria);
 
-    List<ComponenteDTO> obtenerProductosPorCategoriaYMarca(String categoria, String marca);
+    List<ComponenteDTO> obtenerProductosPorCategoriaYMarca(String categoria, String marca, EnsamblajeDTO ensamblajeActual);
 
     boolean hayProductosDisponibles(String categoria, String marca);
 
@@ -20,5 +20,6 @@ public interface IConfiguracionControl {
     boolean tieneMarcaEnCategoria(String categoria, String marca);
 
     ComponenteDTO convertirProductoADTO(String productoId);
-}
 
+    List<ComponenteDTO> obtenerProductosAleatorios(int cantidad);
+}

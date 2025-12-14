@@ -1,32 +1,32 @@
-package entidades;
-
-import org.bson.types.ObjectId;
+package objetosNegocio;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Entidad que representa una configuración guardada en MongoDB.
+ * Business Object para Configuración de PC.
+ * Contiene la lógica de negocio para una configuración guardada.
  */
-public class ConfiguracionEntidad {
-    private ObjectId id;
+public class ConfiguracionBO implements IConfiguracionBO {
+    private String id;
     private String usuarioId;
     private String nombre;
     private List<Map<String, Object>> componentes;
     private BigDecimal precioTotal;
     private LocalDateTime fechaCreacion;
 
-    public ConfiguracionEntidad() {
-        this.fechaCreacion = LocalDateTime.now();
+    public ConfiguracionBO() {
+        this.componentes = new ArrayList<>();
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -68,6 +68,14 @@ public class ConfiguracionEntidad {
 
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public boolean esValida() {
+        return componentes != null && !componentes.isEmpty();
+    }
+
+    public int getCantidadComponentes() {
+        return componentes != null ? componentes.size() : 0;
     }
 }
 

@@ -227,7 +227,7 @@ public class MenuOpcionesPanel extends JPanel {
             ConfiguracionEntidad nuevaConfig = new ConfiguracionEntidad();
             nuevaConfig.setNombre(nombre);
             nuevaConfig.setUsuarioId(clienteId);
-            nuevaConfig.setPrecioTotal(ensamblajActual.getPrecioTotal());
+            nuevaConfig.setPrecioTotal(java.math.BigDecimal.valueOf(ensamblajActual.getPrecioTotal()));
             nuevaConfig.setComponentes(convertirComponentesAMapas());
 
             configuracionDAO.guardar(nuevaConfig);

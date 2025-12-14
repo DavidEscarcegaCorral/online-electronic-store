@@ -1,15 +1,15 @@
-package entidades;
-
-import org.bson.types.ObjectId;
+package objetosNegocio;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 /**
- * Entidad que representa un producto en MongoDB.
+ * Business Object para Producto.
+ * Representa la lógica de negocio de un producto.
+ * NO contiene anotaciones de base de datos ni de serialización.
  */
-public class ProductoEntidad {
-    private ObjectId id;
+public class ProductoBO implements IProductoBO {
+    private String id;
     private String nombre;
     private String categoria;
     private String marca;
@@ -19,14 +19,14 @@ public class ProductoEntidad {
     private String descripcion;
     private String imagenUrl;
 
-    public ProductoEntidad() {
+    public ProductoBO() {
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -92,6 +92,22 @@ public class ProductoEntidad {
 
     public void setImagenUrl(String imagenUrl) {
         this.imagenUrl = imagenUrl;
+    }
+
+    public boolean tieneStock() {
+        return stock != null && stock > 0;
+    }
+
+    public boolean tieneStockSuficiente(int cantidad) {
+        return stock != null && stock >= cantidad;
+    }
+
+    public void reducirStock(int cantidad) {
+        if (stock != null && stock >= cantidad) {
+            stock -= cantidad;
+        } else {
+            throw new IllegalStateException("Stock insuficiente para el producto: " + nombre);
+        }
     }
 }
 

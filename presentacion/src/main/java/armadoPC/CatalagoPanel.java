@@ -3,6 +3,7 @@ package armadoPC;
 import compartido.cards.ProductoCard;
 import compartido.estilos.Estilos;
 import compartido.estilos.scroll.ScrollPaneCustom;
+import dto.ComponenteDTO;
 import ensamblajecontrol.ConfiguracionFacade;
 
 import javax.swing.*;
@@ -61,7 +62,7 @@ public class CatalagoPanel extends JPanel {
             // Obtener productos compatibles con el ensamblaje actual
             List<dto.ComponenteDTO> productosCompatibles = fachada.obtenerComponentesCompatibles(nombreProducto, null);
 
-            // Filtrar por marca si se especifica
+            // Filtrar por marca
             if (marca != null && !marca.isEmpty()) {
                 List<dto.ComponenteDTO> productosFiltrados = new ArrayList<>();
                 for (dto.ComponenteDTO componente : productosCompatibles) {
@@ -86,10 +87,10 @@ public class CatalagoPanel extends JPanel {
                 return;
             }
 
-            dto.ComponenteDTO seleccionadoDTO = fachada.getComponenteSeleccionado(nombreProducto);
+            ComponenteDTO seleccionadoDTO = fachada.getComponenteSeleccionado(nombreProducto);
             String seleccionadoId = seleccionadoDTO != null ? seleccionadoDTO.getId() : null;
 
-            for (dto.ComponenteDTO componente : productosCompatibles) {
+            for (ComponenteDTO componente : productosCompatibles) {
                 ProductoCard card = crearProductoCardDesdeDTO(componente);
 
                 if (seleccionadoId != null && seleccionadoId.equals(componente.getId())) {
@@ -125,12 +126,13 @@ public class CatalagoPanel extends JPanel {
         }
     }
 
-    private ProductoCard crearProductoCardDesdeDTO(dto.ComponenteDTO componente) {
+    private ProductoCard crearProductoCardDesdeDTO(ComponenteDTO componente) {
         ProductoCard card = new ProductoCard(
                 componente.getId(),
                 componente.getNombre(),
                 componente.getPrecio(),
-                componente.getImagenUrl() != null ? componente.getImagenUrl() : "/img/productos/default.png"
+                componente.getImagenUrl() != null ? componente.getImagenUrl() : "/img/productos/default.png",
+                ProductoCard.Modo.ARMADO
         );
 
         card.setOnSelect(id -> {

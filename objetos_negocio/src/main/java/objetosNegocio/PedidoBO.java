@@ -1,16 +1,18 @@
-package entidades;
-
-import org.bson.types.ObjectId;
+package objetosNegocio;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Entidad que representa un pedido en MongoDB.
+ * Business Object para Pedido.
+ * Representa la lógica de negocio pura del pedido.
+ * NO contiene anotaciones de MongoDB ni tipos específicos de BD.
  */
-public class PedidoEntidad {
-    private ObjectId id;
+public class PedidoBO implements IPedidoBO {
+    private String id;
     private String clienteId;
     private List<ItemPedido> items;
     private BigDecimal total;
@@ -30,14 +32,18 @@ public class PedidoEntidad {
         CANCELADO
     }
 
-    public PedidoEntidad() {
+    public PedidoBO() {
+        this.items = new ArrayList<>();
+        this.fechaCreacion = LocalDateTime.now();
+        this.estado = EstadoPedido.PENDIENTE;
     }
 
-    public ObjectId getId() {
+    // Getters y Setters
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -54,7 +60,7 @@ public class PedidoEntidad {
     }
 
     public void setItems(List<ItemPedido> items) {
-        this.items = items;
+        this.items = items != null ? items : new ArrayList<>();
     }
 
     public BigDecimal getTotal() {
@@ -97,14 +103,101 @@ public class PedidoEntidad {
         this.direccionEntrega = direccionEntrega;
     }
 
+    // Métodos de lógica de negocio
+    public boolean esPendiente() {
+        return estado == EstadoPedido.PENDIENTE;
+    }
+
+    public boolean estaProcesando() {
+        return estado == EstadoPedido.PROCESANDO;
+    }
+
+    public boolean estaEnviado() {
+        return estado == EstadoPedido.ENVIADO;
+    }
+
+    public boolean estaEntregado() {
+        return estado == EstadoPedido.ENTREGADO;
+    }
+
+    public boolean estaCancelado() {
+        return estado == EstadoPedido.CANCELADO;
+    }
+
+    public boolean puedeSerCancelado() {
+        return estado == EstadoPedido.PENDIENTE || estado == EstadoPedido.PROCESANDO;
+    }
+
+    public void cancelar() {
+        if (!puedeSerCancelado()) {
+            throw new IllegalStateException("El pedido no puede ser cancelado en estado: " + estado);
+        }
+        this.estado = EstadoPedido.CANCELADO;
+    }
+
+    public void marcarComoProcesando() {
+        if (!esPendiente()) {
+            throw new IllegalStateException("Solo pedidos pendientes pueden ser marcados como procesando");
+        }
+        this.estado = EstadoPedido.PROCESANDO;
+    }
+
+    public void marcarComoEnviado() {
+        if (!estaProcesando()) {
+            throw new IllegalStateException("Solo pedidos en procesamiento pueden ser marcados como enviados");
+        }
+        this.estado = EstadoPedido.ENVIADO;
+    }
+
+    public void marcarComoEntregado() {
+        if (!estaEnviado()) {
+            throw new IllegalStateException("Solo pedidos enviados pueden ser marcados como entregados");
+        }
+        this.estado = EstadoPedido.ENTREGADO;
+    }
+
+    public BigDecimal calcularTotal() {
+        if (items == null || items.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal suma = BigDecimal.ZERO;
+        for (ItemPedido item : items) {
+            BigDecimal subtotal = item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad()));
+            suma = suma.add(subtotal);
+        }
+        return suma;
+    }
+
+    public int getCantidadTotalItems() {
+        if (items == null) return 0;
+        return items.stream().mapToInt(ItemPedido::getCantidad).sum();
+    }
+
+    public void agregarItem(ItemPedido item) {
+        if (item != null) {
+            items.add(item);
+        }
+    }
+
     /**
-     * Representa un item individual dentro del pedido.
+     * Clase interna para representar un item del pedido.
      */
     public static class ItemPedido {
         private String productoId;
         private String nombre;
         private Integer cantidad;
         private BigDecimal precioUnitario;
+
+        public ItemPedido() {
+        }
+
+        public ItemPedido(String productoId, String nombre, Integer cantidad, BigDecimal precioUnitario) {
+            this.productoId = productoId;
+            this.nombre = nombre;
+            this.cantidad = cantidad;
+            this.precioUnitario = precioUnitario;
+        }
 
         public String getProductoId() {
             return productoId;
@@ -137,14 +230,29 @@ public class PedidoEntidad {
         public void setPrecioUnitario(BigDecimal precioUnitario) {
             this.precioUnitario = precioUnitario;
         }
+
+        public BigDecimal getSubtotal() {
+            if (precioUnitario == null || cantidad == null) {
+                return BigDecimal.ZERO;
+            }
+            return precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+        }
     }
 
     /**
-     * Información del método de pago utilizado en el pedido.
+     * Clase interna para información del método de pago.
      */
     public static class MetodoPagoInfo {
         private String tipo;
         private String detalles;
+
+        public MetodoPagoInfo() {
+        }
+
+        public MetodoPagoInfo(String tipo, String detalles) {
+            this.tipo = tipo;
+            this.detalles = detalles;
+        }
 
         public String getTipo() {
             return tipo;
@@ -164,13 +272,17 @@ public class PedidoEntidad {
     }
 
     /**
-     * Dirección de entrega del pedido.
+     * Clase interna para dirección de entrega.
      */
     public static class DireccionEntrega {
         private String calle;
         private String ciudad;
         private String estado;
         private String codigoPostal;
+        private String pais;
+
+        public DireccionEntrega() {
+        }
 
         public String getCalle() {
             return calle;
@@ -202,6 +314,14 @@ public class PedidoEntidad {
 
         public void setCodigoPostal(String codigoPostal) {
             this.codigoPostal = codigoPostal;
+        }
+
+        public String getPais() {
+            return pais;
+        }
+
+        public void setPais(String pais) {
+            this.pais = pais;
         }
     }
 }

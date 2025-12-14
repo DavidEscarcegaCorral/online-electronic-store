@@ -2,7 +2,6 @@ package compartido.cards;
 
 import compartido.estilos.Estilos;
 import compartido.estilos.FontUtil;
-
 import javax.swing.*;
 import java.awt.*;
 

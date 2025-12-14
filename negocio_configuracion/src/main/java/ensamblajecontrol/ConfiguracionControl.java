@@ -1,13 +1,13 @@
 package ensamblajecontrol;
 
 import dao.ConfiguracionDAO;
-import dao.IProductoDAO;
 import dao.ProductoDAO;
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
 import entidades.ConfiguracionEntidad;
 import entidades.ProductoEntidad;
-
+import objetosNegocio.ProductoBO;
+import objetosNegocio.mappers.ProductoMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class ConfiguracionControl implements IConfiguracionControl {
     private final ConfiguracionDAO configuracionDAO;
-    private final IProductoDAO productoDAO;
+    private final ProductoDAO productoDAO;
 
     public ConfiguracionControl() {
         this.configuracionDAO = new ConfiguracionDAO();
@@ -64,15 +64,85 @@ public class ConfiguracionControl implements IConfiguracionControl {
     }
 
     @Override
-    public List<ComponenteDTO> obtenerProductosPorCategoriaYMarca(String categoria, String marca) {
+    public List<ComponenteDTO> obtenerProductosPorCategoriaYMarca(String categoria, String marca, EnsamblajeDTO ensamblajeActual) {
         List<ProductoEntidad> entidades = productoDAO.obtenerPorCategoriaYMarca(categoria, marca);
         List<ComponenteDTO> dtos = new ArrayList<>();
 
         for (ProductoEntidad entidad : entidades) {
-            dtos.add(convertirADTO(entidad));
+            ProductoBO bo = ProductoMapper.entidadABO(entidad);
+            ComponenteDTO dto = ProductoMapper.boADTO(bo);
+
+            if (ensamblajeActual != null && !validarCompatibilidad(dto, ensamblajeActual).isEmpty()) {
+                continue;
+            }
+
+            dtos.add(dto);
         }
 
         return dtos;
+    }
+
+    private List<String> validarCompatibilidad(ComponenteDTO componenteNuevo, EnsamblajeDTO ensamblaje) {
+        List<String> errores = new ArrayList<>();
+
+        if (ensamblaje == null) {
+            return errores;
+        }
+
+        ComponenteDTO placaMadre = ensamblaje.getComponente("Tarjeta Madre");
+        ComponenteDTO procesador = ensamblaje.getComponente("Procesador");
+        ComponenteDTO ram = ensamblaje.getComponente("RAM");
+        ComponenteDTO gabinete = ensamblaje.getComponente("Gabinete");
+
+        String categoriaNueva = componenteNuevo.getCategoria();
+
+        switch (categoriaNueva) {
+            case "Procesador":
+                if (placaMadre != null && placaMadre.getSocket() != null &&
+                    componenteNuevo.getSocket() != null &&
+                    !placaMadre.getSocket().equals(componenteNuevo.getSocket())) {
+                    errores.add("Socket incompatible con Tarjeta Madre (" + placaMadre.getSocket() + ")");
+                }
+                break;
+
+            case "Tarjeta Madre":
+                if (procesador != null && procesador.getSocket() != null &&
+                    componenteNuevo.getSocket() != null &&
+                    !procesador.getSocket().equals(componenteNuevo.getSocket())) {
+                    errores.add("Socket incompatible con Procesador (" + procesador.getSocket() + ")");
+                }
+                if (ram != null && ram.getTipoRam() != null &&
+                    componenteNuevo.getTipoRam() != null &&
+                    !ram.getTipoRam().equals(componenteNuevo.getTipoRam())) {
+                    errores.add("Tipo de RAM incompatible con RAM (" + ram.getTipoRam() + ")");
+                }
+                if (gabinete != null && gabinete.getFormFactor() != null &&
+                    componenteNuevo.getFormFactor() != null &&
+                    gabinete.getFormFactor().equals("Micro-ATX") &&
+                    componenteNuevo.getFormFactor().equals("ATX")) {
+                    errores.add("Placa ATX no cabe en gabinete Micro-ATX");
+                }
+                break;
+
+            case "RAM":
+                if (placaMadre != null && placaMadre.getTipoRam() != null &&
+                    componenteNuevo.getTipoRam() != null &&
+                    !placaMadre.getTipoRam().equals(componenteNuevo.getTipoRam())) {
+                    errores.add("Tipo de RAM incompatible con Tarjeta Madre (" + placaMadre.getTipoRam() + ")");
+                }
+                break;
+
+            case "Gabinete":
+                if (placaMadre != null && placaMadre.getFormFactor() != null &&
+                    componenteNuevo.getFormFactor() != null &&
+                    componenteNuevo.getFormFactor().equals("Micro-ATX") &&
+                    placaMadre.getFormFactor().equals("ATX")) {
+                    errores.add("Gabinete Micro-ATX es muy pequeño para la Placa Madre (ATX)");
+                }
+                break;
+        }
+
+        return errores;
     }
 
     @Override
@@ -111,7 +181,7 @@ public class ConfiguracionControl implements IConfiguracionControl {
         }
 
         entidad.setComponentes(componentesList);
-        entidad.setPrecioTotal(ensamblajeDTO.getPrecioTotal());
+        entidad.setPrecioTotal(java.math.BigDecimal.valueOf(ensamblajeDTO.getPrecioTotal()));
 
         return entidad;
     }
@@ -123,42 +193,65 @@ public class ConfiguracionControl implements IConfiguracionControl {
         }
 
         try {
-            ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
-            if (producto == null) {
+            ProductoEntidad entidad = productoDAO.obtenerPorId(productoId);
+            if (entidad == null) {
                 return null;
             }
-            return convertirADTO(producto);
+
+            ProductoBO bo = ProductoMapper.entidadABO(entidad);
+            return ProductoMapper.boADTO(bo);
         } catch (Exception e) {
             System.err.println("Error al convertir producto a DTO: " + e.getMessage());
             return null;
         }
     }
 
-    private ComponenteDTO convertirADTO(ProductoEntidad entidad) {
-        ComponenteDTO dto = new ComponenteDTO();
-        dto.setId(entidad.getId().toString());
-        dto.setNombre(entidad.getNombre());
-        dto.setCategoria(entidad.getCategoria());
-        dto.setMarca(entidad.getMarca());
-        dto.setPrecio(entidad.getPrecio());
-        dto.setStock(entidad.getStock());
-        dto.setDescripcion(entidad.getDescripcion());
-        dto.setImagenUrl(entidad.getImagenUrl());
+    @Override
+    public List<ComponenteDTO> obtenerProductosAleatorios(int cantidad) {
+        try {
+            List<ProductoEntidad> todasLasEntidades = productoDAO.obtenerTodos();
 
-        Map<String, String> specs = entidad.getEspecificaciones();
-        if (specs != null) {
-            dto.setSocket(specs.get("socket"));
-            dto.setTipoRam(specs.get("tipoRam"));
-            dto.setFormFactor(specs.get("formFactor"));
-            if (specs.containsKey("watts")) {
-                try {
-                    dto.setWatts(Integer.parseInt(specs.get("watts")));
-                } catch (NumberFormatException e) {
-                    dto.setWatts(0);
-                }
+            if (todasLasEntidades == null || todasLasEntidades.isEmpty()) {
+                return new ArrayList<>();
             }
+
+            List<ProductoEntidad> entidadesAleatorias = seleccionarAleatorios(todasLasEntidades, cantidad);
+
+            List<ComponenteDTO> dtos = new ArrayList<>();
+            for (ProductoEntidad entidad : entidadesAleatorias) {
+                ProductoBO bo = ProductoMapper.entidadABO(entidad);
+                ComponenteDTO dto = ProductoMapper.boADTO(bo);
+                dtos.add(dto);
+            }
+
+            return dtos;
+        } catch (Exception e) {
+            System.err.println("Error al obtener productos aleatorios: " + e.getMessage());
+            return new ArrayList<>();
         }
-        return dto;
+    }
+
+    /**
+     * Selecciona elementos aleatorios de una lista, solo se usa para aggrear componentes el menu de inicio... de momento :b.
+     *
+     * @param lista Lista de elementos
+     * @param cantidad Cantidad de elementos a seleccionar
+     * @return Lista con elementos aleatorios
+     */
+    private <T> List<T> seleccionarAleatorios(List<T> lista, int cantidad) {
+        if (lista.size() <= cantidad) {
+            return new ArrayList<>(lista);
+        }
+
+        List<T> copia = new ArrayList<>(lista);
+        List<T> seleccionados = new ArrayList<>();
+        java.util.Random random = new java.util.Random();
+
+        for (int i = 0; i < cantidad && !copia.isEmpty(); i++) {
+            int indice = random.nextInt(copia.size());
+            seleccionados.add(copia.remove(indice));
+        }
+
+        return seleccionados;
     }
 }
-

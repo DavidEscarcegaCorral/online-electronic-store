@@ -146,5 +146,12 @@ public interface IControlPresentacionArmado {
      * @return El ComponenteDTO o null si no se encuentra el producto
      */
     ComponenteDTO convertirProductoADTO(String productoId);
-}
 
+    /**
+     * Obtiene una cantidad específica de productos aleatorios para mostrar como destacados.
+     *
+     * @param cantidad Número de productos aleatorios a obtener
+     * @return Lista de productos aleatorios como DTOs
+     */
+    List<ComponenteDTO> obtenerProductosAleatorios(int cantidad);
+}

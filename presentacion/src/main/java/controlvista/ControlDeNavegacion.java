@@ -2,6 +2,7 @@ package controlvista;
 
 import compartido.FramePrincipal;
 import armadoPC.ArmarPcPanel;
+import dto.ComponenteDTO;
 import dto.ConfiguracionDTO;
 import venta.carrito.CarritoPanel;
 import venta.pedido.ConfirmarDetallesPedidoPanel;
@@ -45,7 +46,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     public ControlDeNavegacion(FramePrincipal frame) {
         this.frame = frame;
         this.armarPcPanel = new ArmarPcPanel();
-        this.carritoPanel = new CarritoPanel();
+        this.carritoPanel = new CarritoPanel(frame);
         this.confirmarDetallesPedidoPanel = new ConfirmarDetallesPedidoPanel();
         this.productoPanel = new ProductoPanel();
         this.menuPrincipalPanel = new MenuPrincipalPanel();
@@ -68,8 +69,27 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
     private void inicializarVista() {
         menuPrincipalPanel.setOnProductoSeleccionado(this::mostrarProducto);
+        cargarProductosDestacados();
         frame.cambiarPanel(menuPrincipalPanel);
         frame.setVisible(true);
+    }
+
+    /**
+     * Carga 5 productos aleatorios como productos destacados en el menú principal.
+     * FLUJO CORRECTO: Controlador → obtiene productos → convierte a DTO → pasa a Vista
+     *
+     * Los ProductoCard se configuran con el callback para abrir ProductoPanel.
+     */
+    private void cargarProductosDestacados() {
+        try {
+            List<dto.ComponenteDTO> productosDestacados = controlPresentacionArmado.obtenerProductosAleatorios(5);
+            menuPrincipalPanel.cargarProductosDestacados(productosDestacados);
+
+            // Configurar el callback para que al hacer clic en el botón o link, abra ProductoPanel
+            menuPrincipalPanel.setOnProductoSeleccionado(this::mostrarProducto);
+        } catch (Exception e) {
+            System.err.println("Error al cargar productos destacados: " + e.getMessage());
+        }
     }
 
     private void configurarBarraNavegacion(BarraNavegacion barra) {
@@ -177,7 +197,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
     @Override
     public void mostrarProducto(String productoId) {
-        dto.ComponenteDTO producto = controlPresentacionArmado.convertirProductoADTO(productoId);
+        ComponenteDTO producto = controlPresentacionArmado.convertirProductoADTO(productoId);
         if (producto != null) {
             mostrarProducto(producto);
         } else {
@@ -236,7 +256,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         }
     }
 
-    private void agregarComponenteDTOAlCarrito(dto.ComponenteDTO componente, int cantidad) {
+    private void agregarComponenteDTOAlCarrito(ComponenteDTO componente, int cantidad) {
         try {
             String productoId = componente.getId();
             String nombreProducto = componente.getNombre();

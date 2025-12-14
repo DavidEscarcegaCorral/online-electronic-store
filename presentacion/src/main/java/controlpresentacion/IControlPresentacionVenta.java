@@ -34,6 +34,13 @@ public interface IControlPresentacionVenta {
     List<ConfiguracionDTO> obtenerConfiguracionesEnCarrito();
 
     /**
+     * Obtiene todos los productos individuales del carrito.
+     *
+     * @return Lista de items del carrito como DTOs
+     */
+    List<dto.ItemCarritoDTO> obtenerProductosDelCarrito();
+
+    /**
      * Confirma el pedido y procesa el pago.
      *
      * @param metodoPago El método de pago seleccionado por el usuario

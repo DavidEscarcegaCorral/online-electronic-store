@@ -114,9 +114,4 @@ public class FramePrincipal extends JFrame {
         panelContenedor.revalidate();
         panelContenedor.repaint();
     }
-
-    public JPanel getPanelContenido() {
-        return panelContenido;
-    }
-
 }

@@ -1,13 +1,13 @@
-package objetosNegocio.usuarioON;
+package objetosNegocio;
 
-public class UsuarioON implements IUsuarioON {
+public class UsuarioBO implements IUsuarioBO {
     private String id;
     private String nombre;
     private String email;
 
-    public UsuarioON() {}
+    public UsuarioBO() {}
 
-    public UsuarioON(String id, String nombre, String email) {
+    public UsuarioBO(String id, String nombre, String email) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;

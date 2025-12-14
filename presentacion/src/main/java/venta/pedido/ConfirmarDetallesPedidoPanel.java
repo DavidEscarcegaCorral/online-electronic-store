@@ -7,9 +7,6 @@ import compartido.estilos.Estilos;
 import compartido.estilos.TituloLabel;
 import dto.MetodoPagoDTO;
 import controlpresentacion.ControlPresentacionVenta;
-import dao.CarritoDAO;
-import dao.UsuarioDAO;
-import entidades.UsuarioEntidad;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,21 +21,20 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
 
     public ConfirmarDetallesPedidoPanel() {
         super();
-
         catalagoPedidoPanel = new CatalagoPedidoPanel();
         metodoPagoPanel = new MetodoPagoPanel();
         tituloLabel = new TituloLabel("Confirmar y pagar");
         totalPanel = new TotalPanel();
 
         confirmarPedidoBtn = new Boton(
-            "Confirmar Pedido",
-            180,
-            30,
-            14,
-            8,
-            Color.WHITE,
-            Estilos.COLOR_BOTON_MORADO,
-            Estilos.COLOR_BOTON_MORADO_HOVER
+                "Confirmar Pedido",
+                180,
+                30,
+                14,
+                8,
+                Color.WHITE,
+                Estilos.COLOR_BOTON_MORADO,
+                Estilos.COLOR_BOTON_MORADO_HOVER
         );
 
         inicializarPanelCentral();
@@ -65,31 +61,15 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
         panelEste.add(Box.createVerticalGlue());
     }
 
-    private String obtenerClienteIdDefecto() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        UsuarioEntidad usuario = usuarioDAO.obtenerPorEmail("cliente_default@local");
-        if (usuario != null && usuario.getId() != null) {
-            return usuario.getId().toString();
-        }
-        throw new IllegalStateException("Usuario por defecto no encontrado");
-    }
-
     private void configurarEventos() {
         confirmarPedidoBtn.addActionListener(e -> {
             try {
-                // Validar que hay productos en el carrito
                 ControlPresentacionVenta controlVenta = ControlPresentacionVenta.getInstance();
-                var configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
 
-                String clienteId = obtenerClienteIdDefecto();
-                entidades.CarritoEntidad carrito = new CarritoDAO().obtenerCarrito(clienteId);
-                java.util.List<java.util.Map<String, Object>> productosIndividuales =
-                    carrito.getProductos() != null ? carrito.getProductos() : new java.util.ArrayList<>();
+                double total = controlVenta.calcularTotalCarrito();
+                boolean tieneItems = total > 0;
 
-                boolean tieneConfiguraciones = configuraciones != null && !configuraciones.isEmpty();
-                boolean tieneProductos = !productosIndividuales.isEmpty();
-
-                if (!tieneConfiguraciones && !tieneProductos) {
+                if (!tieneItems) {
                     JOptionPane.showMessageDialog(
                         this,
                         "No hay productos en el carrito para realizar el pedido.",
@@ -101,11 +81,11 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
 
                 // Confirmar acción con el usuario
                 int confirmacion = JOptionPane.showConfirmDialog(
-                    this,
-                    "¿Está seguro de confirmar este pedido?",
-                    "Confirmar Pedido",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
+                        this,
+                        "¿Está seguro de confirmar este pedido?",
+                        "Confirmar Pedido",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
                 );
 
                 if (confirmacion == JOptionPane.YES_OPTION) {
@@ -118,10 +98,10 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
 
                     if (pedidoId != null) {
                         JOptionPane.showMessageDialog(
-                            this,
-                            "¡Pedido confirmado exitosamente!\nID: " + pedidoId,
-                            "Pedido Confirmado",
-                            JOptionPane.INFORMATION_MESSAGE
+                                this,
+                                "¡Pedido confirmado exitosamente!\nID: " + pedidoId,
+                                "Pedido Confirmado",
+                                JOptionPane.INFORMATION_MESSAGE
                         );
 
                         // Ejecutar callback si existe
@@ -130,10 +110,10 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
                         }
                     } else {
                         JOptionPane.showMessageDialog(
-                            this,
-                            "Error al procesar el pedido. Intente nuevamente.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
+                                this,
+                                "Error al procesar el pedido. Intente nuevamente.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
                         );
                     }
                 }
@@ -141,10 +121,10 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(
-                    this,
-                    "Error al confirmar el pedido: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                        this,
+                        "Error al confirmar el pedido: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
                 );
             }
         });
@@ -163,7 +143,8 @@ public class ConfirmarDetallesPedidoPanel extends PanelBase {
             catalagoPedidoPanel.cargarProductosDelCarrito();
         }
         if (totalPanel != null) {
-            totalPanel.actualizarTotal();
+            double total = getTotalCarrito();
+            totalPanel.actualizarTotal(total);
         }
     }
 

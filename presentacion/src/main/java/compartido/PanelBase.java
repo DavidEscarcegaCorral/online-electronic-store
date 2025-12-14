@@ -1,9 +1,5 @@
 package compartido;
 
-import compartido.estilos.Boton;
-import compartido.estilos.Estilos;
-import compartido.estilos.TituloLabel;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -44,14 +40,6 @@ public class PanelBase extends JPanel {
 
     }
 
-    public JPanel getPanelNorte() {
-        return panelNorte;
-    }
-
-    public void setPanelNorte(JPanel panelNorte) {
-        this.panelNorte = panelNorte;
-    }
-
     public JPanel getPanelCentro() {
         return panelCentro;
     }
@@ -60,28 +48,5 @@ public class PanelBase extends JPanel {
         this.panelCentro = panelCentro;
     }
 
-    public JPanel getPanelSur() {
-        return panelSur;
-    }
-
-    public void setPanelSur(JPanel panelSur) {
-        this.panelSur = panelSur;
-    }
-
-    public JPanel getPanelEste() {
-        return panelEste;
-    }
-
-    public void setPanelEste(JPanel panelEste) {
-        this.panelEste = panelEste;
-    }
-
-    public JPanel getPanelOeste() {
-        return panelOeste;
-    }
-
-    public void setPanelOeste(JPanel panelOeste) {
-        this.panelOeste = panelOeste;
-    }
 
 }

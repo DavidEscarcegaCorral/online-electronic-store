@@ -1,9 +1,7 @@
 package ventacontrol;
 
-import dto.CarritoDTO;
 import dto.MetodoPagoDTO;
 import entidades.ConfiguracionEntidad;
-
 import java.util.List;
 
 /**
@@ -11,22 +9,11 @@ import java.util.List;
  * Gestiona el carrito y el proceso de pago.
  *
  * PATRÓN: Facade
- * - Orquesta llamadas a VentaControl.
- * - Obtiene clienteId del contexto de sesión.
- * - NO mantiene estado.
  */
 public interface IVentaFacade {
 
     /**
-     * Obtiene el carrito actual del cliente.
-     * Si no existe, se crea automáticamente.
-     *
-     * @return El carrito actual.
-     */
-    CarritoDTO getCarritoActual();
-
-    /**
-     * Vacía el carrito actual (elimina todos los items/configuraciones).
+     * Vacía el carrito actual.
      */
     void vaciarCarrito();
 
@@ -71,6 +58,13 @@ public interface IVentaFacade {
      * @return true si se removió correctamente, false si no existe.
      */
     boolean removerConfiguracionDelCarrito(String configuracionId);
+
+    /**
+     * Obtiene el carrito completo del cliente actual.
+     *
+     * @return El carrito con todos sus datos (productos y configuraciones).
+     */
+    objetosNegocio.CarritoBO obtenerCarrito();
 
     /**
      * Obtiene todas las configuraciones que están en el carrito actual.

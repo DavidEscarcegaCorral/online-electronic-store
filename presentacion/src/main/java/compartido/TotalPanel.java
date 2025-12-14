@@ -2,17 +2,19 @@ package compartido;
 
 import compartido.estilos.Estilos;
 import compartido.estilos.FontUtil;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Vista Pasiva para mostrar el total de un carrito o pedido.
+ */
 public class TotalPanel extends JPanel {
-    private JPanel panelNorte;
-    private JPanel panelCentro;
-    private JPanel panelSur;
+    private static final Logger logger = LoggerFactory.getLogger(TotalPanel.class);
 
-    private JLabel subtotalLabel;
-    private JLabel envioLabel;
+    private JPanel panelNorte;
+    private JPanel panelSur;
     private JLabel totalLabel;
     private JLabel totalValueLabel;
 
@@ -63,21 +65,35 @@ public class TotalPanel extends JPanel {
         add(panelSur, BorderLayout.SOUTH);
     }
 
-    public void actualizarTotal() {
+    /**
+     * Actualiza el total con el valor recibido.
+     * @param total El valor total a mostrar
+     */
+    public void actualizarTotal(double total) {
         try {
-            controlpresentacion.ControlPresentacionVenta controlVenta = controlpresentacion.ControlPresentacionVenta.getInstance();
-            double total = controlVenta.calcularTotalCarrito();
+            if (total < 0) {
+                logger.warn("Intento de establecer total negativo: {}", total);
+                total = 0.0;
+            }
+
             totalValueLabel.setText(String.format("$%,.2f", total));
-            System.out.println("Total actualizado: $" + total);
+            logger.debug("Total actualizado: ${}", total);
+
             revalidate();
             repaint();
         } catch (Exception e) {
-            System.err.println("Error al calcular total: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error al actualizar total en vista", e);
             totalValueLabel.setText("$0.00");
             revalidate();
             repaint();
         }
+    }
+
+    /**
+     * Limpia el total (establece a $0.00).
+     */
+    public void limpiar() {
+        actualizarTotal(0.0);
     }
 
     @Override

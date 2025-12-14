@@ -1,7 +1,7 @@
 package controlpresentacion;
 
 import ensamblajecontrol.ConfiguracionFacade;
-import ensamblajecontrol.IEnsamblajeControl;
+import ensamblajecontrol.IEnsamblajeFacade;
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
 
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ControlPresentacionArmado implements IControlPresentacionArmado {
 
-    private final IEnsamblajeControl fachada;
+    private final IEnsamblajeFacade fachada;
 
     private String categoriaActual;
     private String marcaActual;
@@ -71,7 +71,7 @@ public class ControlPresentacionArmado implements IControlPresentacionArmado {
         if (categoriaActual == null || marcaActual == null) {
             throw new IllegalStateException("Debe seleccionar categoría y marca primero");
         }
-        return fachada.obtenerProductosPorCategoriaYMarca(categoriaActual, marcaActual);
+        return fachada.obtenerProductosPorCategoriaYMarca(categoriaActual, marcaActual, fachada.getEnsamblajeActual());
     }
 
     @Override
@@ -181,5 +181,10 @@ public class ControlPresentacionArmado implements IControlPresentacionArmado {
     @Override
     public ComponenteDTO convertirProductoADTO(String productoId) {
         return fachada.convertirProductoADTO(productoId);
+    }
+
+    @Override
+    public List<ComponenteDTO> obtenerProductosAleatorios(int cantidad) {
+        return fachada.obtenerProductosAleatorios(cantidad);
     }
 }

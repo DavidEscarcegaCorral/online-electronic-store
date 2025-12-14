@@ -7,6 +7,8 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,7 +57,8 @@ public class ConfiguracionDAO {
             Document doc = new Document();
             doc.append("usuarioId", configuracion.getUsuarioId())
                     .append("nombre", configuracion.getNombre())
-                    .append("precioTotal", configuracion.getPrecioTotal())
+                    .append("precioTotal", configuracion.getPrecioTotal() != null ?
+                        configuracion.getPrecioTotal().doubleValue() : 0.0)
                     .append("fechaCreacion", fechaCreacion);
 
             if (componentesDocs != null) {
@@ -70,7 +73,8 @@ public class ConfiguracionDAO {
             Document doc = new Document();
             doc.append("usuarioId", configuracion.getUsuarioId())
                     .append("nombre", configuracion.getNombre())
-                    .append("precioTotal", configuracion.getPrecioTotal())
+                    .append("precioTotal", configuracion.getPrecioTotal() != null ?
+                        configuracion.getPrecioTotal().doubleValue() : 0.0)
                     .append("fechaCreacion", fechaCreacion);
 
             if (componentesDocs != null) {
@@ -95,7 +99,9 @@ public class ConfiguracionDAO {
         config.setId(doc.getObjectId("_id"));
         config.setUsuarioId(doc.getString("usuarioId"));
         config.setNombre(doc.getString("nombre"));
-        config.setPrecioTotal(doc.getDouble("precioTotal"));
+
+        Double precioTotal = doc.getDouble("precioTotal");
+        config.setPrecioTotal(precioTotal != null ? BigDecimal.valueOf(precioTotal) : BigDecimal.ZERO);
 
         Object fechaObj = doc.get("fechaCreacion");
         if (fechaObj != null) {
@@ -144,7 +150,9 @@ public class ConfiguracionDAO {
                 config.setId(doc.getObjectId("_id"));
                 config.setUsuarioId(doc.getString("usuarioId"));
                 config.setNombre(doc.getString("nombre"));
-                config.setPrecioTotal(doc.getDouble("precioTotal"));
+
+                Double precioTotal = doc.getDouble("precioTotal");
+                config.setPrecioTotal(precioTotal != null ? BigDecimal.valueOf(precioTotal) : java.math.BigDecimal.ZERO);
 
                 Object fechaObj = doc.get("fechaCreacion");
                 if (fechaObj != null && fechaObj instanceof Date) {
@@ -205,12 +213,6 @@ public class ConfiguracionDAO {
         }
     }
 
-    /**
-     * Obtiene todas las configuraciones guardadas de un usuario específico y las ordena por fecha.
-     *
-     * @param usuarioId El ID del usuario propietario de las configuraciones
-     * @return Lista de ConfiguracionEntidad asociadas al usuario ordenadas por fecha descendente
-     */
     public List<ConfiguracionEntidad> obtenerPorUsuarioIdOrdenado(String usuarioId) {
         List<ConfiguracionEntidad> configuraciones = obtenerPorUsuarioId(usuarioId);
         if (configuraciones != null) {

@@ -1,10 +1,10 @@
-package objetosNegocio.componenteON;
+package objetosNegocio;
 
 import dto.ComponenteDTO;
 
 import java.util.List;
 
-public interface IComponenteON {
+public interface IComponenteBO {
     /**
      * Obtiene una lista de todos los componentes disponibles.
      *

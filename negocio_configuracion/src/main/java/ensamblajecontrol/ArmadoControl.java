@@ -4,23 +4,24 @@ import dao.ConfiguracionDAO;
 import dto.ComponenteDTO;
 import dto.EnsamblajeDTO;
 import entidades.ConfiguracionEntidad;
-import objetosNegocio.componenteON.ComponenteON;
-import objetosNegocio.componenteON.IComponenteON;
-
+import objetosNegocio.ComponenteBO;
+import objetosNegocio.IComponenteBO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.math.BigDecimal.valueOf;
+
 public class ArmadoControl implements IArmadoControl {
     private final ConfiguracionDAO configuracionDAO;
-    private final IComponenteON componenteON;
+    private final IComponenteBO componenteON;
     private EnsamblajeDTO ensamblajeActual;
 
     public ArmadoControl() {
         this.configuracionDAO = new ConfiguracionDAO();
-        this.componenteON = ComponenteON.getInstance();
+        this.componenteON = ComponenteBO.getInstance();
         this.ensamblajeActual = new EnsamblajeDTO();
     }
 
@@ -51,7 +52,7 @@ public class ArmadoControl implements IArmadoControl {
                 componentesList.add(compMap);
             }
             configuracion.setComponentes(componentesList);
-            configuracion.setPrecioTotal(ensamblaje.getPrecioTotal());
+            configuracion.setPrecioTotal(valueOf(ensamblaje.getPrecioTotal()));
 
             configuracionDAO.guardar(configuracion);
 
@@ -161,11 +162,11 @@ public class ArmadoControl implements IArmadoControl {
     /**
      * Obtiene las categorías críticas según el tipo de uso.
      *
-     * Categorías críticas (obligatorias):
+     * Categorías obligatorias:
      * - Gaming/Diseño/Custom: Procesador, Tarjeta Madre, RAM, Tarjeta de video, Almacenamiento, Fuente de poder, Gabinete, Disipador
-     * - Office: Procesador, Tarjeta Madre, RAM, Almacenamiento, Fuente de poder, Gabinete, Disipador (SIN Tarjeta de video)
+     * - Office: Procesador, Tarjeta Madre, RAM, Almacenamiento, Fuente de poder, Gabinete, Disipador
      *
-     * Categorías opcionales (para todos): Ventilador, Monitor, Kit de teclado/ratón, Redes e internet
+     * Categorías opcionales: Ventilador, Monitor, Kit de teclado/ratón, Redes e internet
      */
     private List<String> obtenerCategoriasCriticas(String tipoUso) {
         List<String> categoriasCriticas = new ArrayList<>();

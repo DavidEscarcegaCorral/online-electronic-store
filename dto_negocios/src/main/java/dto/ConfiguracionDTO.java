@@ -5,7 +5,6 @@ import java.util.Map;
 
 /**
  * DTO para representar una configuración de PC guardada.
- * NO expone detalles de la base de datos a la capa de presentación.
  */
 public class ConfiguracionDTO {
     private String id;

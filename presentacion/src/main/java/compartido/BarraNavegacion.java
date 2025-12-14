@@ -111,35 +111,8 @@ public class BarraNavegacion extends JPanel {
         return armarPcBtn;
     }
 
-    public Boton getPedidosBtn() {
-        return pedidosBtn;
-    }
-
     public Boton getCarritoBtn() {
         return carritoBtn;
     }
 
-    public Boton getCuentaBtn() {
-        return cuentaBtn;
-    }
-
-    public Boton getEquiposBtn() {
-        return equiposBtn;
-    }
-
-    public Boton getComponentesBtn() {
-        return componentesBtn;
-    }
-
-    public Boton getAlmacenamientoBtn() {
-        return almacenamientoBtn;
-    }
-
-    public Boton getRedesBtn() {
-        return redesBtn;
-    }
-
-    public Boton getAccesoriosBtn() {
-        return accesoriosBtn;
-    }
 }

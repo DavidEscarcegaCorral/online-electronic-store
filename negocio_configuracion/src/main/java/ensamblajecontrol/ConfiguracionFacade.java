@@ -4,7 +4,7 @@ import dto.EnsamblajeDTO;
 import dto.ComponenteDTO;
 import java.util.List;
 
-public class ConfiguracionFacade implements IEnsamblajeControl {
+public class ConfiguracionFacade implements IEnsamblajeFacade {
     private final IArmadoControl armadoControl;
     private final IConfiguracionControl configuracionControl;
 
@@ -103,8 +103,8 @@ public class ConfiguracionFacade implements IEnsamblajeControl {
     }
 
     @Override
-    public List<ComponenteDTO> obtenerProductosPorCategoriaYMarca(String categoria, String marca) {
-        return configuracionControl.obtenerProductosPorCategoriaYMarca(categoria, marca);
+    public List<ComponenteDTO> obtenerProductosPorCategoriaYMarca(String categoria, String marca, EnsamblajeDTO ensamblajeActual) {
+        return configuracionControl.obtenerProductosPorCategoriaYMarca(categoria, marca, ensamblajeActual);
     }
 
     @Override
@@ -116,5 +116,9 @@ public class ConfiguracionFacade implements IEnsamblajeControl {
     public ComponenteDTO convertirProductoADTO(String productoId) {
         return configuracionControl.convertirProductoADTO(productoId);
     }
-}
 
+    @Override
+    public List<ComponenteDTO> obtenerProductosAleatorios(int cantidad) {
+        return configuracionControl.obtenerProductosAleatorios(cantidad);
+    }
+}

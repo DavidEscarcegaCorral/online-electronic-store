@@ -256,8 +256,12 @@ public class ControlFlujoArmado {
 
             List<String> errores = controlPresentacionArmado.avanzarConComponenteSeleccionado();
 
+            // Los productos incompatibles ya se filtran antes de mostrarse,
+            // pero si por alguna razón hay errores, los manejamos
             if (!errores.isEmpty()) {
-                System.err.println("Advertencia: Se encontraron errores de compatibilidad inesperados: " + String.join(", ", errores));
+                mostrarMensaje("Error de compatibilidad: " + String.join(", ", errores),
+                              "Componente incompatible", JOptionPane.WARNING_MESSAGE);
+                return;
             }
 
             armarPcPanel.updateResumen(controlPresentacionArmado.getEnsamblajeActual());

@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Implementación del DAO para Productos usando MongoDB.
  */
-public class ProductoDAO implements IProductoDAO {
+public class ProductoDAO {
     private final MongoCollection<Document> coleccion;
 
     public ProductoDAO() {
@@ -26,7 +26,6 @@ public class ProductoDAO implements IProductoDAO {
                 .getCollection("productos");
     }
 
-    @Override
     public List<ProductoEntidad> obtenerPorCategoria(String categoria) {
         List<ProductoEntidad> productos = new ArrayList<>();
         try (MongoCursor<Document> cursor = coleccion
@@ -39,7 +38,6 @@ public class ProductoDAO implements IProductoDAO {
         return productos;
     }
 
-    @Override
     public List<ProductoEntidad> obtenerTodos() {
         List<ProductoEntidad> productos = new ArrayList<>();
         try (MongoCursor<Document> cursor = coleccion.find().iterator()) {
@@ -50,7 +48,6 @@ public class ProductoDAO implements IProductoDAO {
         return productos;
     }
 
-    @Override
     public List<ProductoEntidad> obtenerPorCategoriaYMarca(String categoria, String marca) {
         List<ProductoEntidad> productos = new ArrayList<>();
         try (MongoCursor<Document> cursor = coleccion
@@ -67,7 +64,6 @@ public class ProductoDAO implements IProductoDAO {
         return productos;
     }
 
-    @Override
     public List<String> obtenerMarcasPorCategoria(String categoria) {
         return coleccion.distinct("marca",
                         Filters.eq("categoria", categoria),
@@ -75,13 +71,11 @@ public class ProductoDAO implements IProductoDAO {
                 .into(new ArrayList<>());
     }
 
-    @Override
     public ProductoEntidad obtenerPorId(String id) {
         Document doc = coleccion.find(Filters.eq("_id", new ObjectId(id))).first();
         return doc != null ? documentoAEntidad(doc) : null;
     }
 
-    @Override
     public boolean actualizarStock(String id, int cantidad) {
         return coleccion.updateOne(
                 Filters.eq("_id", new ObjectId(id)),
@@ -89,9 +83,7 @@ public class ProductoDAO implements IProductoDAO {
         ).getModifiedCount() > 0;
     }
 
-    @Override
     public long contarDisponiblesPorCategoria(String categoria) {
-        // Contar documentos con categoria y stock > 0
         return coleccion.countDocuments(Filters.and(
                 Filters.eq("categoria", categoria),
                 Filters.gt("stock", 0)
@@ -104,7 +96,9 @@ public class ProductoDAO implements IProductoDAO {
         producto.setNombre(doc.getString("nombre"));
         producto.setCategoria(doc.getString("categoria"));
         producto.setMarca(doc.getString("marca"));
-        producto.setPrecio(doc.getDouble("precio"));
+        Double precio = doc.getDouble("precio");
+        producto.setPrecio(precio != null ? java.math.BigDecimal.valueOf(precio) : java.math.BigDecimal.ZERO);
+
         producto.setStock(doc.getInteger("stock"));
         producto.setDescripcion(doc.getString("descripcion"));
         producto.setImagenUrl(doc.getString("imagenUrl"));
