@@ -105,6 +105,40 @@ public class ConfiguracionMapper {
     }
 
     /**
+     * Convierte un EnsamblajeDTO a ConfiguracionBO.
+     *
+     * @param ensamblaje El ensamblaje (configuración temporal) del usuario
+     * @param usuarioId El ID del usuario propietario
+     * @param nombre El nombre de la configuración
+     * @return ConfiguracionBO listo para ser convertido a Entidad
+     */
+    public static ConfiguracionBO ensamblajeABO(dto.EnsamblajeDTO ensamblaje, String usuarioId, String nombre) {
+        if (ensamblaje == null) {
+            return null;
+        }
+
+        ConfiguracionBO bo = new ConfiguracionBO();
+        bo.setUsuarioId(usuarioId);
+        bo.setNombre(nombre != null ? nombre : "Configuración " + java.time.LocalDateTime.now());
+        bo.setFechaCreacion(java.time.LocalDateTime.now());
+
+        List<java.util.Map<String, Object>> componentesList = new ArrayList<>();
+        for (dto.ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
+            java.util.Map<String, Object> compMap = new java.util.HashMap<>();
+            compMap.put("categoria", comp.getCategoria());
+            compMap.put("id", comp.getId());
+            compMap.put("nombre", comp.getNombre());
+            compMap.put("precio", comp.getPrecio());
+            compMap.put("marca", comp.getMarca());
+            componentesList.add(compMap);
+        }
+        bo.setComponentes(componentesList);
+        bo.setPrecioTotal(BigDecimal.valueOf(ensamblaje.getPrecioTotal()));
+
+        return bo;
+    }
+
+    /**
      * Convierte una lista de ConfiguracionBO a lista de ConfiguracionDTO.
      */
     public static List<ConfiguracionDTO> listaBOADTO(List<ConfiguracionBO> bos) {
