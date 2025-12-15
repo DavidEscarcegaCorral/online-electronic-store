@@ -4,6 +4,8 @@ import compartido.FramePrincipal;
 import armadoPC.ArmarPcPanel;
 import dto.ComponenteDTO;
 import dto.ConfiguracionDTO;
+import dto.EnsamblajeDTO;
+import entidades.ProductoEntidad;
 import venta.carrito.CarritoPanel;
 import venta.pedido.ConfirmarDetallesPedidoPanel;
 import venta.producto.ProductoPanel;
@@ -22,10 +24,7 @@ import ventacontrol.VentaFacade;
 /**
  * Controlador principal de navegación entre pantallas principales.
  *
- * PATRÓN: Mediador Jerárquico
- * - Se encarga SOLO de navegar entre secciones grandes (Inicio, Armar PC, Carrito, Producto).
- * - Delega la complejidad del flujo de armado a ControlFlujoArmado.
- * - Coordina la comunicación entre las vistas y los controles de presentación.
+ * PATRÓN: Mediador
  */
 public class ControlDeNavegacion implements IControlDeNavegacion {
 
@@ -76,8 +75,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
 
     /**
      * Carga 5 productos aleatorios como productos destacados en el menú principal.
-     * FLUJO CORRECTO: Controlador → obtiene productos → convierte a DTO → pasa a Vista
-     *
      * Los ProductoCard se configuran con el callback para abrir ProductoPanel.
      */
     private void cargarProductosDestacados() {
@@ -85,7 +82,6 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
             List<dto.ComponenteDTO> productosDestacados = controlPresentacionArmado.obtenerProductosAleatorios(5);
             menuPrincipalPanel.cargarProductosDestacados(productosDestacados);
 
-            // Configurar el callback para que al hacer clic en el botón o link, abra ProductoPanel
             menuPrincipalPanel.setOnProductoSeleccionado(this::mostrarProducto);
         } catch (Exception e) {
             System.err.println("Error al cargar productos destacados: " + e.getMessage());
@@ -102,7 +98,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private void configurarCallbacksGuardarConfiguracion() {
         Consumer<Void> guardarConfigHandler = unused -> {
             try {
-                dto.EnsamblajeDTO ensamblaje = controlPresentacionArmado.getEnsamblajeActual();
+                EnsamblajeDTO ensamblaje = controlPresentacionArmado.getEnsamblajeActual();
 
                 if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
                     mostrarMensaje(MENSAJE_CONFIG_VACIA + "guardar", "Configuración vacía", JOptionPane.WARNING_MESSAGE);
@@ -128,7 +124,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
     private void configurarCallbacksAgregarAlCarrito() {
         Consumer<Void> agregarCarritoHandler = unused -> {
             try {
-                dto.EnsamblajeDTO ensamblaje = controlPresentacionArmado.getEnsamblajeActual();
+                EnsamblajeDTO ensamblaje = controlPresentacionArmado.getEnsamblajeActual();
 
                 if (ensamblaje == null || ensamblaje.obtenerTodosComponentes().isEmpty()) {
                     mostrarMensaje(MENSAJE_CONFIG_VACIA + "añadir al carrito", "Configuración vacía", JOptionPane.WARNING_MESSAGE);
@@ -234,7 +230,7 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
         });
     }
 
-    private void agregarProductoEntidadAlCarrito(entidades.ProductoEntidad producto, int cantidad) {
+    private void agregarProductoEntidadAlCarrito(ProductoEntidad producto, int cantidad) {
         try {
             String productoId = producto.getId().toString();
             String nombreProducto = producto.getNombre();

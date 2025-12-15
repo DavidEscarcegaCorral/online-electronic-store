@@ -9,10 +9,6 @@ import java.util.List;
 
 /**
  * Implementación del control de presentación para el flujo de armado de PC.
- *
- * IMPORTANTE: Esta clase NO debe ser Singleton.
- * Cada instancia de la vista debe tener su propia instancia del controlador
- * para evitar conflictos de estado entre múltiples usuarios/sesiones.
  */
 public class ControlPresentacionArmado implements IControlPresentacionArmado {
 

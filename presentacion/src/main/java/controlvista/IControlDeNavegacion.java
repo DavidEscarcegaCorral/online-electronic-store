@@ -3,19 +3,16 @@ package controlvista;
 
 /**
  * Interfaz para el controlador principal de navegación entre pantallas.
- * Define el contrato para gestionar el flujo de la aplicación y la comunicación
- * entre la vista y los subsistemas de negocio.
  */
 public interface IControlDeNavegacion {
 
     /**
-     * Navega a la pantalla del Menú Principal (Home).
+     * Navega a la pantalla del Menú Principal.
      */
     void mostrarMenuPrincipal();
 
     /**
      * Inicia el flujo de Armado de PC (Wizard).
-     * Debe resetear el estado del ensamblaje si es necesario.
      */
     void mostrarArmarPc();
 

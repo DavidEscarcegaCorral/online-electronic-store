@@ -10,12 +10,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Control especializado para gestionar el flujo de armado de PC (wizard de pasos).
+ * Control especializado para gestionar el flujo de armado de PC.
  * <p>
- * PATRÓN: Mediador Jerárquico
- * - Se encarga exclusivamente de la lógica de navegación entre pasos del armado.
- * - Gestiona validaciones de categoría, marca y componentes obligatorios.
- * - Delega la lógica de negocio a ControlPresentacionArmado.
+ * PATRÓN: Mediador
  */
 public class ControlFlujoArmado {
 
@@ -165,9 +162,6 @@ public class ControlFlujoArmado {
 
     /**
      * Actualiza el contenido del panel este (derecha) según el paso actual.
-     * Panel Este en paso RESUMEN: muestra opciones (Guardar/Agregar al carrito)
-     * Panel Este en otros pasos: muestra resumen de la configuración
-     * Panel Oeste (izquierda): SIEMPRE visible con el menú de componentes
      */
     private void actualizarPanelEste(int nuevoIndice) {
         if (nuevoIndice == INDICE_RESUMEN) {
@@ -256,8 +250,7 @@ public class ControlFlujoArmado {
 
             List<String> errores = controlPresentacionArmado.avanzarConComponenteSeleccionado();
 
-            // Los productos incompatibles ya se filtran antes de mostrarse,
-            // pero si por alguna razón hay errores, los manejamos
+            // por si ocurren errores al mostrar los productos filtrados
             if (!errores.isEmpty()) {
                 mostrarMensaje("Error de compatibilidad: " + String.join(", ", errores),
                               "Componente incompatible", JOptionPane.WARNING_MESSAGE);
