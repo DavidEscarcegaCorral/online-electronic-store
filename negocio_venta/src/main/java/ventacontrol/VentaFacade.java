@@ -1,5 +1,6 @@
 package ventacontrol;
 
+import dto.EnsamblajeDTO;
 import ensamblajecontrol.ConfiguracionFacade;
 import ensamblajecontrol.IEnsamblajeFacade;
 import dao.UsuarioDAO;
@@ -74,7 +75,7 @@ public class VentaFacade implements IVentaFacade {
     }
 
     @Override
-    public String agregarConfiguracionAlCarrito(dto.EnsamblajeDTO ensamblaje) {
+    public String agregarConfiguracionAlCarrito(EnsamblajeDTO ensamblaje) {
         String clienteId = obtenerClienteIdDefecto();
 
         IEnsamblajeFacade fachadaControl = ConfiguracionFacade.getInstance();
