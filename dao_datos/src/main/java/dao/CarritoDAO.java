@@ -7,11 +7,12 @@ import entidades.CarritoEntidad;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -85,6 +86,7 @@ public class CarritoDAO {
             fechaActualizacion = new Date();
         }
 
+        // preparar lista de IDs de configuraciones
         List<ObjectId> ids = carrito.getConfiguracionesIds() != null
                 ? new ArrayList<>(carrito.getConfiguracionesIds())
                 : new ArrayList<>();
@@ -177,9 +179,9 @@ public class CarritoDAO {
 
         List<Document> productosDoc = (List<Document>) doc.get("productos");
         if (productosDoc != null) {
-            List<java.util.Map<String, Object>> productos = new ArrayList<>();
+            List<Map<String, Object>> productos = new ArrayList<>();
             for (Document prodDoc : productosDoc) {
-                java.util.Map<String, Object> prod = new java.util.HashMap<>();
+                Map<String, Object> prod = new HashMap<>();
                 prod.put("productoId", prodDoc.getString("productoId"));
                 prod.put("nombre", prodDoc.getString("nombre"));
                 prod.put("precio", prodDoc.getDouble("precio"));

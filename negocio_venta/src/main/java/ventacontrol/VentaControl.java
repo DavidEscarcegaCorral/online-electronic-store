@@ -10,6 +10,7 @@ import entidades.ConfiguracionEntidad;
 import entidades.PedidoEntidad;
 import entidades.ProductoEntidad;
 import objetosNegocio.CarritoBO;
+//import objetosNegocio.PedidoBO;
 import objetosNegocio.PedidoBO;
 import objetosNegocio.mappers.CarritoMapper;
 import objetosNegocio.mappers.PedidoMapper;
@@ -24,8 +25,6 @@ import java.util.Map;
 
 /**
  * Control de negocio para gestión de ventas y carritos.
- *
- * PATRÓN: Stateless
  */
 public class VentaControl {
     private static final Logger logger = LoggerFactory.getLogger(VentaControl.class);
@@ -91,7 +90,7 @@ public class VentaControl {
      */
     public String agregarConfiguracionAlCarrito(String clienteId, String configuracionId) {
         if (configuracionId == null) {
-            logger.warn("Intento de agregar configuración nula al carrito");
+            logger.warn("No se puede agregar una configuración nula al carrito");
             return null;
         }
 

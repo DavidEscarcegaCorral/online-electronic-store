@@ -27,7 +27,6 @@ public class Tabla extends JTable {
     }
 
     private void configStyle() {
-        //Background, foreground, font, row height
         setOpaque(true);
         this.setForeground(Color.white);
         this.setBackground(Estilos.COLOR_BACKGROUND);
@@ -39,7 +38,7 @@ public class Tabla extends JTable {
         this.setShowVerticalLines(false);
         this.setGridColor(Estilos.COLOR_BACKGROUND);
         setIntercellSpacing(new Dimension(0, 0));
-//        setBorder(null);
+        setBorder(null);
 
         this.setSelectionBackground(Estilos.COLOR_BACKGROUND);
         this.setSelectionForeground(this.getForeground());
@@ -91,17 +90,8 @@ public class Tabla extends JTable {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return getColumnName(column).equals("Ver");
-    }
-
-
-    public void addColumnButton() {
-        try {
-            getColumn("Ver").setCellRenderer(new ButtonRenderer());
-            getColumn("Ver").setCellEditor(new ButtonEditor(new JCheckBox(), owner));
-        } catch (IllegalArgumentException e) {
-            System.out.println("La tabla no tiene columna 'Ver'.");
-        }
+        String colName = getColumnName(column);
+        return "Ver".equals(colName) || "Cantidad".equals(colName);
     }
 
     @Override

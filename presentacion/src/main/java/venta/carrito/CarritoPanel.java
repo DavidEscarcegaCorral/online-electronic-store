@@ -38,6 +38,42 @@ public class CarritoPanel extends PanelBase {
 
         tablaPanel = new TablaPanel(framePadre);
 
+        tablaPanel.setOnCambioCantidad((productoId, nuevaCantidad) -> {
+            try {
+                boolean ok = controlVenta.actualizarCantidadItem(productoId, nuevaCantidad);
+                if (!ok) {
+                    JOptionPane.showMessageDialog(this, "No hay stock suficiente", "Sin stock", JOptionPane.WARNING_MESSAGE);
+                    actualizarCarrito();
+                } else {
+                    actualizarCarrito();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al actualizar la cantidad: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                actualizarCarrito();
+            }
+        });
+
+        tablaPanel.setOnEliminarProducto(productoId -> {
+            try {
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "¿Eliminar este producto del carrito?",
+                        "Confirmar eliminación",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    controlVenta.removerProductoDelCarrito(productoId);
+                    actualizarCarrito();
+                    if (totalPanel != null) {
+                        double total = controlVenta.calcularTotalCarrito();
+                        totalPanel.actualizarTotal(total);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al eliminar el producto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         // Panel Norte
         panelNorte.add(tituloLbl);
 
@@ -55,7 +91,7 @@ public class CarritoPanel extends PanelBase {
         esteBox.add(opcionPagoPanel);
         panelEste.add(esteBox);
 
-        // Eventos botones
+        // botones
         try {
             var vaciarBtn = opcionPagoPanel.getVaciarCarritoBtn();
             if (vaciarBtn != null) {
@@ -74,6 +110,14 @@ public class CarritoPanel extends PanelBase {
             var realizarPedidoBtn = opcionPagoPanel.getRealizarPedidoBtn();
             if (realizarPedidoBtn != null) {
                 realizarPedidoBtn.addActionListener(e -> {
+                    // verificar stock de todas las cantidades
+                    boolean tieneStock = controlVenta.verificarStockCarrito();
+                    if (!tieneStock) {
+                        JOptionPane.showMessageDialog(this, "No hay stock suficiente para los items del carrito.", "Sin stock", JOptionPane.WARNING_MESSAGE);
+                        actualizarCarrito();
+                        return;
+                    }
+
                     if (onRealizarPedido != null) {
                         onRealizarPedido.run();
                     }
@@ -88,20 +132,53 @@ public class CarritoPanel extends PanelBase {
         this.onRealizarPedido = onRealizarPedido;
     }
 
+    public void cancelarEdicionTabla() {
+        try {
+            if (tablaPanel != null) {
+                tablaPanel.cancelarEdicion();
+            }
+        } catch (Exception ignored) {}
+    }
+
     /**
-     * Actualiza el carrito obteniendo datos del controlador.
+     * Actualiza la cantidad mostrada de un producto en la tabla.
+     * @param productoId id del producto cuyo valor se esta modificando
      */
+    public boolean actualizarCantidadProductoEnVista(String productoId) {
+        try {
+            if (productoId == null) return false;
+            List<ItemCarritoDTO> productos = controlVenta.obtenerProductosDelCarrito();
+            if (productos == null) return false;
+
+            for (ItemCarritoDTO item : productos) {
+                if (productoId.equals(item.getProductoId())) {
+                    if (tablaPanel != null) {
+                        boolean updated = tablaPanel.actualizarCantidadEnFila(productoId, item.getCantidad());
+                        if (updated && totalPanel != null) {
+                            double total = controlVenta.calcularTotalCarrito();
+                            totalPanel.actualizarTotal(total);
+                        }
+                        return updated;
+                    }
+                    return false;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error al sincronizar cantidad de producto en vista: " + e.getMessage());
+            return false;
+        }
+    }
+
     public void actualizarCarrito() {
         try {
             List<ItemCarritoDTO> items = new ArrayList<>();
 
-            // Obtener productos individuales del carrito
             List<ItemCarritoDTO> productos = controlVenta.obtenerProductosDelCarrito();
             if (productos != null && !productos.isEmpty()) {
                 items.addAll(productos);
             }
 
-            // Obtener configuraciones del carrito
             List<ConfiguracionDTO> configuraciones = controlVenta.obtenerConfiguracionesEnCarrito();
             if (configuraciones != null) {
                 for (ConfiguracionDTO config : configuraciones) {

@@ -68,8 +68,6 @@ public class FramePrincipal extends JFrame {
 
     /**
      * Establece la barra de navegación con los listeners ya configurados.
-     * Permite que el controlador inyecte la barra personalizada.
-     *
      * @param barraNavegacion La barra de navegación configurada
      */
     public void setBarraDeNavegacion(BarraNavegacion barraNavegacion) {
