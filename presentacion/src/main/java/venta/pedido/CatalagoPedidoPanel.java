@@ -7,12 +7,12 @@ import controlpresentacion.ControlPresentacionVenta;
 import dao.CarritoDAO;
 import dao.UsuarioDAO;
 import entidades.UsuarioEntidad;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 public class CatalagoPedidoPanel extends JPanel {
     private List<ProductoPedidoCard> productoPedidoCardList;
@@ -59,7 +59,7 @@ public class CatalagoPedidoPanel extends JPanel {
                 mensajeVacio.setFont(new Font("Segoe UI", Font.PLAIN, 16));
                 add(mensajeVacio);
             } else {
-                // Cargar configuraciones (componentes individuales de cada configuración)
+                // Cargar configuraciones
                 if (tieneConfiguraciones) {
                     for (ConfiguracionDTO config : configuraciones) {
                         if (config.getComponentes() != null && !config.getComponentes().isEmpty()) {
@@ -68,7 +68,6 @@ public class CatalagoPedidoPanel extends JPanel {
                                 productoPedidoCardList.add(card);
                                 add(card);
 
-                                // Sumar al total
                                 Object precioObj = componente.get("precio");
                                 if (precioObj instanceof Number) {
                                     totalGeneral += ((Number) precioObj).doubleValue();
@@ -88,8 +87,7 @@ public class CatalagoPedidoPanel extends JPanel {
                         if (productoId != null && cantidad != null && cantidad > 0) {
                             entidades.ProductoEntidad producto = productoDAO.obtenerPorId(productoId);
                             if (producto != null) {
-                                // Crear un Map compatible con crearProductoPedidoCard
-                                Map<String, Object> productoMap = new java.util.HashMap<>();
+                                Map<String, Object> productoMap = new HashMap<>();
                                 productoMap.put("nombre", producto.getNombre() + " (x" + cantidad + ")");
 
                                 double precioUnitario = producto.getPrecio() != null ? producto.getPrecio().doubleValue() : 0.0;

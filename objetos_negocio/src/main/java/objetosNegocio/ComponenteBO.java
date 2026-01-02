@@ -69,7 +69,6 @@ public class ComponenteBO implements IComponenteBO {
             return null;
         }
 
-        // Usar ProductoMapper para hacer la conversión
         ProductoBO productoBO = ProductoMapper.entidadABO(entidad);
         return ProductoMapper.boADTO(productoBO);
     }

@@ -3,7 +3,7 @@ package controlpresentacion;
 import dto.ConfiguracionDTO;
 import dto.EnsamblajeDTO;
 import dto.MetodoPagoDTO;
-
+import dto.ItemCarritoDTO;
 import java.util.List;
 
 /**
@@ -38,7 +38,7 @@ public interface IControlPresentacionVenta {
      *
      * @return Lista de items del carrito como DTOs
      */
-    List<dto.ItemCarritoDTO> obtenerProductosDelCarrito();
+    List<ItemCarritoDTO> obtenerProductosDelCarrito();
 
     /**
      * Confirma el pedido y procesa el pago.
@@ -58,6 +58,27 @@ public interface IControlPresentacionVenta {
     boolean agregarProductoAlCarrito(String productoId, int cantidad);
 
     /**
+     * Remueve un producto del carrito por su id.
+     *
+     * @param productoId El id del producto a remover
+     */
+    void removerProductoDelCarrito(String productoId);
+
+    /**
+     * Actualiza la cantidad de un producto que ya está en el carrito.
+     * @param productoId id del producto
+     * @param nuevaCantidad nueva cantidad solicitada
+     * @return true si la actualización fue aceptada, false si excede stock u otro error
+     */
+    boolean actualizarCantidadItem(String productoId, int nuevaCantidad);
+
+    /**
+     * Verifica si todas las cantidades del carrito son válidas frente al inventario.
+     * @return true si hay stock suficiente para todos los items
+     */
+    boolean verificarStockCarrito();
+
+    /**
      * Agrega una configuración completa de PC al carrito.
      *
      * @param ensamblaje El ensamblaje/configuración a agregar
@@ -65,4 +86,3 @@ public interface IControlPresentacionVenta {
      */
     String agregarConfiguracionAlCarrito(EnsamblajeDTO ensamblaje);
 }
-

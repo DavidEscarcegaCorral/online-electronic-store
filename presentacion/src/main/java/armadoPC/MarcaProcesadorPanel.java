@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public class MarcaProcesadorPanel extends JPanel {
     private static MarcaProcesadorCard intel = new MarcaProcesadorCard("Intel", "/img/marcas/intelLogo.png");
     private static MarcaProcesadorCard amd = new MarcaProcesadorCard("AMD", "/img/marcas/AMDLogo.png");
-    private java.util.function.Consumer<String> onMarcaSelected;
+    private Consumer<String> onMarcaSelected;
     private String seleccionActual = null;
 
     public MarcaProcesadorPanel() {

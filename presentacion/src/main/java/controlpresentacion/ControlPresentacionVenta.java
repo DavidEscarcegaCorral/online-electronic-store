@@ -74,6 +74,21 @@ public class ControlPresentacionVenta implements IControlPresentacionVenta {
     }
 
     @Override
+    public void removerProductoDelCarrito(String productoId) {
+        ventaFacade.removerItemDelCarrito(productoId);
+    }
+
+    @Override
+    public boolean actualizarCantidadItem(String productoId, int nuevaCantidad) {
+        return ventaFacade.actualizarCantidadItem(productoId, nuevaCantidad);
+    }
+
+    @Override
+    public boolean verificarStockCarrito() {
+        return ventaFacade.verificarStockCarrito();
+    }
+
+    @Override
     public String agregarConfiguracionAlCarrito(EnsamblajeDTO ensamblaje) {
         return ventaFacade.agregarConfiguracionAlCarrito(ensamblaje);
     }

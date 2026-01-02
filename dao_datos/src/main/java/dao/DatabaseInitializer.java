@@ -33,8 +33,6 @@ public class DatabaseInitializer {
 
     /**
      * Ejecuta la inicialización de la base de datos.
-     * Retorna true si fue exitosa o si ya había datos (no necesita inicializar).
-     * Retorna false si hubo un error.
      */
     public static boolean ejecutarInicializacion() {
         try {
@@ -48,8 +46,7 @@ public class DatabaseInitializer {
 
     /**
      * Inicializa completamente la base de datos.
-     * SIEMPRE limpia y recrea toda la base de datos (DROP AND CREATE).
-     * Retorna true si fue exitosa.
+     * limpia y recrea toda la base de datos.
      */
     private boolean inicializarBaseDatos() {
         logger.info("   INICIALIZADOR DE BASE DE DATOS");
@@ -115,16 +112,8 @@ public class DatabaseInitializer {
     }
 
     /**
-     * Crea índices únicos en las colecciones para garantizar integridad de datos.
-     *
-     * <p>Índices creados:</p>
-     * <ul>
-     *   <li>carritos.clienteId: Índice único para evitar duplicados de carritos por usuario</li>
-     *   <li>usuarios.email: Índice único para evitar usuarios con email duplicado</li>
-     *   <li>configuraciones.usuarioId: Índice para búsquedas rápidas por usuario</li>
-     * </ul>
-     *
-     * <p>Estos índices previenen condiciones de carrera (race conditions) en acceso concurrente.</p>
+     * Crea índices únicos en las colecciones para integridad de datos.
+     * prevenir race conditions en acceso concurrente
      */
     private void crearIndices() {
         try {
@@ -193,53 +182,53 @@ public class DatabaseInitializer {
     private void insertarProductos() {
         MongoCollection<Document> productosCol = database.getCollection("productos");
 
-        List<Document> todosProductos = new ArrayList<>();
+        List<Document> inventario = new ArrayList<>();
 
         // Procesadores
-        todosProductos.addAll(crearProcesadores());
+        inventario.addAll(crearProcesadores());
 
         // Tarjetas Madre
-        todosProductos.addAll(crearTarjetasMadre());
+        inventario.addAll(crearTarjetasMadre());
 
         // Memorias RAM
-        todosProductos.addAll(crearMemoriasRAM());
+        inventario.addAll(crearMemoriasRAM());
 
         // Tarjetas de Video
-        todosProductos.addAll(crearTarjetasVideo());
+        inventario.addAll(crearTarjetasVideo());
 
         // Almacenamiento
-        todosProductos.addAll(crearAlmacenamiento());
+        inventario.addAll(crearAlmacenamiento());
 
         // Fuentes de Poder
-        todosProductos.addAll(crearFuentesPoder());
+        inventario.addAll(crearFuentesPoder());
 
         // Gabinetes
-        todosProductos.addAll(crearGabinetes());
+        inventario.addAll(crearGabinetes());
 
         // Disipadores
-        todosProductos.addAll(crearDisipadores());
+        inventario.addAll(crearDisipadores());
 
         // Ventiladores
-        todosProductos.addAll(crearVentiladores());
+        inventario.addAll(crearVentiladores());
 
         // Monitores
-        todosProductos.addAll(crearMonitores());
+        inventario.addAll(crearMonitores());
 
         // Kits Teclado/Ratón
-        todosProductos.addAll(crearKitsTecladoRaton());
+        inventario.addAll(crearKitsTecladoRaton());
 
         // Redes e Internet
-        todosProductos.addAll(crearRedes());
+        inventario.addAll(crearRedes());
 
         // Insertar todos
-        if (!todosProductos.isEmpty()) {
-            productosCol.insertMany(todosProductos);
+        if (!inventario.isEmpty()) {
+            productosCol.insertMany(inventario);
 
-            for (Document doc : todosProductos) {
+            for (Document doc : inventario) {
                 productosIds.add(doc.getObjectId("_id"));
             }
 
-            logger.info("{} productos insertados", todosProductos.size());
+            logger.info("{} productos insertados", inventario.size());
         }
     }
 
@@ -299,9 +288,6 @@ public class DatabaseInitializer {
         }
     }
 
-    /**
-     * Muestra estadísticas finales de la base de datos
-     */
     private void mostrarInserts() {
         logger.info("\nRegistros insertados:");
         logger.info("Usuarios:         {}", database.getCollection("usuarios").countDocuments());

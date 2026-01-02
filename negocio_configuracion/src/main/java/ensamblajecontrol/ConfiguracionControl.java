@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class ConfiguracionControl implements IConfiguracionControl {
     private final ConfiguracionDAO configuracionDAO;
@@ -229,7 +230,7 @@ public class ConfiguracionControl implements IConfiguracionControl {
 
         List<T> copia = new ArrayList<>(lista);
         List<T> seleccionados = new ArrayList<>();
-        java.util.Random random = new java.util.Random();
+        Random random = new Random();
 
         for (int i = 0; i < cantidad && !copia.isEmpty(); i++) {
             int indice = random.nextInt(copia.size());

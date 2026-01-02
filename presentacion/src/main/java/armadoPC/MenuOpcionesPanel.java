@@ -11,13 +11,14 @@ import entidades.ConfiguracionEntidad;
 import entidades.UsuarioEntidad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
 public class MenuOpcionesPanel extends JPanel {
@@ -161,15 +162,15 @@ public class MenuOpcionesPanel extends JPanel {
     private boolean validarRequisitosMinimos(dto.EnsamblajeDTO ensamblaje) {
         if (ensamblaje == null) return false;
 
-        java.util.List<dto.ComponenteDTO> componentes = ensamblaje.obtenerTodosComponentes();
+        List<dto.ComponenteDTO> componentes = ensamblaje.obtenerTodosComponentes();
         if (componentes == null || componentes.isEmpty()) return false;
 
-        java.util.Set<String> categoriasPresentes = new java.util.HashSet<>();
+        Set<String> categoriasPresentes = new HashSet<>();
         for (dto.ComponenteDTO comp : componentes) {
             categoriasPresentes.add(comp.getCategoria());
         }
 
-        java.util.Set<String> categoriasObligatorias = java.util.Set.of(
+        Set<String> categoriasObligatorias = Set.of(
             "Procesador",
             "Tarjeta Madre",
             "RAM",

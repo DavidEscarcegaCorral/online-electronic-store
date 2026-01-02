@@ -1,13 +1,18 @@
 package objetosNegocio.mappers;
 
 import dto.ConfiguracionDTO;
+import dto.EnsamblajeDTO;
+import dto.ComponenteDTO;
 import entidades.ConfiguracionEntidad;
 import objetosNegocio.ConfiguracionBO;
 import org.bson.types.ObjectId;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Mapper unificado para ConfiguraciónEntidada a ConfiguracionBO a ConfiguracionDTO.
@@ -112,19 +117,19 @@ public class ConfiguracionMapper {
      * @param nombre El nombre de la configuración
      * @return ConfiguracionBO listo para ser convertido a Entidad
      */
-    public static ConfiguracionBO ensamblajeABO(dto.EnsamblajeDTO ensamblaje, String usuarioId, String nombre) {
+    public static ConfiguracionBO ensamblajeABO(EnsamblajeDTO ensamblaje, String usuarioId, String nombre) {
         if (ensamblaje == null) {
             return null;
         }
 
         ConfiguracionBO bo = new ConfiguracionBO();
         bo.setUsuarioId(usuarioId);
-        bo.setNombre(nombre != null ? nombre : "Configuración " + java.time.LocalDateTime.now());
-        bo.setFechaCreacion(java.time.LocalDateTime.now());
+        bo.setNombre(nombre != null ? nombre : "Configuración " + LocalDateTime.now());
+        bo.setFechaCreacion(LocalDateTime.now());
 
-        List<java.util.Map<String, Object>> componentesList = new ArrayList<>();
-        for (dto.ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
-            java.util.Map<String, Object> compMap = new java.util.HashMap<>();
+        List<Map<String, Object>> componentesList = new ArrayList<>();
+        for (ComponenteDTO comp : ensamblaje.obtenerTodosComponentes()) {
+            Map<String, Object> compMap = new HashMap<>();
             compMap.put("categoria", comp.getCategoria());
             compMap.put("id", comp.getId());
             compMap.put("nombre", comp.getNombre());

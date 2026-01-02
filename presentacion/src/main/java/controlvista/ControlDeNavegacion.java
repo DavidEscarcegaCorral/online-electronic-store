@@ -243,7 +243,12 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     "Producto Agregado",
                     JOptionPane.INFORMATION_MESSAGE
                 );
-                carritoPanel.actualizarCarrito();
+                // Intentar sincronizar solo la fila en la vista; si no existe, refrescar todo
+                boolean synced = carritoPanel.actualizarCantidadProductoEnVista(productoId);
+                if (!synced) {
+                    carritoPanel.cancelarEdicionTabla();
+                    carritoPanel.actualizarCarrito();
+                }
             } else {
                 mostrarMensaje("Error al agregar el producto al carrito", TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             }
@@ -265,7 +270,12 @@ public class ControlDeNavegacion implements IControlDeNavegacion {
                     "Producto Agregado",
                     JOptionPane.INFORMATION_MESSAGE
                 );
-                carritoPanel.actualizarCarrito();
+                // Intentar sincronizar solo la fila en la vista; si no existe, refrescar todo
+                boolean synced = carritoPanel.actualizarCantidadProductoEnVista(productoId);
+                if (!synced) {
+                    carritoPanel.cancelarEdicionTabla();
+                    carritoPanel.actualizarCarrito();
+                }
             } else {
                 mostrarMensaje("Error al agregar el producto al carrito", TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             }

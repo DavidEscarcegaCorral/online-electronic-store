@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.function.Consumer;
 
 public class CategoriaCard extends JPanel {
     private static final Logger logger = LoggerFactory.getLogger(CategoriaCard.class);
@@ -18,7 +19,7 @@ public class CategoriaCard extends JPanel {
 
     private String nombreCategoria;
     private String imagenUrl;
-    private java.util.function.Consumer<String> onCategoriaSelected;
+    private Consumer<String> onCategoriaSelected;
     private boolean seleccionado = false;
 
     public CategoriaCard(String nombreCategoria, String imagenUrl) {
@@ -30,7 +31,7 @@ public class CategoriaCard extends JPanel {
         setupListeners();
     }
 
-    public void setOnCategoriaSelected(java.util.function.Consumer<String> callback) {
+    public void setOnCategoriaSelected(Consumer<String> callback) {
         this.onCategoriaSelected = callback;
     }
 
